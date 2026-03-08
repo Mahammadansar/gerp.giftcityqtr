@@ -1,0 +1,81 @@
+<div class="portal-content">
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 page-header-modern">
+        <div>
+          <h2>{{ title }}</h2>
+          <p class="text-muted mb-0">{{ subtitle }}</p>
+        </div>
+        <span class="demo-badge-page"><i class="feather icon-info me-1"></i>Demo Data</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-6 mb-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light border-0 py-3">
+          <h6 class="mb-0 fw-semibold">Custom User Roles</h6>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-modern mb-0">
+            <thead>
+              <tr>
+                <th>Role</th>
+                <th class="text-end">Users</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let r of roles">
+                <td class="fw-semibold">{{ r.name }}</td>
+                <td class="text-end">{{ r.users }}</td>
+                <td class="small text-muted">{{ r.description }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6 mb-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light border-0 py-3">
+          <h6 class="mb-0 fw-semibold">Business Workflows</h6>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-modern mb-0">
+            <thead>
+              <tr>
+                <th>Workflow</th>
+                <th>Type</th>
+                <th class="text-end">Steps</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let w of workflows">
+                <td class="fw-semibold">{{ w.name }}</td>
+                <td>{{ w.type }}</td>
+                <td class="text-end">{{ w.steps }}</td>
+                <td><span class="status-badge-modern status-approved">{{ w.status }}</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-body">
+      <h6 class="fw-semibold mb-3">Professional + Settings</h6>
+      <ul class="list-unstyled mb-0 small">
+        <li class="py-2 border-bottom"><i class="feather icon-globe me-2 text-muted"></i>Custom domain</li>
+        <li class="py-2 border-bottom"><i class="feather icon-layers me-2 text-muted"></i>Custom modules</li>
+        <li class="py-2 border-bottom"><i class="feather icon-check-square me-2 text-muted"></i>Custom field validation</li>
+        <li class="py-2 border-bottom"><i class="feather icon-code me-2 text-muted"></i>Custom functions</li>
+        <li class="py-2"><i class="feather icon-maximize-2 me-2 text-muted"></i>Embed web pages / apps</li>
+      </ul>
+    </div>
+  </div>
+</div>

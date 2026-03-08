@@ -1,0 +1,240 @@
+<div class="portal-content dashboard-pro">
+  <!-- Page Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="dashboard-header">
+        <div class="header-content">
+          <div>
+            <h1 class="dashboard-title">ERP Dashboard</h1>
+            <p class="dashboard-subtitle">Gift City Qatar — business performance at a glance.</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-icon-modern" title="Refresh">
+              <i class="feather icon-refresh-cw"></i>
+            </button>
+            <button class="btn btn-icon-modern" title="Settings">
+              <i class="feather icon-settings"></i>
+            </button>
+            <span class="badge badge-demo">Gift City Qatar</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI Cards Row -->
+  <div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6 col-12" *ngFor="let k of kpis; let i = index">
+      <div class="kpi-card-pro" [attr.data-index]="i">
+        <div class="kpi-card-top">
+          <div class="kpi-icon-container">
+            <div class="kpi-icon-bg">
+              <i [class]="k.icon"></i>
+            </div>
+          </div>
+          <div class="kpi-trend-badge" *ngIf="k.trend">
+            <i [class]="k.trend > 0 ? 'feather icon-trending-up' : 'feather icon-trending-down'"></i>
+            <span>{{ k.trend > 0 ? '+' : '' }}{{ k.trend }}%</span>
+          </div>
+        </div>
+        <div class="kpi-card-content">
+          <div class="kpi-main-value">
+            <span class="kpi-number">{{ k.value | number:'1.0-0' }}</span>
+            <span class="kpi-currency" *ngIf="k.subtitle === 'AED'">AED</span>
+          </div>
+          <h4 class="kpi-title">{{ k.label }}</h4>
+          <div class="kpi-meta">
+            <span class="kpi-period">{{ k.subtitle }}</span>
+            <div class="kpi-sparkline" *ngIf="k.chartData">
+              <svg class="sparkline" viewBox="0 0 100 30" preserveAspectRatio="none">
+                <polyline [attr.points]="k.chartData" fill="none" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Revenue Chart & Quick Stats -->
+  <div class="row g-4 mb-4">
+    <div class="col-xl-8 col-lg-7">
+      <div class="chart-card-pro">
+        <div class="chart-header">
+          <div>
+            <h5 class="chart-title">Revenue Overview</h5>
+            <p class="chart-subtitle">Last 6 months performance</p>
+          </div>
+          <div class="chart-controls">
+            <select class="form-select form-select-sm">
+              <option>6 Months</option>
+              <option>12 Months</option>
+              <option>Year to Date</option>
+            </select>
+          </div>
+        </div>
+        <div class="chart-body">
+          <div class="revenue-chart">
+            <div class="chart-bars">
+              <div class="chart-bar" *ngFor="let month of revenueData">
+                <div class="bar-value">{{ (month.amount / 1000) | number:'1.0-0' }}K</div>
+                <div class="bar-fill" [style.height.%]="month.value"></div>
+              </div>
+            </div>
+            <div class="chart-labels">
+              <span *ngFor="let month of revenueData">{{ month.label }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4 col-lg-5">
+      <div class="quick-stats-card">
+        <div class="quick-stats-header">
+          <h5 class="chart-title">Quick Stats</h5>
+        </div>
+        <div class="quick-stats-body">
+          <div class="stat-item" *ngFor="let stat of quickStats">
+            <div class="stat-icon">
+              <i [class]="stat.icon"></i>
+            </div>
+            <div class="stat-info">
+              <div class="stat-label">{{ stat.label }}</div>
+              <div class="stat-value">{{ stat.value }}</div>
+            </div>
+            <div class="stat-change" [ngClass]="stat.change > 0 ? 'positive' : 'negative'">
+              <i [class]="stat.change > 0 ? 'feather icon-arrow-up' : 'feather icon-arrow-down'"></i>
+              <span>{{ stat.change > 0 ? '+' : '' }}{{ stat.change }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity & Performance Row -->
+  <div class="row g-4 mb-4">
+    <div class="col-xl-8 col-lg-7">
+      <div class="activity-card-pro">
+        <div class="card-header-pro">
+          <div>
+            <h5 class="card-title-pro">Recent Activity</h5>
+            <p class="card-subtitle-pro">Latest transactions and updates</p>
+          </div>
+          <a href="#" class="btn-link-pro">View All <i class="feather icon-arrow-right"></i></a>
+        </div>
+        <div class="activity-timeline">
+          <div class="timeline-item" *ngFor="let activity of recentActivities">
+            <div class="timeline-marker" [ngClass]="activity.type">
+              <i [class]="activity.icon"></i>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <h6 class="timeline-title">{{ activity.title }}</h6>
+                <span class="timeline-time">{{ activity.time }}</span>
+              </div>
+              <p class="timeline-description" *ngIf="activity.description">{{ activity.description }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4 col-lg-5">
+      <div class="performance-card-pro">
+        <div class="card-header-pro">
+          <div>
+            <h5 class="card-title-pro">Performance Metrics</h5>
+            <p class="card-subtitle-pro">Key performance indicators</p>
+          </div>
+          <span class="badge badge-success">On Track</span>
+        </div>
+        <div class="performance-metrics">
+          <div class="metric-item" *ngFor="let perf of performance">
+            <div class="metric-header">
+              <span class="metric-label">{{ perf.label }}</span>
+              <span class="metric-value">{{ perf.value }}</span>
+            </div>
+            <div class="metric-progress">
+              <div class="progress-bar-pro" [ngClass]="'progress-' + perf.color">
+                <div class="progress-fill" [style.width.%]="perf.percentage"></div>
+              </div>
+              <span class="progress-text">{{ perf.percentage }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Deals & Client Segments -->
+  <div class="row g-4">
+    <div class="col-xl-6 col-lg-6">
+      <div class="data-table-card">
+        <div class="card-header-pro">
+          <div>
+            <h5 class="card-title-pro">Top Orders This Month</h5>
+            <p class="card-subtitle-pro">Highest value orders</p>
+          </div>
+          <a href="#" class="btn-link-pro">View All</a>
+        </div>
+        <div class="table-responsive-modern">
+          <table class="table table-modern-compact">
+            <thead>
+              <tr>
+                <th>Project</th>
+                <th>Client</th>
+                <th class="text-end">Value</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let deal of topDeals">
+                <td>
+                  <div class="deal-info">
+                    <strong>{{ deal.project }}</strong>
+                    <small>{{ deal.unit }}</small>
+                  </div>
+                </td>
+                <td>{{ deal.client }}</td>
+                <td class="text-end">
+                  <strong>{{ deal.value | number:'1.0-0' }} <small>AED</small></strong>
+                </td>
+                <td>
+                  <span class="status-badge" [ngClass]="'status-' + deal.status.toLowerCase()">
+                    {{ deal.status }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-6 col-lg-6">
+      <div class="segments-card">
+        <div class="card-header-pro">
+          <div>
+            <h5 class="card-title-pro">Client Segments</h5>
+            <p class="card-subtitle-pro">Distribution by segment</p>
+          </div>
+        </div>
+        <div class="segments-body">
+          <div class="segment-item" *ngFor="let segment of clientSegments">
+            <div class="segment-header">
+              <div class="segment-info">
+                <span class="segment-label">{{ segment.label }}</span>
+                <span class="segment-count">{{ segment.count }} clients</span>
+              </div>
+              <span class="segment-percentage">{{ segment.percentage }}%</span>
+            </div>
+            <div class="segment-bar">
+              <div class="segment-fill" 
+                   [style.width.%]="segment.percentage"
+                   [ngClass]="'segment-' + segment.type"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

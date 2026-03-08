@@ -1,0 +1,163 @@
+<div class="portal-content">
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 page-header-modern">
+        <div>
+          <h2>{{ title }}</h2>
+          <p class="text-muted mb-0">{{ subtitle }}</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="demo-badge-page"><i class="feather icon-info me-1"></i>Demo Data</span>
+          <button type="button" class="btn btn-primary btn-modern" (click)="toggleGenerateForm()">
+            <i class="feather icon-plus me-2"></i>{{ showGenerateForm ? 'Cancel' : 'Generate Invoice' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generate Invoice Form -->
+  <div class="card border-0 shadow-sm mb-4" *ngIf="showGenerateForm">
+    <div class="card-header bg-light border-0 py-3 d-flex justify-content-between align-items-center">
+      <h5 class="mb-0 fw-semibold">New Invoice</h5>
+      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="toggleGenerateForm()">
+        <i class="feather icon-x"></i>
+      </button>
+    </div>
+    <div class="card-body">
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Client name</label>
+          <input type="text" class="form-control form-control-modern" [(ngModel)]="form.client" placeholder="Client or company name">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label fw-semibold">Invoice date</label>
+          <input type="date" class="form-control form-control-modern" [(ngModel)]="form.invoiceDate">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label fw-semibold">Due date</label>
+          <input type="date" class="form-control form-control-modern" [(ngModel)]="form.dueDate">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label fw-semibold">Currency</label>
+          <select class="form-select form-select-modern" [(ngModel)]="form.currency">
+            <option value="AED">AED</option>
+            <option value="USD">USD</option>
+            <option value="QAR">QAR</option>
+          </select>
+        </div>
+      </div>
+
+      <label class="form-label fw-semibold">Line items</label>
+      <div class="table-responsive mb-3">
+        <table class="table table-bordered table-sm align-middle">
+          <thead class="table-light">
+            <tr>
+              <th style="width: 40%">Description</th>
+              <th style="width: 15%">Qty</th>
+              <th style="width: 20%">Unit price</th>
+              <th style="width: 20%">Amount</th>
+              <th style="width: 5%"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let line of lines; let i = index">
+              <td><input type="text" class="form-control form-control-sm" [(ngModel)]="line.description" placeholder="Item description"></td>
+              <td><input type="number" class="form-control form-control-sm" [(ngModel)]="line.qty" (ngModelChange)="updateLineAmount(i)" min="1"></td>
+              <td><input type="number" class="form-control form-control-sm" [(ngModel)]="line.unitPrice" (ngModelChange)="updateLineAmount(i)" min="0" step="0.01"></td>
+              <td class="text-end">{{ (line.qty * line.unitPrice) | number:'1.2-2' }}</td>
+              <td>
+                <button type="button" class="btn btn-sm btn-outline-danger p-1" (click)="removeLine(i)" [disabled]="lines.length === 1" title="Remove line">
+                  <i class="feather icon-trash-2"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <button type="button" class="btn btn-outline-primary btn-sm mb-3" (click)="addLine()">
+        <i class="feather icon-plus me-1"></i>Add line
+      </button>
+
+      <div class="row justify-content-end">
+        <div class="col-md-4">
+          <div class="mb-2 d-flex justify-content-between">
+            <span class="text-muted">Subtotal</span>
+            <span>{{ subtotal | number:'1.2-2' }} {{ form.currency }}</span>
+          </div>
+          <div class="mb-2 d-flex justify-content-between align-items-center">
+            <span class="text-muted">Tax (%)</span>
+            <input type="number" class="form-control form-control-sm w-25 d-inline-block" [(ngModel)]="form.taxPercent" min="0" max="100" step="0.5">
+          </div>
+          <div class="mb-2 d-flex justify-content-between">
+            <span class="text-muted">Tax amount</span>
+            <span>{{ taxAmount | number:'1.2-2' }} {{ form.currency }}</span>
+          </div>
+          <div class="d-flex justify-content-between fw-bold fs-5 border-top pt-2">
+            <span>Total</span>
+            <span>{{ total | number:'1.2-2' }} {{ form.currency }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-3">
+        <label class="form-label fw-semibold">Notes (optional)</label>
+        <textarea class="form-control form-control-modern" [(ngModel)]="form.notes" rows="2" placeholder="Payment terms, bank details, etc."></textarea>
+      </div>
+
+      <div class="mt-4 d-flex gap-2">
+        <button type="button" class="btn btn-primary btn-modern" (click)="saveInvoice()">
+          <i class="feather icon-save me-2"></i>Save Invoice
+        </button>
+        <button type="button" class="btn btn-outline-secondary" (click)="toggleGenerateForm()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Invoices list -->
+  <div class="card table-card-modern">
+    <div class="card-header border-0 bg-light py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <h5 class="mb-0 fw-semibold">Invoices</h5>
+      <span class="text-muted small">{{ invoices.length }} invoice(s)</span>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-modern table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Invoice No</th>
+            <th>Client</th>
+            <th>Date</th>
+            <th>Due Date</th>
+            <th class="text-end">Amount</th>
+            <th>Status</th>
+            <th class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let inv of invoices">
+            <td><span class="ref-badge">{{ inv.invoiceNo }}</span></td>
+            <td class="fw-semibold">{{ inv.client }}</td>
+            <td>{{ inv.date }}</td>
+            <td>{{ inv.dueDate }}</td>
+            <td class="text-end">{{ inv.amount | number:'1.0-0' }} {{ inv.currency }}</td>
+            <td>
+              <span class="status-badge-modern" [ngClass]="{
+                'status-approved': inv.status === 'Paid',
+                'status-pending': inv.status === 'Sent' || inv.status === 'Draft',
+                'status-rejected': inv.status === 'Overdue'
+              }">{{ inv.status }}</span>
+            </td>
+            <td class="text-center">
+              <button type="button" class="btn btn-sm btn-outline-primary me-1" (click)="previewInvoice(inv)" title="Preview">
+                <i class="feather icon-eye"></i>
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" (click)="downloadInvoice(inv)" title="Download PDF">
+                <i class="feather icon-download"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

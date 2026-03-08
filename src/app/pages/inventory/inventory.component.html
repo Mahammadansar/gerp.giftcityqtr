@@ -1,0 +1,92 @@
+<div class="portal-content">
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 page-header-modern">
+        <div>
+          <h2>{{ title }}</h2>
+          <p class="text-muted mb-0">{{ subtitle }}</p>
+        </div>
+        <span class="demo-badge-page"><i class="feather icon-info me-1"></i>Demo Data</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="stat-icon-box me-3"><i class="feather icon-package"></i></div>
+            <div>
+              <div class="text-muted small">Total SKUs</div>
+              <div class="h4 mb-0 fw-bold">6</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="stat-icon-box me-3"><i class="feather icon-alert-triangle"></i></div>
+            <div>
+              <div class="text-muted small">Low Stock</div>
+              <div class="h4 mb-0 fw-bold text-warning">1</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="stat-icon-box me-3"><i class="feather icon-check-circle"></i></div>
+            <div>
+              <div class="text-muted small">In Stock</div>
+              <div class="h4 mb-0 fw-bold text-success">5</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card table-card-modern">
+    <div class="card-header border-0 bg-light py-3">
+      <h5 class="mb-0 fw-semibold">Inventory Items</h5>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-modern table-hover mb-0">
+        <thead>
+          <tr>
+            <th>SKU</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th class="text-end">Qty</th>
+            <th>Unit</th>
+            <th class="text-end">Reorder At</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let i of items">
+            <td><span class="ref-badge">{{ i.sku }}</span></td>
+            <td class="fw-semibold">{{ i.name }}</td>
+            <td>{{ i.category }}</td>
+            <td class="text-end">{{ i.qty | number }}</td>
+            <td>{{ i.unit }}</td>
+            <td class="text-end">{{ i.reorderLevel }}</td>
+            <td>
+              <span class="status-badge-modern" [ngClass]="{
+                'status-approved': i.status === 'In Stock',
+                'status-pending': i.status === 'Low Stock'
+              }">{{ i.status }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

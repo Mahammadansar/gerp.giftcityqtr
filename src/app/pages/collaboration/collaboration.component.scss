@@ -1,0 +1,23 @@
+.thread-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #b71c1c 0%, #8b0000 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+}
+.collab-placeholder-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: rgba(183, 28, 28, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  i { font-size: 2rem; color: #b71c1c; }
+}

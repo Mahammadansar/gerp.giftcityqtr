@@ -1,0 +1,72 @@
+<div class="portal-content">
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 page-header-modern">
+        <div>
+          <h2>{{ title }}</h2>
+          <p class="text-muted mb-0">{{ subtitle }}</p>
+        </div>
+        <span class="demo-badge-page"><i class="feather icon-info me-1"></i>Demo Data</span>
+      </div>
+    </div>
+  </div>
+
+  <ul class="nav nav-tabs nav-tabs-modern mb-4">
+    <li class="nav-item"><a class="nav-link" [class.active]="activeTab === 'timesheets'" href="javascript:void(0)" (click)="activeTab = 'timesheets'">Timesheets</a></li>
+    <li class="nav-item"><a class="nav-link" [class.active]="activeTab === 'profitability'" href="javascript:void(0)" (click)="activeTab = 'profitability'">Project Profitability</a></li>
+  </ul>
+
+  <div class="card table-card-modern" *ngIf="activeTab === 'timesheets'">
+    <div class="card-header border-0 bg-light py-3"><h5 class="mb-0 fw-semibold">Recent Timesheet Entries</h5></div>
+    <div class="table-responsive">
+      <table class="table table-modern table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Project</th>
+            <th>Date</th>
+            <th class="text-end">Hours</th>
+            <th>Task</th>
+            <th>Billable</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let t of timesheets">
+            <td class="fw-semibold">{{ t.project }}</td>
+            <td>{{ t.date }}</td>
+            <td class="text-end">{{ t.hours }}h</td>
+            <td>{{ t.task }}</td>
+            <td><span class="status-badge-modern" [ngClass]="t.billable ? 'status-approved' : 'status-draft'">{{ t.billable ? 'Yes' : 'No' }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card table-card-modern" *ngIf="activeTab === 'profitability'">
+    <div class="card-header border-0 bg-light py-3"><h5 class="mb-0 fw-semibold">Project Profitability</h5></div>
+    <div class="table-responsive">
+      <table class="table table-modern table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Project</th>
+            <th>Client</th>
+            <th class="text-end">Revenue</th>
+            <th class="text-end">Cost</th>
+            <th class="text-end">Profit</th>
+            <th class="text-end">Margin</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of profitability">
+            <td class="fw-semibold">{{ p.project }}</td>
+            <td>{{ p.client }}</td>
+            <td class="text-end">{{ p.revenue | number }} AED</td>
+            <td class="text-end">{{ p.cost | number }} AED</td>
+            <td class="text-end text-success fw-semibold">{{ p.profit | number }} AED</td>
+            <td class="text-end">{{ p.margin }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,72 @@
+/* You can add global styles to this file, and also import other style files */
+
+// Global icon font
+@import "./assets/fonts/feather/style.css";
+
+// 3rd party plugins
+@import '~perfect-scrollbar/css/perfect-scrollbar.css';
+// @import "~metismenujs/scss/metismenujs"; // Commented out - package not installed
+
+// NobleUI styles for LTR
+@import "./assets/scss/style";
+
+// Gift City Qatar ERP Styles
+@import "./app/shared/color-system";
+@import "./app/shared/styles-modern";
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+// Additional utility classes
+.gap-2 {
+    gap: 0.5rem;
+}
+
+.gap-3 {
+    gap: 1rem;
+}
+
+.gap-4 {
+    gap: 1.5rem;
+}
+
+// Sidebar toggle states (global so body class works)
+body.sidebar-closed {
+  @media (min-width: 992px) {
+    .sidebar {
+      transform: translateX(-100%) !important;
+    }
+    .page-wrapper {
+      margin-left: 0 !important;
+      width: 100% !important;
+    }
+    .navbar {
+      left: 0 !important;
+      width: 100% !important;
+    }
+  }
+}
+body.sidebar-open {
+  @media (max-width: 991px) {
+    .sidebar {
+      transform: translateX(0) !important;
+    }
+    .main-wrapper::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 998;
+      opacity: 1;
+      visibility: visible;
+      pointer-events: all;
+    }
+  }
+}

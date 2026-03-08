@@ -1,0 +1,45 @@
+<div class="portal-content">
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 page-header-modern">
+        <div>
+          <h2>{{ title }}</h2>
+          <p class="text-muted mb-0">{{ subtitle }}</p>
+        </div>
+        <span class="demo-badge-page"><i class="feather icon-info me-1"></i>Demo Data</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card table-card-modern">
+    <div class="card-header border-0 bg-light py-3">
+      <h5 class="mb-0 fw-semibold">Fixed Assets (Pro)</h5>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-modern table-hover mb-0">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Purchase Date</th>
+            <th class="text-end">Value (AED)</th>
+            <th>Depreciation</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let a of assets">
+            <td><span class="ref-badge">{{ a.id }}</span></td>
+            <td class="fw-semibold">{{ a.name }}</td>
+            <td>{{ a.category }}</td>
+            <td>{{ a.purchaseDate }}</td>
+            <td class="text-end">{{ a.value | number }}</td>
+            <td>{{ a.depreciation }}</td>
+            <td><span class="status-badge-modern status-approved">{{ a.status }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

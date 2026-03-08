@@ -1,0 +1,118 @@
+<div class="portal-content">
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 page-header-modern">
+        <div>
+          <h2>{{ title }}</h2>
+          <p class="text-muted mb-0">{{ subtitle }}</p>
+        </div>
+        <span class="demo-badge-page"><i class="feather icon-info me-1"></i>Demo Data</span>
+      </div>
+    </div>
+  </div>
+
+  <ul class="nav nav-tabs nav-tabs-modern mb-4">
+    <li class="nav-item"><a class="nav-link" [class.active]="activeTab === 'bills'" href="javascript:void(0)" (click)="activeTab = 'bills'">Vendor Bills</a></li>
+    <li class="nav-item"><a class="nav-link" [class.active]="activeTab === 'retainers'" href="javascript:void(0)" (click)="activeTab = 'retainers'">Retainers</a></li>
+    <li class="nav-item"><a class="nav-link" [class.active]="activeTab === 'multi'" href="javascript:void(0)" (click)="activeTab = 'multi'">Multi-Currency</a></li>
+    <li class="nav-item"><a class="nav-link" [class.active]="activeTab === 'cashflow'" href="javascript:void(0)" (click)="activeTab = 'cashflow'">Cashflow (Pro)</a></li>
+  </ul>
+
+  <div class="card table-card-modern" *ngIf="activeTab === 'bills'">
+    <div class="card-header border-0 bg-light py-3"><h5 class="mb-0 fw-semibold">Vendor Bills & Payments</h5></div>
+    <div class="table-responsive">
+      <table class="table table-modern table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Reference</th>
+            <th>Vendor</th>
+            <th>Date</th>
+            <th>Due Date</th>
+            <th class="text-end">Amount</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let b of vendorBills">
+            <td><span class="ref-badge">{{ b.ref }}</span></td>
+            <td>{{ b.vendor }}</td>
+            <td>{{ b.date }}</td>
+            <td>{{ b.dueDate }}</td>
+            <td class="text-end fw-semibold">{{ b.amount | number }} {{ b.currency }}</td>
+            <td><span class="status-badge-modern" [ngClass]="b.status === 'Paid' ? 'status-approved' : 'status-pending'">{{ b.status }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card table-card-modern" *ngIf="activeTab === 'retainers'">
+    <div class="card-header border-0 bg-light py-3"><h5 class="mb-0 fw-semibold">Retainers</h5></div>
+    <div class="table-responsive">
+      <table class="table table-modern table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th class="text-end">Amount</th>
+            <th>Start Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of retainers">
+            <td class="fw-semibold">{{ r.client }}</td>
+            <td class="text-end">{{ r.amount | number }} {{ r.currency }}</td>
+            <td>{{ r.startDate }}</td>
+            <td><span class="status-badge-modern status-approved">{{ r.status }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card table-card-modern" *ngIf="activeTab === 'multi'">
+    <div class="card-header border-0 bg-light py-3"><h5 class="mb-0 fw-semibold">Multi-Currency</h5></div>
+    <div class="table-responsive">
+      <table class="table table-modern table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Currency</th>
+            <th class="text-end">Rate (vs AED)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of currencies">
+            <td><span class="ref-badge">{{ c.code }}</span></td>
+            <td>{{ c.name }}</td>
+            <td class="text-end">{{ c.rate }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card table-card-modern" *ngIf="activeTab === 'cashflow'">
+    <div class="card-header border-0 bg-light py-3"><h5 class="mb-0 fw-semibold">Cashflow Forecast (Pro)</h5></div>
+    <div class="table-responsive">
+      <table class="table table-modern table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Month</th>
+            <th class="text-end">Inflow (AED)</th>
+            <th class="text-end">Outflow (AED)</th>
+            <th class="text-end">Net</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let m of cashflowMonths">
+            <td class="fw-semibold">{{ m.month }}</td>
+            <td class="text-end text-success">{{ m.inflow | number }}</td>
+            <td class="text-end text-danger">{{ m.outflow | number }}</td>
+            <td class="text-end fw-semibold">{{ (m.inflow - m.outflow) | number }} AED</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

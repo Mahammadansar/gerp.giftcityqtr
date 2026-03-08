@@ -1,0 +1,41 @@
+// Unified Color System - Professional Corporate SaaS
+// All colors should reference these variables for consistency
+
+// Brand Colors - Gift City Qatar (black & red)
+$brand-red: #b71c1c;
+$brand-red-light: #e53935;
+$brand-black: #1a1a1a;
+$brand-gold: #b71c1c; // alias for compatibility
+$brand-gold-light: #e53935;
+$brand-gold-dark: #1a1a1a;
+
+// Neutral Colors
+$bg-dark: #0a0e14;
+$bg-light: #f8f9fa;
+$bg-white: #ffffff;
+
+// Text Colors
+$text-dark: #1a202c;
+$text-medium: #6b7280;
+$text-light: #9ca3af;
+$text-white: #ffffff;
+
+// Border Colors
+$border-light: rgba(0, 0, 0, 0.08);
+$border-medium: rgba(0, 0, 0, 0.12);
+$border-gold: rgba(183, 28, 28, 0.2);
+
+// Status Colors (Harmonious)
+$success: #10b981;
+$success-light: rgba(16, 185, 129, 0.1);
+$info: #3b82f6;
+$info-light: rgba(59, 130, 246, 0.1);
+$warning: #f59e0b;
+$warning-light: rgba(245, 158, 11, 0.1);
+$danger: #ef4444;
+$danger-light: rgba(239, 68, 68, 0.1);
+
+// Shadows
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+$shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);

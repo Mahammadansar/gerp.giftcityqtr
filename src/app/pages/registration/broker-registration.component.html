@@ -1,0 +1,365 @@
+<div class="portal-content registration-page">
+  <!-- Page Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="registration-header">
+        <div class="header-content">
+          <div>
+            <h1 class="page-title">Broker Registration</h1>
+            <p class="page-subtitle">Register as a broker to purchase properties from Kleindienst Group</p>
+          </div>
+          <div class="header-badge">
+            <i class="feather icon-file-text"></i>
+            <span>Property Purchase Registration</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Message -->
+  <div class="row mb-4" *ngIf="submitSuccess">
+    <div class="col-12">
+      <div class="alert alert-success-modern">
+        <i class="feather icon-check-circle"></i>
+        <div>
+          <strong>Registration Submitted Successfully!</strong>
+          <p>Thank you for registering. Our team will contact you within 24-48 hours.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div class="row mb-4" *ngIf="submitError">
+    <div class="col-12">
+      <div class="alert alert-error-modern">
+        <i class="feather icon-alert-circle"></i>
+        <div>
+          <strong>Error</strong>
+          <p>{{ submitError }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Registration Form -->
+  <form (ngSubmit)="onSubmit()" *ngIf="!submitSuccess">
+    <!-- Personal Information Section -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-icon">
+          <i class="feather icon-user"></i>
+        </div>
+        <div>
+          <h3 class="section-title">Personal Information</h3>
+          <p class="section-subtitle">Please provide your personal details</p>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label required">First Name</label>
+            <input type="text" class="form-control-modern" 
+                   [(ngModel)]="formData.firstName" 
+                   name="firstName"
+                   placeholder="Enter your first name" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label required">Last Name</label>
+            <input type="text" class="form-control-modern" 
+                   [(ngModel)]="formData.lastName" 
+                   name="lastName"
+                   placeholder="Enter your last name" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label required">Email Address</label>
+            <div class="input-group-modern">
+              <span class="input-group-icon">
+                <i class="feather icon-mail"></i>
+              </span>
+              <input type="email" class="form-control-modern" 
+                     [(ngModel)]="formData.email" 
+                     name="email"
+                     placeholder="your.email@example.com" required>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label required">Phone Number</label>
+            <div class="input-group-modern">
+              <span class="input-group-icon">
+                <i class="feather icon-phone"></i>
+              </span>
+              <input type="tel" class="form-control-modern" 
+                     [(ngModel)]="formData.phone" 
+                     name="phone"
+                     placeholder="+971 XX XXX XXXX" required>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Alternate Phone</label>
+            <div class="input-group-modern">
+              <span class="input-group-icon">
+                <i class="feather icon-phone-call"></i>
+              </span>
+              <input type="tel" class="form-control-modern" 
+                     [(ngModel)]="formData.alternatePhone" 
+                     name="alternatePhone"
+                     placeholder="Optional alternate number">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Date of Birth</label>
+            <input type="date" class="form-control-modern" 
+                   [(ngModel)]="formData.dateOfBirth" 
+                   name="dateOfBirth">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Nationality</label>
+            <select class="form-select-modern" 
+                    [(ngModel)]="formData.nationality" 
+                    name="nationality">
+              <option value="">Select Nationality</option>
+              <option *ngFor="let nat of nationalities" [value]="nat">{{ nat }}</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Emirates ID</label>
+            <input type="text" class="form-control-modern" 
+                   [(ngModel)]="formData.emiratesId" 
+                   name="emiratesId"
+                   placeholder="XXX-XXXX-XXXXXXX-X">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Passport Number</label>
+            <input type="text" class="form-control-modern" 
+                   [(ngModel)]="formData.passportNumber" 
+                   name="passportNumber"
+                   placeholder="Enter passport number">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Company Information Section -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-icon">
+          <i class="feather icon-briefcase"></i>
+        </div>
+        <div>
+          <h3 class="section-title">Company Information</h3>
+          <p class="section-subtitle">Details about your brokerage company</p>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Company Name</label>
+            <input type="text" class="form-control-modern" 
+                   [(ngModel)]="formData.companyName" 
+                   name="companyName"
+                   placeholder="Your company name">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Company License Number</label>
+            <input type="text" class="form-control-modern" 
+                   [(ngModel)]="formData.companyLicense" 
+                   name="companyLicense"
+                   placeholder="License number">
+          </div>
+          <div class="col-md-12">
+            <label class="form-label">Company Address</label>
+            <input type="text" class="form-control-modern" 
+                   [(ngModel)]="formData.companyAddress" 
+                   name="companyAddress"
+                   placeholder="Street address">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">City</label>
+            <select class="form-select-modern" 
+                    [(ngModel)]="formData.companyCity" 
+                    name="companyCity">
+              <option value="">Select City</option>
+              <option *ngFor="let city of cities" [value]="city">{{ city }}</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Country</label>
+            <input type="text" class="form-control-modern" 
+                   [(ngModel)]="formData.companyCountry" 
+                   name="companyCountry"
+                   value="UAE" readonly>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Years of Experience</label>
+            <input type="number" class="form-control-modern" 
+                   [(ngModel)]="formData.yearsOfExperience" 
+                   name="yearsOfExperience"
+                   min="0" max="50"
+                   placeholder="Years">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Broker License Section -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-icon">
+          <i class="feather icon-award"></i>
+        </div>
+        <div>
+          <h3 class="section-title">Broker License Details</h3>
+          <p class="section-subtitle">Your professional broker credentials</p>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Broker License Number</label>
+            <input type="text" class="form-control-modern" 
+                   [(ngModel)]="formData.brokerLicenseNumber" 
+                   name="brokerLicenseNumber"
+                   placeholder="License number">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">License Expiry Date</label>
+            <input type="date" class="form-control-modern" 
+                   [(ngModel)]="formData.brokerLicenseExpiry" 
+                   name="brokerLicenseExpiry">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Commission Structure</label>
+            <select class="form-select-modern" 
+                    [(ngModel)]="formData.commissionStructure" 
+                    name="commissionStructure">
+              <option value="">Select Structure</option>
+              <option *ngFor="let comm of commissionStructures" [value]="comm">{{ comm }}</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">How did you hear about us?</label>
+            <select class="form-select-modern" 
+                    [(ngModel)]="formData.referralSource" 
+                    name="referralSource">
+              <option value="">Select Source</option>
+              <option *ngFor="let source of referralSources" [value]="source">{{ source }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Property Purchase Details Section -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-icon">
+          <i class="feather icon-home"></i>
+        </div>
+        <div>
+          <h3 class="section-title">Property Purchase Details</h3>
+          <p class="section-subtitle">Tell us about your property purchase requirements</p>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="row g-3">
+          <div class="col-md-12">
+            <label class="form-label">Property Type Interest</label>
+            <div class="checkbox-group">
+              <label class="checkbox-item" *ngFor="let type of propertyTypes">
+                <input type="checkbox" 
+                       [checked]="formData.propertyType.includes(type)"
+                       (change)="togglePropertyType(type)">
+                <span class="checkbox-label">{{ type }}</span>
+              </label>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <label class="form-label">Preferred Locations</label>
+            <div class="checkbox-group">
+              <label class="checkbox-item" *ngFor="let location of cities">
+                <input type="checkbox" 
+                       [checked]="formData.preferredLocation.includes(location)"
+                       (change)="toggleLocation(location)">
+                <span class="checkbox-label">{{ location }}</span>
+              </label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Budget Range</label>
+            <select class="form-select-modern" 
+                    [(ngModel)]="formData.budgetRange" 
+                    name="budgetRange">
+              <option value="">Select Budget Range</option>
+              <option *ngFor="let budget of budgetRanges" [value]="budget">{{ budget }}</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Purchase Timeline</label>
+            <select class="form-select-modern" 
+                    [(ngModel)]="formData.purchaseTimeline" 
+                    name="purchaseTimeline">
+              <option value="">Select Timeline</option>
+              <option *ngFor="let timeline of purchaseTimelines" [value]="timeline">{{ timeline }}</option>
+            </select>
+          </div>
+          <div class="col-md-12">
+            <label class="form-label">Additional Notes</label>
+            <textarea class="form-control-modern" 
+                      [(ngModel)]="formData.additionalNotes" 
+                      name="additionalNotes"
+                      rows="4"
+                      placeholder="Any additional information or special requirements..."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Terms and Conditions Section -->
+    <div class="form-section">
+      <div class="form-card">
+        <div class="row">
+          <div class="col-12">
+            <div class="terms-section">
+              <label class="checkbox-item large">
+                <input type="checkbox" 
+                       [(ngModel)]="formData.termsAccepted" 
+                       name="termsAccepted" required>
+                <span class="checkbox-label">
+                  I accept the <a href="#" class="terms-link">Terms and Conditions</a> and <a href="#" class="terms-link">Privacy Policy</a>
+                  <span class="required-indicator">*</span>
+                </span>
+              </label>
+              <label class="checkbox-item large">
+                <input type="checkbox" 
+                       [(ngModel)]="formData.marketingConsent" 
+                       name="marketingConsent">
+                <span class="checkbox-label">
+                  I consent to receive marketing communications and updates about properties
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary-modern" (click)="resetForm()" [disabled]="isSubmitting">
+        <i class="feather icon-x"></i>
+        Reset Form
+      </button>
+      <button type="submit" class="btn btn-primary-modern" [disabled]="isSubmitting">
+        <i class="feather icon-send" *ngIf="!isSubmitting"></i>
+        <i class="feather icon-loader" *ngIf="isSubmitting" class="spinning"></i>
+        <span>{{ isSubmitting ? 'Submitting...' : 'Submit Registration' }}</span>
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,424 @@
+// Broker Registration Form Styles
+@import "../../shared/color-system";
+
+$brand-gold: #C9A961;
+$brand-gold-light: #E5D4A3;
+$brand-gold-dark: #A6894F;
+
+.registration-page {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  
+  @media (max-width: 768px) {
+    padding: 1.5rem 1rem;
+  }
+}
+
+// Page Header
+.registration-header {
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.75rem;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.06);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+  }
+}
+
+.page-subtitle {
+  font-size: 0.9375rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.header-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(135deg, rgba(201, 169, 97, 0.1) 0%, rgba(201, 169, 97, 0.05) 100%);
+  border-radius: 8px;
+  border: 1px solid rgba(201, 169, 97, 0.2);
+  color: $brand-gold-dark;
+  font-weight: 600;
+  font-size: 0.875rem;
+  
+  i {
+    color: $brand-gold;
+    font-size: 1rem;
+  }
+}
+
+// Alert Messages
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: 12px;
+  border: 1px solid;
+  
+  i {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+  }
+  
+  strong {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-size: 1rem;
+  }
+  
+  p {
+    margin: 0;
+    font-size: 0.875rem;
+  }
+}
+
+.alert-success-modern {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #059669;
+  
+  i {
+    color: #10b981;
+  }
+}
+
+.alert-error-modern {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #dc2626;
+  
+  i {
+    color: #ef4444;
+  }
+}
+
+// Form Sections
+.form-section {
+  margin-bottom: 2.5rem;
+}
+
+.section-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.section-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(201, 169, 97, 0.1) 0%, rgba(201, 169, 97, 0.05) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $brand-gold;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 0.25rem 0;
+  line-height: 1.3;
+}
+
+.section-subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.4;
+}
+
+// Form Card
+.form-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+  }
+}
+
+// Form Controls
+.form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  
+  &.required::after {
+    content: ' *';
+    color: #ef4444;
+  }
+}
+
+.form-control-modern,
+.form-select-modern {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: #1a202c;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  
+  &:focus {
+    outline: none;
+    border-color: $brand-gold;
+    box-shadow: 0 0 0 3px rgba(201, 169, 97, 0.1);
+  }
+  
+  &::placeholder {
+    color: #9ca3af;
+  }
+  
+  &:disabled {
+    background: #f3f4f6;
+    cursor: not-allowed;
+  }
+}
+
+.form-select-modern {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.75rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+textarea.form-control-modern {
+  resize: vertical;
+  min-height: 100px;
+}
+
+// Input Group with Icon
+.input-group-modern {
+  position: relative;
+  display: flex;
+  align-items: center;
+  
+  .input-group-icon {
+    position: absolute;
+    left: 1rem;
+    z-index: 1;
+    color: #9ca3af;
+    pointer-events: none;
+    font-size: 1rem;
+  }
+  
+  .form-control-modern {
+    padding-left: 2.75rem;
+  }
+}
+
+// Checkbox Groups
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+  
+  input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: $brand-gold;
+    flex-shrink: 0;
+  }
+  
+  .checkbox-label {
+    font-size: 0.875rem;
+    color: #374151;
+    font-weight: 500;
+  }
+  
+  &.large {
+    align-items: flex-start;
+    
+    input[type="checkbox"] {
+      margin-top: 0.25rem;
+    }
+    
+    .checkbox-label {
+      line-height: 1.5;
+    }
+  }
+}
+
+.terms-section {
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  
+  .checkbox-item {
+    margin-bottom: 1rem;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  
+  .terms-link {
+    color: $brand-gold;
+    text-decoration: none;
+    font-weight: 600;
+    
+    &:hover {
+      text-decoration: underline;
+      color: $brand-gold-dark;
+    }
+  }
+  
+  .required-indicator {
+    color: #ef4444;
+    margin-left: 0.25rem;
+  }
+}
+
+// Form Actions
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 2rem;
+  margin-top: 2rem;
+  border-top: 2px solid rgba(0, 0, 0, 0.06);
+  
+  @media (max-width: 768px) {
+    flex-direction: column-reverse;
+    
+    button {
+      width: 100%;
+    }
+  }
+}
+
+.btn-primary-modern,
+.btn-secondary-modern {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 2rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  i {
+    font-size: 1rem;
+    
+    &.spinning {
+      animation: spin 1s linear infinite;
+    }
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.btn-primary-modern {
+  background: linear-gradient(135deg, $brand-gold 0%, $brand-gold-dark 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(201, 169, 97, 0.3);
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(201, 169, 97, 0.4);
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+}
+
+.btn-secondary-modern {
+  background: #ffffff;
+  color: #6b7280;
+  border: 1px solid #e2e8f0;
+  
+  &:hover:not(:disabled) {
+    background: #f8f9fa;
+    border-color: #d1d5db;
+    color: #374151;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Row spacing
+.row {
+  margin-left: -0.75rem;
+  margin-right: -0.75rem;
+  
+  > * {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}
+
+.g-3 {
+  --bs-gutter-x: 1rem;
+  --bs-gutter-y: 1rem;
+}

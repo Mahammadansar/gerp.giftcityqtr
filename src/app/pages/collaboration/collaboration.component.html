@@ -1,0 +1,49 @@
+<div class="portal-content">
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 page-header-modern">
+        <div>
+          <h2>{{ title }}</h2>
+          <p class="text-muted mb-0">{{ subtitle }}</p>
+        </div>
+        <span class="demo-badge-page"><i class="feather icon-info me-1"></i>Demo Data</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-4 mb-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-light border-0 py-3">
+          <h6 class="mb-0 fw-semibold">Recent Chats</h6>
+        </div>
+        <div class="card-body p-0">
+          <div class="collab-thread list-group list-group-flush" *ngFor="let t of threads">
+            <a href="javascript:void(0)" class="list-group-item list-group-item-action d-flex align-items-center">
+              <div class="thread-avatar me-3">{{ t.name.charAt(0) }}</div>
+              <div class="flex-grow-1 min-w-0">
+                <div class="d-flex justify-content-between">
+                  <span class="fw-semibold">{{ t.name }}</span>
+                  <span class="text-muted small">{{ t.time }}</span>
+                </div>
+                <div class="text-muted small text-truncate">{{ t.lastMessage }}</div>
+              </div>
+              <span class="badge bg-primary rounded-pill ms-2" *ngIf="t.unread">{{ t.unread }}</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body text-center py-5">
+          <div class="collab-placeholder-icon mb-3">
+            <i class="feather icon-message-circle"></i>
+          </div>
+          <h5 class="fw-semibold">Chat, voice & video</h5>
+          <p class="text-muted mb-0">Select a conversation or start a new one. Screen sharing available in calls.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

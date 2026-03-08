@@ -1,0 +1,53 @@
+<div class="portal-content">
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 page-header-modern">
+        <div>
+          <h2>{{ title }}</h2>
+          <p class="text-muted mb-0">{{ subtitle }}</p>
+        </div>
+        <span class="demo-badge-page"><i class="feather icon-info me-1"></i>Demo Data</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-6 mb-3" *ngFor="let v of vendors">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <h6 class="fw-semibold mb-2">{{ v.name }}</h6>
+          <div class="small text-muted">
+            <span class="me-3">POs: {{ v.poCount }}</span>
+            <span>Last active: {{ v.lastActive }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card table-card-modern">
+    <div class="card-header border-0 bg-light py-3">
+      <h5 class="mb-0 fw-semibold">Vendor Portal Activity</h5>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-modern table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Vendor</th>
+            <th>Action</th>
+            <th>Reference</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let a of activity">
+            <td class="fw-semibold">{{ a.vendor }}</td>
+            <td>{{ a.action }}</td>
+            <td><span class="ref-badge">{{ a.ref }}</span></td>
+            <td>{{ a.date }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,17 @@
+.nav-tabs-modern .nav-link {
+  border-radius: 8px 8px 0 0;
+  font-weight: 600;
+  color: #6b7280;
+  border: 1px solid rgba(0,0,0,0.08);
+  margin-right: 4px;
+  &.active { background: #fff; color: #1a202c; border-bottom-color: #fff; }
+}
+.ref-badge {
+  display: inline-block;
+  padding: 0.35rem 0.65rem;
+  background: rgba(201, 169, 97, 0.12);
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.8125rem;
+  color: #8b6914;
+}

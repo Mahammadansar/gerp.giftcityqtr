@@ -1,0 +1,87 @@
+<div class="portal-content">
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 page-header-modern">
+        <div>
+          <h2>{{ title }}</h2>
+          <p class="text-muted mb-0">{{ subtitle }}</p>
+        </div>
+        <span class="demo-badge-page"><i class="feather icon-info me-1"></i>Demo Data</span>
+      </div>
+    </div>
+  </div>
+
+  <ul class="nav nav-tabs nav-tabs-modern mb-4">
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab === 'orders'" href="javascript:void(0)" (click)="activeTab = 'orders'">Sales Orders</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab === 'pricelists'" href="javascript:void(0)" (click)="activeTab = 'pricelists'">Price Lists</a>
+    </li>
+  </ul>
+
+  <!-- Sales Orders -->
+  <div class="card table-card-modern" *ngIf="activeTab === 'orders'">
+    <div class="card-header border-0 bg-light py-3">
+      <h5 class="mb-0 fw-semibold">Recent Sales Orders</h5>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-modern table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Order No</th>
+            <th>Date</th>
+            <th>Client</th>
+            <th>Items</th>
+            <th class="text-end">Total</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let o of salesOrders">
+            <td><span class="ref-badge">{{ o.orderNo }}</span></td>
+            <td>{{ o.date }}</td>
+            <td>{{ o.client }}</td>
+            <td><span class="text-muted small">{{ o.items }}</span></td>
+            <td class="text-end fw-semibold">{{ o.total | number:'1.0-0' }} {{ o.currency }}</td>
+            <td>
+              <span class="status-badge-modern" [ngClass]="{
+                'status-approved': o.status === 'Delivered' || o.status === 'Confirmed',
+                'status-pending': o.status === 'Pending'
+              }">{{ o.status }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Price Lists -->
+  <div class="card table-card-modern" *ngIf="activeTab === 'pricelists'">
+    <div class="card-header border-0 bg-light py-3">
+      <h5 class="mb-0 fw-semibold">Price Lists</h5>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-modern table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Valid From</th>
+            <th class="text-end">Items</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of priceLists">
+            <td class="fw-semibold">{{ p.name }}</td>
+            <td>{{ p.type }}</td>
+            <td>{{ p.validFrom }}</td>
+            <td class="text-end">{{ p.items }}</td>
+            <td><span class="status-badge-modern status-approved">{{ p.status }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

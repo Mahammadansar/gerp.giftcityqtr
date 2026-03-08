@@ -1,0 +1,188 @@
+// Professional Modern Styles - Clean & Corporate
+
+// Brand Colors - Gift City Qatar (black & red)
+$brand-red: #b71c1c;
+$brand-black: #1a1a1a;
+$brand-gold: #b71c1c;
+$brand-gold-dark: #1a1a1a;
+
+// Page Header - Professional
+.page-header-modern {
+  padding: 1.5rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  margin-bottom: 2rem;
+
+  h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    font-size: 0.9375rem;
+    color: #6b7280;
+    margin-bottom: 0;
+  }
+}
+
+// Filters Card - Clean
+.filters-card-modern {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  margin-bottom: 1.5rem;
+}
+
+// Form Controls - Professional
+.form-control-modern,
+.form-select-modern {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 6px;
+  padding: 0.625rem 1rem;
+  transition: all 0.2s ease;
+  font-size: 0.9375rem;
+  background: #ffffff;
+
+  &:focus {
+    border-color: $brand-red;
+    box-shadow: 0 0 0 3px rgba(183, 28, 28, 0.1);
+    outline: none;
+  }
+}
+
+.input-group-modern {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .input-group-icon {
+    position: absolute;
+    left: 1rem;
+    z-index: 1;
+    color: #6b7280;
+    pointer-events: none;
+  }
+
+  .form-control-modern {
+    padding-left: 3rem;
+  }
+}
+
+// Buttons - Professional
+.btn-modern {
+  border-radius: 6px;
+  padding: 0.625rem 1.5rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  border: none;
+  font-size: 0.9375rem;
+
+  &.btn-primary {
+    background: linear-gradient(135deg, $brand-red 0%, darken($brand-red, 10%) 100%);
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(183, 28, 28, 0.25);
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(183, 28, 28, 0.35);
+    }
+  }
+
+  i {
+    font-size: 1rem;
+    margin-right: 0.5rem;
+  }
+}
+
+// Badges - Clean
+.badge {
+  font-weight: 600;
+  padding: 0.375rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+
+  &.bg-primary {
+    background: linear-gradient(135deg, $brand-red 0%, $brand-black 100%) !important;
+    color: #ffffff !important;
+  }
+}
+
+// Utility Classes
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.fw-semibold {
+  font-weight: 600;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-3 {
+  gap: 1rem;
+}
+
+.gap-4 {
+  gap: 1.5rem;
+}
+
+// Status badges for tables
+.status-badge-modern {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  &.status-pending { background: rgba(245, 158, 11, 0.15); color: #b45309; }
+  &.status-closed, &.status-approved, &.status-completed { background: rgba(34, 197, 94, 0.15); color: #15803d; }
+  &.status-cancelled, &.status-rejected { background: rgba(239, 68, 68, 0.15); color: #b91c1c; }
+  &.status-draft { background: rgba(107, 114, 128, 0.15); color: #4b5563; }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+}
+
+// Table card for ERP pages
+.table-card-modern {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+// Base table (ERP pages)
+.table-modern {
+  margin-bottom: 0;
+  thead th {
+    padding: 0.875rem 1rem;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #4a5568;
+    background: #f8f9fa;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+  tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    font-size: 0.875rem;
+  }
+  tbody tr:hover { background: #f8f9fa; }
+}
+
+.demo-badge-page {
+  font-size: 0.75rem;
+  padding: 0.35rem 0.65rem;
+  background: rgba(183, 28, 28, 0.12);
+  color: #b71c1c;
+  border-radius: 6px;
+  font-weight: 600;
+}

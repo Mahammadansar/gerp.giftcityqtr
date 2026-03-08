@@ -1,0 +1,194 @@
+<!-- Signed out overlay -->
+  <div class="logged-out-overlay" *ngIf="!isLoggedIn">
+    <div class="logged-out-card">
+      <div class="logged-out-icon">
+        <i class="feather icon-log-out"></i>
+      </div>
+      <h3>You have signed out</h3>
+      <p class="text-muted">Sign in again to access Gift City Qatar.</p>
+      <button type="button" class="btn btn-primary btn-modern px-4 py-2" (click)="signInAgain()">
+        <i class="feather icon-log-in me-2"></i>Sign in again
+      </button>
+    </div>
+  </div>
+
+  <div class="main-wrapper" *ngIf="isLoggedIn">
+  <nav class="sidebar">
+    <div class="sidebar-header">
+      <a routerLink="/" class="text-center sidebar-brand kleindienst-logo">
+        <div class="logo-container">
+          <img src="assets/logo.png" alt="Gift City Qatar" class="logo-image">
+        </div>
+        <span class="logo-tagline d-block text-uppercase">Gift City Qatar ERP</span>
+      </a>
+    </div>
+
+    <div class="sidebar-body" [perfectScrollbar]>
+      <ul class="sidebar-nav metismenu" id="sidebar-menu">
+        <li class="nav-item nav-category">Main</li>
+        <li class="nav-item">
+          <a routerLink="/dashboard" class="nav-link nav-link-ref">
+            <i class="link-icon feather icon-home"></i>
+            <span class="link-title">Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item nav-category">Standard +</li>
+        <li class="nav-item">
+          <a routerLink="/sales" class="nav-link nav-link-ref">
+            <i class="link-icon feather icon-shopping-cart"></i>
+            <span class="link-title">Sales Orders</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/purchasing" class="nav-link nav-link-ref">
+            <i class="link-icon feather icon-shopping-bag"></i>
+            <span class="link-title">Purchase Orders</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/inventory" class="nav-link nav-link-ref">
+            <i class="link-icon feather icon-package"></i>
+            <span class="link-title">Inventory</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/finance" class="nav-link nav-link-ref">
+            <i class="link-icon feather icon-dollar-sign"></i>
+            <span class="link-title">Finance</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/invoices" class="nav-link nav-link-ref">
+            <i class="link-icon feather icon-file-text"></i>
+            <span class="link-title">Generate Invoice</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/projects" class="nav-link nav-link-ref">
+            <i class="link-icon feather icon-briefcase"></i>
+            <span class="link-title">Projects & Timesheets</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/approvals" class="nav-link nav-link-ref">
+            <i class="link-icon feather icon-check-circle"></i>
+            <span class="link-title">Approvals</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/collaboration" class="nav-link nav-link-ref">
+            <i class="link-icon feather icon-message-circle"></i>
+            <span class="link-title">Collaboration</span>
+          </a>
+        </li>
+        <li class="nav-item nav-category">Professional +</li>
+        <li class="nav-item">
+          <a routerLink="/assets" class="nav-link nav-link-ref">
+            <i class="link-icon feather icon-cpu"></i>
+            <span class="link-title">Fixed Assets</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/vendor-portal" class="nav-link nav-link-ref">
+            <i class="link-icon feather icon-users"></i>
+            <span class="link-title">Vendor Portal</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/settings" class="nav-link nav-link-ref">
+            <i class="link-icon feather icon-settings"></i>
+            <span class="link-title">Settings</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="page-wrapper">
+    <nav class="navbar">
+      <button type="button" class="sidebar-toggler" (click)="toggleSidebar()" aria-label="Toggle sidebar">
+        <i class="feather icon-menu"></i>
+      </button>
+      <div class="navbar-content v-center">
+        <div class="gradient-text-theme ps-4">
+          <h5>Gift City Qatar</h5>
+        </div>
+
+        <ul class="navbar-nav">
+          <li class="nav-item nav-profile" ngbDropdown>
+            <a class="nav-link profile-trigger" ngbDropdownToggle id="profileDropdown">
+              <div class="profile-avatar-wrapper">
+                <img class="profile-avatar" src="assets/male.jpg" alt="Profile">
+                <span class="profile-status"></span>
+              </div>
+              <div class="profile-info">
+                <span class="profile-name">{{ user_data.first_name }} {{ user_data.last_name }}</span>
+                <span class="profile-role">{{ user_data.job }}</span>
+              </div>
+              <i class="feather icon-chevron-down profile-chevron"></i>
+            </a>
+            <div ngbDropdownMenu class="profile-dropdown" aria-labelledby="profileDropdown">
+              <div class="profile-dropdown-header">
+                <div class="profile-header-bg"></div>
+                <div class="profile-header-content">
+                  <div class="profile-header-avatar">
+                    <img src="assets/male.jpg" alt="Profile">
+                    <span class="profile-status-large"></span>
+                  </div>
+                  <div class="profile-header-info">
+                    <h6 class="profile-header-name">{{ user_data.first_name }} {{ user_data.last_name }}</h6>
+                    <p class="profile-header-role">{{ user_data.job }}</p>
+                    <span class="profile-header-company">{{ user_data.company }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="profile-dropdown-body">
+                <a href="#" class="profile-menu-item">
+                  <i class="feather icon-user"></i>
+                  <span>My Profile</span>
+                  <i class="feather icon-chevron-right"></i>
+                </a>
+                <a routerLink="/settings" class="profile-menu-item">
+                  <i class="feather icon-settings"></i>
+                  <span>Settings</span>
+                  <i class="feather icon-chevron-right"></i>
+                </a>
+                <a href="#" class="profile-menu-item">
+                  <i class="feather icon-bell"></i>
+                  <span>Notifications</span>
+                  <span class="badge badge-notification">3</span>
+                </a>
+                <div class="profile-menu-divider"></div>
+                <a href="#" class="profile-menu-item">
+                  <i class="feather icon-help-circle"></i>
+                  <span>Help & Support</span>
+                </a>
+                <div class="profile-menu-divider"></div>
+                <div class="profile-menu-footer">
+                  <div class="demo-badge">
+                    <i class="feather icon-info"></i>
+                    <span>Gift City Qatar</span>
+                  </div>
+                  <a href="javascript:void(0)" class="profile-menu-item text-danger" (click)="logout()">
+                    <i class="feather icon-log-out"></i>
+                    <span>Sign Out</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="page-content">
+      <router-outlet></router-outlet>
+    </div>
+
+    <footer class="footer d-flex flex-column flex-md-row align-items-center justify-content-between">
+      <p class="text-muted text-center text-md-left">
+        Gift City Qatar
+      </p>
+    </footer>
+  </div>
+</div>
