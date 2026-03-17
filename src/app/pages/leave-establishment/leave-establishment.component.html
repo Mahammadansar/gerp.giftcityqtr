@@ -1,0 +1,94 @@
+<div class="portal-content">
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 page-header-modern">
+        <div>
+          <h2>{{ title }}</h2>
+          <p class="text-muted mb-0">{{ subtitle }}</p>
+        </div>
+        <button type="button" class="btn btn-primary me-2" (click)="toggleAddType()">{{ showAddType ? 'Cancel' : 'Add Leave Type' }}</button>
+        <button type="button" class="btn btn-outline-primary" (click)="toggleAddRequest()">{{ showAddRequest ? 'Cancel' : 'Request Leave' }}</button>
+      </div>
+    </div>
+  </div>
+  <div class="card border-0 shadow-sm mb-4" *ngIf="showAddType">
+    <div class="card-body">
+      <h6 class="mb-3">Add leave type</h6>
+      <div class="row g-2 align-items-end">
+        <div class="col-md-2"><input type="text" class="form-control form-control-sm" [(ngModel)]="typeForm.name" placeholder="Name" /></div>
+        <div class="col-md-1"><input type="number" class="form-control form-control-sm" [(ngModel)]="typeForm.daysPerYear" placeholder="Days/yr" min="0" /></div>
+        <div class="col-md-1"><input type="number" class="form-control form-control-sm" [(ngModel)]="typeForm.carryOver" placeholder="Carry" min="0" /></div>
+        <div class="col-md-4"><input type="text" class="form-control form-control-sm" [(ngModel)]="typeForm.description" placeholder="Description" /></div>
+        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveLeaveType()">Save</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="card border-0 shadow-sm mb-4" *ngIf="showAddRequest">
+    <div class="card-body">
+      <h6 class="mb-3">Request leave</h6>
+      <div class="row g-2 align-items-end">
+        <div class="col-md-2"><input type="text" class="form-control form-control-sm" [(ngModel)]="requestForm.employee" placeholder="Employee" /></div>
+        <div class="col-md-2"><input type="text" class="form-control form-control-sm" [(ngModel)]="requestForm.type" placeholder="Type" /></div>
+        <div class="col-md-2"><input type="date" class="form-control form-control-sm" [(ngModel)]="requestForm.from" placeholder="From" /></div>
+        <div class="col-md-2"><input type="date" class="form-control form-control-sm" [(ngModel)]="requestForm.to" placeholder="To" /></div>
+        <div class="col-md-1"><input type="number" class="form-control form-control-sm" [(ngModel)]="requestForm.days" min="0" placeholder="Days" /></div>
+        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveLeaveRequest()">Save</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="card table-card-modern mb-4">
+    <div class="card-header border-0 bg-light py-3"><h5 class="mb-0 fw-semibold">Leave types and entitlements</h5></div>
+    <div class="table-responsive">
+      <table class="table table-modern table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Leave Type</th>
+            <th class="text-end">Days/Year</th>
+            <th class="text-end">Carry Over</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let l of leaveTypes">
+            <td class="fw-semibold">{{ l.name }}</td>
+            <td class="text-end">{{ l.daysPerYear }}</td>
+            <td class="text-end">{{ l.carryOver }}</td>
+            <td class="text-muted small">{{ l.description }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card table-card-modern">
+    <div class="card-header border-0 bg-light py-3"><h5 class="mb-0 fw-semibold">Recent leave requests</h5></div>
+    <div class="table-responsive">
+      <table class="table table-modern table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Type</th>
+            <th>From</th>
+            <th>To</th>
+            <th class="text-end">Days</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of recentRequests">
+            <td class="fw-semibold">{{ r.employee }}</td>
+            <td>{{ r.type }}</td>
+            <td>{{ r.from }}</td>
+            <td>{{ r.to }}</td>
+            <td class="text-end">{{ r.days }}</td>
+            <td><span class="status-badge-modern" [ngClass]="r.status === 'Approved' ? 'status-approved' : r.status === 'Rejected' ? 'status-rejected' : 'status-pending'">{{ r.status }}</span></td>
+            <td class="text-end">
+              <button type="button" class="btn btn-sm btn-success me-1" (click)="approveRequest(r)" *ngIf="r.status === 'Pending'">Approve</button>
+              <button type="button" class="btn btn-sm btn-danger" (click)="rejectRequest(r)" *ngIf="r.status === 'Pending'">Reject</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

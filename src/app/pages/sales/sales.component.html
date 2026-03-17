@@ -6,7 +6,15 @@
           <h2>{{ title }}</h2>
           <p class="text-muted mb-0">{{ subtitle }}</p>
         </div>
-        <span class="demo-badge-page"><i class="feather icon-info me-1"></i>Demo Data</span>
+        <div class="d-flex align-items-center gap-2">
+          <span class="text-muted small">{{ salesOrders.length }} orders, {{ priceLists.length }} price lists</span>
+          <button type="button" class="btn btn-primary btn-sm" (click)="toggleAddOrder()" *ngIf="activeTab === 'orders'">
+            {{ showAddOrder ? 'Cancel' : 'Add Sales Order' }}
+          </button>
+          <button type="button" class="btn btn-primary btn-sm" (click)="toggleAddPriceList()" *ngIf="activeTab === 'pricelists'">
+            {{ showAddPriceList ? 'Cancel' : 'Add Price List' }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -20,6 +28,33 @@
     </li>
   </ul>
 
+  <!-- Add Sales Order -->
+  <div class="card border-0 shadow-sm mb-4" *ngIf="activeTab === 'orders' && showAddOrder">
+    <div class="card-body">
+      <h6 class="mb-3">Add sales order</h6>
+      <div class="row g-2 align-items-end">
+        <div class="col-md-2"><label class="form-label small">Client</label><input type="text" class="form-control form-control-sm" [(ngModel)]="orderForm.client" placeholder="Client" /></div>
+        <div class="col-md-2"><label class="form-label small">Date</label><input type="date" class="form-control form-control-sm" [(ngModel)]="orderForm.date" /></div>
+        <div class="col-md-2"><label class="form-label small">Items (summary)</label><input type="text" class="form-control form-control-sm" [(ngModel)]="orderForm.items" placeholder="e.g. 10x Pen Set" /></div>
+        <div class="col-md-2"><label class="form-label small">Total</label><input type="number" class="form-control form-control-sm" [(ngModel)]="orderForm.total" min="0" /></div>
+        <div class="col-md-1"><label class="form-label small">Currency</label><input type="text" class="form-control form-control-sm" [(ngModel)]="orderForm.currency" placeholder="AED" /></div>
+        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveOrder()">Save</button></div>
+      </div>
+    </div>
+  </div>
+  <!-- Add Price List -->
+  <div class="card border-0 shadow-sm mb-4" *ngIf="activeTab === 'pricelists' && showAddPriceList">
+    <div class="card-body">
+      <h6 class="mb-3">Add price list</h6>
+      <div class="row g-2 align-items-end">
+        <div class="col-md-2"><label class="form-label small">Name</label><input type="text" class="form-control form-control-sm" [(ngModel)]="priceListForm.name" placeholder="Name" /></div>
+        <div class="col-md-2"><label class="form-label small">Type</label><input type="text" class="form-control form-control-sm" [(ngModel)]="priceListForm.type" placeholder="Gifts / Print" /></div>
+        <div class="col-md-2"><label class="form-label small">Valid from</label><input type="date" class="form-control form-control-sm" [(ngModel)]="priceListForm.validFrom" /></div>
+        <div class="col-md-1"><label class="form-label small">Items</label><input type="number" class="form-control form-control-sm" [(ngModel)]="priceListForm.items" min="0" /></div>
+        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="savePriceList()">Save</button></div>
+      </div>
+    </div>
+  </div>
   <!-- Sales Orders -->
   <div class="card table-card-modern" *ngIf="activeTab === 'orders'">
     <div class="card-header border-0 bg-light py-3">
@@ -49,6 +84,11 @@
                 'status-approved': o.status === 'Delivered' || o.status === 'Confirmed',
                 'status-pending': o.status === 'Pending'
               }">{{ o.status }}</span>
+              <span class="ms-1" *ngIf="o.status === 'Pending' || o.status === 'Confirmed'">
+                <button type="button" class="btn btn-sm btn-outline-success" (click)="updateOrderStatus(o, o.status === 'Pending' ? 'Confirmed' : 'Delivered')">
+                  {{ o.status === 'Pending' ? 'Confirm' : 'Mark Delivered' }}
+                </button>
+              </span>
             </td>
           </tr>
         </tbody>

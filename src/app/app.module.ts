@@ -20,6 +20,18 @@ import { AssetsComponent } from './pages/assets/assets.component';
 import { VendorPortalComponent } from './pages/vendor-portal/vendor-portal.component';
 import { SettingsComponent } from './pages/settings/settings.component';
 import { InvoicesComponent } from './pages/invoices/invoices.component';
+import { QuotationsComponent } from './pages/quotations/quotations.component';
+import { CreditNoteComponent } from './pages/credit-note/credit-note.component';
+import { DamageSectionComponent } from './pages/damage-section/damage-section.component';
+import { DailyReportsComponent } from './pages/daily-reports/daily-reports.component';
+import { BalanceSheetComponent } from './pages/balance-sheet/balance-sheet.component';
+import { BankStatementComponent } from './pages/bank-statement/bank-statement.component';
+import { ProfitLossComponent } from './pages/profit-loss/profit-loss.component';
+import { CashFlowComponent } from './pages/cash-flow/cash-flow.component';
+import { CustomersLedgerComponent } from './pages/customers-ledger/customers-ledger.component';
+import { SuppliersLedgerComponent } from './pages/suppliers-ledger/suppliers-ledger.component';
+import { StaffDetailsComponent } from './pages/staff-details/staff-details.component';
+import { LeaveEstablishmentComponent } from './pages/leave-establishment/leave-establishment.component';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true
@@ -34,6 +46,18 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     InventoryComponent,
     FinanceComponent,
     InvoicesComponent,
+    QuotationsComponent,
+    CreditNoteComponent,
+    DamageSectionComponent,
+    DailyReportsComponent,
+    BalanceSheetComponent,
+    BankStatementComponent,
+    ProfitLossComponent,
+    CashFlowComponent,
+    CustomersLedgerComponent,
+    SuppliersLedgerComponent,
+    StaffDetailsComponent,
+    LeaveEstablishmentComponent,
     ProjectsComponent,
     ApprovalsComponent,
     CollaborationComponent,

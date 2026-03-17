@@ -7,7 +7,7 @@
           <p class="text-muted mb-0">{{ subtitle }}</p>
         </div>
         <div class="d-flex align-items-center gap-2">
-          <span class="demo-badge-page"><i class="feather icon-info me-1"></i>Demo Data</span>
+          <span class="text-muted small">{{ invoices.length }} invoice(s)</span>
           <button type="button" class="btn btn-primary btn-modern" (click)="toggleGenerateForm()">
             <i class="feather icon-plus me-2"></i>{{ showGenerateForm ? 'Cancel' : 'Generate Invoice' }}
           </button>
@@ -53,16 +53,18 @@
         <table class="table table-bordered table-sm align-middle">
           <thead class="table-light">
             <tr>
-              <th style="width: 40%">Description</th>
-              <th style="width: 15%">Qty</th>
-              <th style="width: 20%">Unit price</th>
-              <th style="width: 20%">Amount</th>
+              <th style="width: 32%">Description</th>
+              <th style="width: 12%">Size</th>
+              <th style="width: 12%">Qty</th>
+              <th style="width: 18%">Unit price</th>
+              <th style="width: 18%">Amount</th>
               <th style="width: 5%"></th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let line of lines; let i = index">
               <td><input type="text" class="form-control form-control-sm" [(ngModel)]="line.description" placeholder="Item description"></td>
+              <td><input type="text" class="form-control form-control-sm" [(ngModel)]="line.size" placeholder="Size"></td>
               <td><input type="number" class="form-control form-control-sm" [(ngModel)]="line.qty" (ngModelChange)="updateLineAmount(i)" min="1"></td>
               <td><input type="number" class="form-control form-control-sm" [(ngModel)]="line.unitPrice" (ngModelChange)="updateLineAmount(i)" min="0" step="0.01"></td>
               <td class="text-end">{{ (line.qty * line.unitPrice) | number:'1.2-2' }}</td>
@@ -148,12 +150,16 @@
               }">{{ inv.status }}</span>
             </td>
             <td class="text-center">
-              <button type="button" class="btn btn-sm btn-outline-primary me-1" (click)="previewInvoice(inv)" title="Preview">
+              <button type="button" class="btn btn-sm btn-outline-primary me-1" (click)="previewInvoice(inv)" title="Preview / Print">
                 <i class="feather icon-eye"></i>
               </button>
-              <button type="button" class="btn btn-sm btn-outline-secondary" (click)="downloadInvoice(inv)" title="Download PDF">
+              <button type="button" class="btn btn-sm btn-outline-secondary me-1" (click)="downloadInvoice(inv)" title="Print / PDF">
                 <i class="feather icon-download"></i>
               </button>
+              <div class="btn-group btn-group-sm" *ngIf="inv.status === 'Draft' || inv.status === 'Sent'">
+                <button type="button" class="btn btn-outline-success" (click)="updateStatus(inv, 'Sent')" *ngIf="inv.status === 'Draft'" title="Mark Sent">Sent</button>
+                <button type="button" class="btn btn-outline-success" (click)="updateStatus(inv, 'Paid')" title="Mark Paid">Paid</button>
+              </div>
             </td>
           </tr>
         </tbody>

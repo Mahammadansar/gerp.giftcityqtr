@@ -1,0 +1,103 @@
+<div class="portal-content">
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 page-header-modern">
+        <div>
+          <h2>{{ title }}</h2>
+          <p class="text-muted mb-0">{{ subtitle }}</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="demo-badge-page"><i class="feather icon-info me-1"></i>Demo Data</span>
+          <button type="button" class="btn btn-primary btn-modern" (click)="toggleCreateForm()">
+            <i class="feather icon-plus me-2"></i>{{ showCreateForm ? 'Cancel' : 'Report Damage' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm mb-4" *ngIf="showCreateForm">
+    <div class="card-header bg-light border-0 py-3 d-flex justify-content-between align-items-center">
+      <h5 class="mb-0 fw-semibold">Report damaged item</h5>
+      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="toggleCreateForm()">
+        <i class="feather icon-x"></i>
+      </button>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Item name</label>
+          <input type="text" class="form-control form-control-modern" [(ngModel)]="form.itemName" placeholder="Product name">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label fw-semibold">SKU</label>
+          <input type="text" class="form-control form-control-modern" [(ngModel)]="form.sku" placeholder="SKU">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label fw-semibold">Size</label>
+          <input type="text" class="form-control form-control-modern" [(ngModel)]="form.size" placeholder="Size">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label fw-semibold">Qty damaged</label>
+          <input type="number" class="form-control form-control-modern" [(ngModel)]="form.qty" min="1" placeholder="1">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Reason</label>
+          <input type="text" class="form-control form-control-modern" [(ngModel)]="form.reason" placeholder="e.g. Transit, defect, expiry">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Reported by</label>
+          <input type="text" class="form-control form-control-modern" [(ngModel)]="form.reportedBy" placeholder="Department or person">
+        </div>
+      </div>
+      <div class="mt-4 d-flex gap-2">
+        <button type="button" class="btn btn-primary btn-modern" (click)="saveEntry()">
+          <i class="feather icon-save me-2"></i>Save
+        </button>
+        <button type="button" class="btn btn-outline-secondary" (click)="toggleCreateForm()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card table-card-modern">
+    <div class="card-header border-0 bg-light py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <h5 class="mb-0 fw-semibold">Damage records</h5>
+      <span class="text-muted small">{{ entries.length }} record(s)</span>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-modern table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Ref No</th>
+            <th>Date</th>
+            <th>Item</th>
+            <th>SKU</th>
+            <th>Size</th>
+            <th class="text-end">Qty</th>
+            <th>Reason</th>
+            <th>Reported by</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let e of entries">
+            <td><span class="ref-badge">{{ e.refNo }}</span></td>
+            <td>{{ e.date }}</td>
+            <td class="fw-semibold">{{ e.itemName }}</td>
+            <td class="text-muted small">{{ e.sku }}</td>
+            <td>{{ e.size }}</td>
+            <td class="text-end">{{ e.qty }}</td>
+            <td><span class="text-muted small">{{ e.reason }}</span></td>
+            <td>{{ e.reportedBy }}</td>
+            <td>
+              <span class="status-badge-modern" [ngClass]="{
+                'status-approved': e.status === 'Replaced' || e.status === 'Written off',
+                'status-pending': e.status === 'Under review'
+              }">{{ e.status }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

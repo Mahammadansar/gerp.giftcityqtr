@@ -6,7 +6,9 @@
           <h2>{{ title }}</h2>
           <p class="text-muted mb-0">{{ subtitle }}</p>
         </div>
-        <span class="demo-badge-page"><i class="feather icon-info me-1"></i>Demo Data</span>
+        <button type="button" class="btn btn-primary" (click)="toggleAddForm()">
+        {{ showAddForm ? 'Cancel' : 'Add Item' }}
+      </button>
       </div>
     </div>
   </div>
@@ -19,7 +21,7 @@
             <div class="stat-icon-box me-3"><i class="feather icon-package"></i></div>
             <div>
               <div class="text-muted small">Total SKUs</div>
-              <div class="h4 mb-0 fw-bold">6</div>
+              <div class="h4 mb-0 fw-bold">{{ items.length }}</div>
             </div>
           </div>
         </div>
@@ -32,7 +34,7 @@
             <div class="stat-icon-box me-3"><i class="feather icon-alert-triangle"></i></div>
             <div>
               <div class="text-muted small">Low Stock</div>
-              <div class="h4 mb-0 fw-bold text-warning">1</div>
+              <div class="h4 mb-0 fw-bold text-warning">{{ lowStockCount }}</div>
             </div>
           </div>
         </div>
@@ -45,7 +47,7 @@
             <div class="stat-icon-box me-3"><i class="feather icon-check-circle"></i></div>
             <div>
               <div class="text-muted small">In Stock</div>
-              <div class="h4 mb-0 fw-bold text-success">5</div>
+              <div class="h4 mb-0 fw-bold text-success">{{ inStockCount }}</div>
             </div>
           </div>
         </div>
@@ -53,6 +55,21 @@
     </div>
   </div>
 
+  <div class="card border-0 shadow-sm mb-4" *ngIf="showAddForm">
+    <div class="card-body">
+      <h6 class="mb-3">Add inventory item</h6>
+      <div class="row g-2">
+        <div class="col-md-2"><input type="text" class="form-control form-control-sm" [(ngModel)]="form.sku" placeholder="SKU" /></div>
+        <div class="col-md-2"><input type="text" class="form-control form-control-sm" [(ngModel)]="form.name" placeholder="Name" /></div>
+        <div class="col-md-2"><input type="text" class="form-control form-control-sm" [(ngModel)]="form.category" placeholder="Category" /></div>
+        <div class="col-md-1"><input type="text" class="form-control form-control-sm" [(ngModel)]="form.size" placeholder="Size" /></div>
+        <div class="col-md-1"><input type="number" class="form-control form-control-sm" [(ngModel)]="form.qty" placeholder="Qty" min="0" /></div>
+        <div class="col-md-1"><input type="text" class="form-control form-control-sm" [(ngModel)]="form.unit" placeholder="Unit" /></div>
+        <div class="col-md-1"><input type="number" class="form-control form-control-sm" [(ngModel)]="form.reorderLevel" placeholder="Reorder" min="0" /></div>
+        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveItem()">Save</button></div>
+      </div>
+    </div>
+  </div>
   <div class="card table-card-modern">
     <div class="card-header border-0 bg-light py-3">
       <h5 class="mb-0 fw-semibold">Inventory Items</h5>
@@ -64,10 +81,12 @@
             <th>SKU</th>
             <th>Name</th>
             <th>Category</th>
+            <th>Size</th>
             <th class="text-end">Qty</th>
             <th>Unit</th>
             <th class="text-end">Reorder At</th>
             <th>Status</th>
+            <th class="text-end">Adjust</th>
           </tr>
         </thead>
         <tbody>
@@ -75,6 +94,7 @@
             <td><span class="ref-badge">{{ i.sku }}</span></td>
             <td class="fw-semibold">{{ i.name }}</td>
             <td>{{ i.category }}</td>
+            <td>{{ i.size }}</td>
             <td class="text-end">{{ i.qty | number }}</td>
             <td>{{ i.unit }}</td>
             <td class="text-end">{{ i.reorderLevel }}</td>
@@ -83,6 +103,9 @@
                 'status-approved': i.status === 'In Stock',
                 'status-pending': i.status === 'Low Stock'
               }">{{ i.status }}</span>
+            </td>
+            <td class="text-end">
+              <input type="number" class="form-control form-control-sm d-inline-block w-75" #qtyInput [value]="i.qty" min="0" (change)="adjustQty(i, qtyInput.value ? +qtyInput.value : 0)" />
             </td>
           </tr>
         </tbody>

@@ -1,45 +1,75 @@
-import { Component } from '@angular/core';
-
-interface SalesOrder {
-  orderNo: string;
-  date: string;
-  client: string;
-  items: string;
-  total: number;
-  currency: string;
-  status: string;
-}
-
-interface PriceList {
-  name: string;
-  type: string;
-  validFrom: string;
-  items: number;
-  status: string;
-}
+import { Component, OnInit } from '@angular/core';
+import { AppDataService, SalesOrder, PriceList } from '../../services/app-data.service';
 
 @Component({
   selector: 'app-sales',
   templateUrl: './sales.component.html',
   styleUrls: ['./sales.component.scss']
 })
-export class SalesComponent {
+export class SalesComponent implements OnInit {
   activeTab: 'orders' | 'pricelists' = 'orders';
   title = 'Sales';
   subtitle = 'Track sales orders and manage price lists for gifts and advertisements.';
+  salesOrders: SalesOrder[] = [];
+  priceLists: PriceList[] = [];
+  showAddOrder = false;
+  showAddPriceList = false;
+  orderForm: Partial<SalesOrder> = { client: '', items: '', total: 0, currency: 'AED', date: '', status: 'Pending' };
+  priceListForm: Partial<PriceList> = { name: '', type: 'Gifts', validFrom: '', items: 0, status: 'Active' };
 
-  salesOrders: SalesOrder[] = [
-    { orderNo: 'SO-2026-001', date: '2026-02-25', client: 'Al Raha Events', items: 'Promo gifts, Branded items', total: 18500, currency: 'AED', status: 'Confirmed' },
-    { orderNo: 'SO-2026-002', date: '2026-02-24', client: 'Gulf Advertising LLC', items: 'Banners, Standees', total: 42000, currency: 'AED', status: 'Delivered' },
-    { orderNo: 'SO-2026-003', date: '2026-02-23', client: 'Corporate Gifts Co', items: 'Diaries, Pens, Bags', total: 12500, currency: 'AED', status: 'Pending' },
-    { orderNo: 'SO-2026-004', date: '2026-02-22', client: 'Expo 2026 Pavilion', items: 'Merchandise pack', total: 68000, currency: 'USD', status: 'Confirmed' },
-    { orderNo: 'SO-2026-005', date: '2026-02-21', client: 'Retail Plus', items: 'Display units, POS', total: 28900, currency: 'AED', status: 'Delivered' }
-  ];
+  constructor(private data: AppDataService) {}
 
-  priceLists: PriceList[] = [
-    { name: 'Standard Gift Catalog 2026', type: 'Gifts', validFrom: '2026-01-01', items: 120, status: 'Active' },
-    { name: 'Advertisement Print Rates', type: 'Print', validFrom: '2026-01-01', items: 45, status: 'Active' },
-    { name: 'Corporate Bulk (500+)', type: 'Gifts', validFrom: '2025-06-01', items: 85, status: 'Active' },
-    { name: 'Event Promo Pack', type: 'Bundle', validFrom: '2026-02-01', items: 12, status: 'Active' }
-  ];
+  ngOnInit(): void {
+    this.load();
+  }
+
+  load(): void {
+    this.salesOrders = this.data.getSalesOrders();
+    this.priceLists = this.data.getPriceLists();
+  }
+
+  toggleAddOrder(): void {
+    this.showAddOrder = !this.showAddOrder;
+    if (this.showAddOrder) this.orderForm = { client: '', items: '', total: 0, currency: 'AED', date: new Date().toISOString().slice(0, 10), status: 'Pending' };
+  }
+
+  saveOrder(): void {
+    const so: SalesOrder = {
+      id: String(Date.now()),
+      orderNo: 'SO-' + new Date().getFullYear() + '-' + String(this.salesOrders.length + 1).padStart(3, '0'),
+      date: this.orderForm.date || '',
+      client: this.orderForm.client || '',
+      items: this.orderForm.items || '',
+      total: this.orderForm.total || 0,
+      currency: this.orderForm.currency || 'AED',
+      status: this.orderForm.status || 'Pending'
+    };
+    this.data.addSalesOrder(so);
+    this.load();
+    this.showAddOrder = false;
+  }
+
+  toggleAddPriceList(): void {
+    this.showAddPriceList = !this.showAddPriceList;
+    if (this.showAddPriceList) this.priceListForm = { name: '', type: 'Gifts', validFrom: new Date().toISOString().slice(0, 10), items: 0, status: 'Active' };
+  }
+
+  savePriceList(): void {
+    const pl: PriceList = {
+      id: String(Date.now()),
+      name: this.priceListForm.name || '',
+      type: this.priceListForm.type || 'Gifts',
+      validFrom: this.priceListForm.validFrom || '',
+      items: this.priceListForm.items || 0,
+      status: this.priceListForm.status || 'Active'
+    };
+    this.data.addPriceList(pl);
+    this.load();
+    this.showAddPriceList = false;
+  }
+
+  updateOrderStatus(order: SalesOrder, status: string): void {
+    this.data.updateSalesOrderStatus(order.id, status);
+    this.load();
+  }
 }

@@ -1,42 +1,17 @@
-import { Component } from '@angular/core';
-
-export interface Invoice {
-  id: string;
-  invoiceNo: string;
-  client: string;
-  date: string;
-  dueDate: string;
-  amount: number;
-  currency: string;
-  status: string;
-}
-
-export interface InvoiceLine {
-  description: string;
-  qty: number;
-  unitPrice: number;
-  amount: number;
-}
+import { Component, OnInit } from '@angular/core';
+import { AppDataService, Invoice, InvoiceLine } from '../../services/app-data.service';
 
 @Component({
   selector: 'app-invoices',
   templateUrl: './invoices.component.html',
   styleUrls: ['./invoices.component.scss']
 })
-export class InvoicesComponent {
+export class InvoicesComponent implements OnInit {
   title = 'Generate Invoice';
   subtitle = 'Create and manage customer invoices for Gift City Qatar.';
   showGenerateForm = false;
+  invoices: Invoice[] = [];
 
-  invoices: Invoice[] = [
-    { id: '1', invoiceNo: 'INV-GCQ-2026-001', client: 'Al Raha Events', date: '2026-02-20', dueDate: '2026-03-22', amount: 18500, currency: 'AED', status: 'Paid' },
-    { id: '2', invoiceNo: 'INV-GCQ-2026-002', client: 'Gulf Advertising LLC', date: '2026-02-22', dueDate: '2026-03-24', amount: 42000, currency: 'AED', status: 'Sent' },
-    { id: '3', invoiceNo: 'INV-GCQ-2026-003', client: 'Corporate Gifts Co', date: '2026-02-24', dueDate: '2026-03-26', amount: 12500, currency: 'AED', status: 'Draft' },
-    { id: '4', invoiceNo: 'INV-GCQ-2026-004', client: 'Expo 2026 Pavilion', date: '2026-02-25', dueDate: '2026-03-27', amount: 68000, currency: 'USD', status: 'Sent' },
-    { id: '5', invoiceNo: 'INV-GCQ-2026-005', client: 'Retail Plus', date: '2026-02-26', dueDate: '2026-03-28', amount: 28900, currency: 'AED', status: 'Overdue' }
-  ];
-
-  // Generate form model
   form = {
     client: '',
     invoiceDate: new Date().toISOString().slice(0, 10),
@@ -46,14 +21,24 @@ export class InvoicesComponent {
     notes: ''
   };
   lines: InvoiceLine[] = [
-    { description: '', qty: 1, unitPrice: 0, amount: 0 }
+    { description: '', size: '', qty: 1, unitPrice: 0, amount: 0 }
   ];
+
+  constructor(private data: AppDataService) {}
+
+  ngOnInit(): void {
+    this.loadInvoices();
+  }
+
+  loadInvoices(): void {
+    this.invoices = this.data.getInvoices();
+  }
 
   get subtotal(): number {
     return this.lines.reduce((sum, l) => sum + (l.qty * l.unitPrice), 0);
   }
   get taxAmount(): number {
-    return (this.subtotal * this.form.taxPercent) / 100;
+    return (this.subtotal * (this.form.taxPercent || 0)) / 100;
   }
   get total(): number {
     return this.subtotal + this.taxAmount;
@@ -73,18 +58,16 @@ export class InvoicesComponent {
         taxPercent: 0,
         notes: ''
       };
-      this.lines = [{ description: '', qty: 1, unitPrice: 0, amount: 0 }];
+      this.lines = [{ description: '', size: '', qty: 1, unitPrice: 0, amount: 0 }];
     }
   }
 
   addLine(): void {
-    this.lines.push({ description: '', qty: 1, unitPrice: 0, amount: 0 });
+    this.lines.push({ description: '', size: '', qty: 1, unitPrice: 0, amount: 0 });
   }
 
   removeLine(index: number): void {
-    if (this.lines.length > 1) {
-      this.lines.splice(index, 1);
-  }
+    if (this.lines.length > 1) this.lines.splice(index, 1);
   }
 
   updateLineAmount(i: number): void {
@@ -93,26 +76,90 @@ export class InvoicesComponent {
   }
 
   saveInvoice(): void {
-    const nextNo = 'INV-GCQ-2026-' + String(this.invoices.length + 1).padStart(3, '0');
     const due = this.form.dueDate || this.form.invoiceDate;
-    this.invoices.unshift({
+    const inv: Invoice = {
       id: String(Date.now()),
-      invoiceNo: nextNo,
+      invoiceNo: this.data.getNextInvoiceNumber(),
       client: this.form.client || 'New Client',
       date: this.form.invoiceDate,
       dueDate: due,
       amount: this.total,
       currency: this.form.currency,
-      status: 'Draft'
-    });
+      status: 'Draft',
+      taxPercent: this.form.taxPercent,
+      notes: this.form.notes || '',
+      lines: this.lines.map(l => ({ ...l, amount: l.qty * l.unitPrice }))
+    };
+    this.data.addInvoice(inv);
+    this.loadInvoices();
     this.showGenerateForm = false;
   }
 
-  downloadInvoice(inv: Invoice): void {
-    console.log('Download invoice', inv.invoiceNo);
+  updateStatus(inv: Invoice, status: string): void {
+    this.data.updateInvoiceStatus(inv.id, status);
+    this.loadInvoices();
   }
 
   previewInvoice(inv: Invoice): void {
-    console.log('Preview invoice', inv.invoiceNo);
+    this.printInvoice(inv, false);
+  }
+
+  downloadInvoice(inv: Invoice): void {
+    this.printInvoice(inv, true);
+  }
+
+  private printInvoice(inv: Invoice, asDownload: boolean): void {
+    const lines = inv.lines && inv.lines.length > 0 ? inv.lines : [];
+    const subtotal = lines.reduce((s, l) => s + (l.qty * l.unitPrice), 0);
+    const taxP = inv.taxPercent || 0;
+    const taxAmt = (subtotal * taxP) / 100;
+    const total = subtotal + taxAmt;
+    const rows = lines.map(l => `
+      <tr>
+        <td>${l.description || '-'}</td>
+        <td>${l.size || '-'}</td>
+        <td>${l.qty}</td>
+        <td>${l.unitPrice.toFixed(2)}</td>
+        <td style="text-align:right">${(l.qty * l.unitPrice).toFixed(2)}</td>
+      </tr>`).join('');
+    const html = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Invoice ${inv.invoiceNo}</title>
+<style>
+body{ font-family: Segoe UI, sans-serif; padding: 24px; max-width: 800px; margin: 0 auto; }
+h1{ color: #b71c1c; font-size: 1.5rem; }
+table{ width: 100%; border-collapse: collapse; margin: 16px 0; }
+th,td{ border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+th{ background: #f5f5f5; }
+.text-right{ text-align: right; }
+.totals{ margin-top: 16px; }
+.notes{ margin-top: 24px; color: #666; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+  <h1>Gift City Qatar</h1>
+  <p><strong>INVOICE</strong> ${inv.invoiceNo}</p>
+  <p>Client: <strong>${inv.client}</strong></p>
+  <p>Date: ${inv.date} &nbsp; Due: ${inv.dueDate}</p>
+  <table>
+    <thead><tr><th>Description</th><th>Size</th><th>Qty</th><th>Unit Price</th><th class="text-right">Amount</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+  <div class="totals">
+    <p>Subtotal: ${subtotal.toFixed(2)} ${inv.currency}</p>
+    ${taxP > 0 ? `<p>Tax (${taxP}%): ${taxAmt.toFixed(2)} ${inv.currency}</p>` : ''}
+    <p><strong>Total: ${total.toFixed(2)} ${inv.currency}</strong></p>
+  </div>
+  ${inv.notes ? `<div class="notes">${inv.notes.replace(/\n/g, '<br>')}</div>` : ''}
+</body>
+</html>`;
+    const w = window.open('', '_blank');
+    if (w) {
+      w.document.write(html);
+      w.document.close();
+      w.focus();
+      setTimeout(() => { w.print(); if (asDownload) w.close(); }, 300);
+    }
   }
 }

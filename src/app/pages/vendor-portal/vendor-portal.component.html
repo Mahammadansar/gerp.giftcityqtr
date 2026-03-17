@@ -6,7 +6,24 @@
           <h2>{{ title }}</h2>
           <p class="text-muted mb-0">{{ subtitle }}</p>
         </div>
-        <span class="demo-badge-page"><i class="feather icon-info me-1"></i>Demo Data</span>
+        <button type="button" class="btn btn-primary" (click)="toggleAddPO()">
+          {{ showAddPO ? 'Cancel' : 'Create PO' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm mb-4" *ngIf="showAddPO">
+    <div class="card-body">
+      <h6 class="mb-3">Create purchase order</h6>
+      <div class="row g-2 align-items-end">
+        <div class="col-md-2"><label class="form-label small">Vendor</label><input type="text" class="form-control form-control-sm" [(ngModel)]="poForm.vendor" placeholder="Vendor" /></div>
+        <div class="col-md-2"><label class="form-label small">Date</label><input type="date" class="form-control form-control-sm" [(ngModel)]="poForm.date" /></div>
+        <div class="col-md-2"><label class="form-label small">Delivery date</label><input type="date" class="form-control form-control-sm" [(ngModel)]="poForm.deliveryDate" /></div>
+        <div class="col-md-2"><label class="form-label small">Items (summary)</label><input type="text" class="form-control form-control-sm" [(ngModel)]="poForm.items" placeholder="e.g. Supplies" /></div>
+        <div class="col-md-1"><label class="form-label small">Total</label><input type="number" class="form-control form-control-sm" [(ngModel)]="poForm.total" min="0" /></div>
+        <div class="col-md-1"><label class="form-label small">Currency</label><input type="text" class="form-control form-control-sm" [(ngModel)]="poForm.currency" placeholder="AED" /></div>
+        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="savePO()">Save</button></div>
       </div>
     </div>
   </div>
@@ -45,6 +62,23 @@
             <td>{{ a.action }}</td>
             <td><span class="ref-badge">{{ a.ref }}</span></td>
             <td>{{ a.date }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card table-card-modern mt-4">
+    <div class="card-header border-0 bg-light py-3"><h5 class="mb-0 fw-semibold">Purchase Orders</h5></div>
+    <div class="table-responsive">
+      <table class="table table-modern table-hover mb-0">
+        <thead><tr><th>PO No</th><th>Vendor</th><th>Date</th><th class="text-end">Total</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let p of pos">
+            <td><span class="ref-badge">{{ p.poNo }}</span></td>
+            <td>{{ p.vendor }}</td>
+            <td>{{ p.date }}</td>
+            <td class="text-end">{{ p.total | number }} AED</td>
+            <td><span class="status-badge-modern" [ngClass]="p.status === 'Approved' ? 'status-approved' : 'status-pending'">{{ p.status }}</span></td>
           </tr>
         </tbody>
       </table>

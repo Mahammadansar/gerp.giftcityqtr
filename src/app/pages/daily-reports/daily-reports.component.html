@@ -1,0 +1,98 @@
+<div class="portal-content">
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 page-header-modern">
+        <div>
+          <h2>{{ title }}</h2>
+          <p class="text-muted mb-0">{{ subtitle }}</p>
+        </div>
+        <button type="button" class="btn btn-outline-secondary btn-sm" (click)="refresh()">
+          <i class="feather icon-refresh-cw me-1"></i>Refresh
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <ul class="nav nav-tabs nav-tabs-modern mb-4">
+    <li class="nav-item"><a class="nav-link" [class.active]="activeTab === 'sales'" href="javascript:void(0)" (click)="activeTab = 'sales'">Sales</a></li>
+    <li class="nav-item"><a class="nav-link" [class.active]="activeTab === 'receipts'" href="javascript:void(0)" (click)="activeTab = 'receipts'">Receipts</a></li>
+    <li class="nav-item"><a class="nav-link" [class.active]="activeTab === 'purchase'" href="javascript:void(0)" (click)="activeTab = 'purchase'">Purchase</a></li>
+    <li class="nav-item"><a class="nav-link" [class.active]="activeTab === 'outstanding'" href="javascript:void(0)" (click)="activeTab = 'outstanding'">Outstanding Amount</a></li>
+    <li class="nav-item"><a class="nav-link" [class.active]="activeTab === 'payments'" href="javascript:void(0)" (click)="activeTab = 'payments'">Payments</a></li>
+  </ul>
+
+  <div class="card table-card-modern" *ngIf="activeTab === 'sales'">
+    <div class="card-header border-0 bg-light py-3"><h5 class="mb-0 fw-semibold">Daily Sales</h5></div>
+    <div class="table-responsive">
+      <table class="table table-modern table-hover mb-0">
+        <thead><tr><th>Date</th><th>Ref</th><th>Client</th><th class="text-end">Amount</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let r of salesRows">
+            <td>{{ r.date }}</td><td><span class="ref-badge">{{ r.ref }}</span></td><td>{{ r.client }}</td>
+            <td class="text-end fw-semibold">{{ r.amount | number }} {{ r.currency }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card table-card-modern" *ngIf="activeTab === 'receipts'">
+    <div class="card-header border-0 bg-light py-3"><h5 class="mb-0 fw-semibold">Receipts</h5></div>
+    <div class="table-responsive">
+      <table class="table table-modern table-hover mb-0">
+        <thead><tr><th>Date</th><th>Ref</th><th>From</th><th class="text-end">Amount</th><th>Mode</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let r of receiptsRows">
+            <td>{{ r.date }}</td><td><span class="ref-badge">{{ r.ref }}</span></td><td>{{ r.from }}</td>
+            <td class="text-end fw-semibold">{{ r.amount | number }}</td><td>{{ r.mode }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card table-card-modern" *ngIf="activeTab === 'purchase'">
+    <div class="card-header border-0 bg-light py-3"><h5 class="mb-0 fw-semibold">Daily Purchase</h5></div>
+    <div class="table-responsive">
+      <table class="table table-modern table-hover mb-0">
+        <thead><tr><th>Date</th><th>Ref</th><th>Vendor</th><th class="text-end">Amount</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let r of purchaseRows">
+            <td>{{ r.date }}</td><td><span class="ref-badge">{{ r.ref }}</span></td><td>{{ r.vendor }}</td>
+            <td class="text-end fw-semibold">{{ r.amount | number }} {{ r.currency }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card table-card-modern" *ngIf="activeTab === 'outstanding'">
+    <div class="card-header border-0 bg-light py-3"><h5 class="mb-0 fw-semibold">Outstanding Amount</h5></div>
+    <div class="table-responsive">
+      <table class="table table-modern table-hover mb-0">
+        <thead><tr><th>Client</th><th>Invoice No</th><th class="text-end">Amount</th><th>Due Date</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let r of outstandingRows">
+            <td>{{ r.client }}</td><td><span class="ref-badge">{{ r.invoiceNo }}</span></td>
+            <td class="text-end fw-semibold">{{ r.amount | number }} AED</td><td>{{ r.dueDate }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card table-card-modern" *ngIf="activeTab === 'payments'">
+    <div class="card-header border-0 bg-light py-3"><h5 class="mb-0 fw-semibold">Payments — Salary, Rent, Petty cash, Local Purchase</h5></div>
+    <div class="table-responsive">
+      <table class="table table-modern table-hover mb-0">
+        <thead><tr><th>Date</th><th>Category</th><th>Ref</th><th class="text-end">Amount</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let r of paymentsRows">
+            <td>{{ r.date }}</td><td>{{ r.category }}</td><td><span class="ref-badge">{{ r.ref }}</span></td>
+            <td class="text-end fw-semibold">{{ r.amount | number }} {{ r.currency }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

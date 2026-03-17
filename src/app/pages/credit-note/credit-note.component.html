@@ -1,0 +1,103 @@
+<div class="portal-content">
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 page-header-modern">
+        <div>
+          <h2>{{ title }}</h2>
+          <p class="text-muted mb-0">{{ subtitle }}</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="demo-badge-page"><i class="feather icon-info me-1"></i>Demo Data</span>
+          <button type="button" class="btn btn-primary btn-modern" (click)="toggleCreateForm()">
+            <i class="feather icon-plus me-2"></i>{{ showCreateForm ? 'Cancel' : 'Create Credit Note' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm mb-4" *ngIf="showCreateForm">
+    <div class="card-header bg-light border-0 py-3 d-flex justify-content-between align-items-center">
+      <h5 class="mb-0 fw-semibold">New Credit Note</h5>
+      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="toggleCreateForm()">
+        <i class="feather icon-x"></i>
+      </button>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Original invoice no</label>
+          <input type="text" class="form-control form-control-modern" [(ngModel)]="form.invoiceNo" placeholder="e.g. INV-GCQ-2026-001">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Client</label>
+          <input type="text" class="form-control form-control-modern" [(ngModel)]="form.client" placeholder="Client name">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label fw-semibold">Date</label>
+          <input type="date" class="form-control form-control-modern" [(ngModel)]="form.date">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label fw-semibold">Currency</label>
+          <select class="form-select form-select-modern" [(ngModel)]="form.currency">
+            <option value="AED">AED</option>
+            <option value="USD">USD</option>
+            <option value="QAR">QAR</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Credit amount</label>
+          <input type="number" class="form-control form-control-modern" [(ngModel)]="form.amount" min="0" step="0.01" placeholder="0.00">
+        </div>
+        <div class="col-md-8">
+          <label class="form-label fw-semibold">Reason</label>
+          <input type="text" class="form-control form-control-modern" [(ngModel)]="form.reason" placeholder="Return, adjustment, discount, etc.">
+        </div>
+      </div>
+      <div class="mt-4 d-flex gap-2">
+        <button type="button" class="btn btn-primary btn-modern" (click)="saveCreditNote()">
+          <i class="feather icon-save me-2"></i>Save Credit Note
+        </button>
+        <button type="button" class="btn btn-outline-secondary" (click)="toggleCreateForm()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card table-card-modern">
+    <div class="card-header border-0 bg-light py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <h5 class="mb-0 fw-semibold">Credit notes</h5>
+      <span class="text-muted small">{{ creditNotes.length }} credit note(s)</span>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-modern table-hover mb-0">
+        <thead>
+          <tr>
+            <th>CN No</th>
+            <th>Invoice No</th>
+            <th>Client</th>
+            <th>Date</th>
+            <th class="text-end">Amount</th>
+            <th>Reason</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let cn of creditNotes">
+            <td><span class="ref-badge">{{ cn.cnNo }}</span></td>
+            <td class="text-muted small">{{ cn.invoiceNo }}</td>
+            <td class="fw-semibold">{{ cn.client }}</td>
+            <td>{{ cn.date }}</td>
+            <td class="text-end">{{ cn.amount | number:'1.2-2' }} {{ cn.currency }}</td>
+            <td><span class="text-muted small">{{ cn.reason }}</span></td>
+            <td>
+              <span class="status-badge-modern" [ngClass]="{
+                'status-approved': cn.status === 'Applied',
+                'status-pending': cn.status === 'Pending' || cn.status === 'Draft'
+              }">{{ cn.status }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -6,7 +6,91 @@
           <h2>{{ title }}</h2>
           <p class="text-muted mb-0">{{ subtitle }}</p>
         </div>
-        <span class="demo-badge-page"><i class="feather icon-info me-1"></i>Demo Data</span>
+        <div class="d-flex align-items-center gap-2">
+          <span class="demo-badge-page"><i class="feather icon-info me-1"></i>Demo Data</span>
+          <button type="button" class="btn btn-primary btn-modern" (click)="toggleCreateForm()">
+            <i class="feather icon-plus me-2"></i>{{ showCreateForm ? 'Cancel' : 'Create PO' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create PO Form -->
+  <div class="card border-0 shadow-sm mb-4" *ngIf="showCreateForm">
+    <div class="card-header bg-light border-0 py-3 d-flex justify-content-between align-items-center">
+      <h5 class="mb-0 fw-semibold">New Purchase Order</h5>
+      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="toggleCreateForm()">
+        <i class="feather icon-x"></i>
+      </button>
+    </div>
+    <div class="card-body">
+      <div class="row g-3 mb-4">
+        <div class="col-md-5">
+          <label class="form-label fw-semibold">Vendor</label>
+          <input type="text" class="form-control form-control-modern" [(ngModel)]="form.vendor" placeholder="Vendor or supplier name">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label fw-semibold">Order date</label>
+          <input type="date" class="form-control form-control-modern" [(ngModel)]="form.orderDate">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label fw-semibold">Delivery date</label>
+          <input type="date" class="form-control form-control-modern" [(ngModel)]="form.deliveryDate">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label fw-semibold">Currency</label>
+          <select class="form-select form-select-modern" [(ngModel)]="form.currency">
+            <option value="AED">AED</option>
+            <option value="USD">USD</option>
+            <option value="QAR">QAR</option>
+          </select>
+        </div>
+      </div>
+      <label class="form-label fw-semibold">Line items</label>
+      <div class="table-responsive mb-3">
+        <table class="table table-bordered table-sm align-middle">
+          <thead class="table-light">
+            <tr>
+              <th style="width: 30%">Description</th>
+              <th style="width: 12%">Size</th>
+              <th style="width: 12%">Qty</th>
+              <th style="width: 18%">Unit price</th>
+              <th style="width: 18%">Amount</th>
+              <th style="width: 5%"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let line of poLines; let i = index">
+              <td><input type="text" class="form-control form-control-sm" [(ngModel)]="line.description" placeholder="Item"></td>
+              <td><input type="text" class="form-control form-control-sm" [(ngModel)]="line.size" placeholder="Size"></td>
+              <td><input type="number" class="form-control form-control-sm" [(ngModel)]="line.qty" (ngModelChange)="updatePOLineAmount(i)" min="1"></td>
+              <td><input type="number" class="form-control form-control-sm" [(ngModel)]="line.unitPrice" (ngModelChange)="updatePOLineAmount(i)" min="0" step="0.01"></td>
+              <td class="text-end">{{ (line.qty * line.unitPrice) | number:'1.2-2' }}</td>
+              <td>
+                <button type="button" class="btn btn-sm btn-outline-danger p-1" (click)="removePOLine(i)" [disabled]="poLines.length === 1" title="Remove">
+                  <i class="feather icon-trash-2"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <button type="button" class="btn btn-outline-primary btn-sm mb-3" (click)="addPOLine()">
+        <i class="feather icon-plus me-1"></i>Add line
+      </button>
+      <div class="d-flex justify-content-end mb-3">
+        <div class="fw-bold">Total: {{ poSubtotal | number:'1.2-2' }} {{ form.currency }}</div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Notes (optional)</label>
+        <textarea class="form-control form-control-modern" [(ngModel)]="form.notes" rows="2" placeholder="Delivery instructions, etc."></textarea>
+      </div>
+      <div class="d-flex gap-2">
+        <button type="button" class="btn btn-primary btn-modern" (click)="savePO()">
+          <i class="feather icon-save me-2"></i>Save PO
+        </button>
+        <button type="button" class="btn btn-outline-secondary" (click)="toggleCreateForm()">Cancel</button>
       </div>
     </div>
   </div>

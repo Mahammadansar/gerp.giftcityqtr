@@ -6,14 +6,28 @@
           <h2>{{ title }}</h2>
           <p class="text-muted mb-0">{{ subtitle }}</p>
         </div>
-        <span class="demo-badge-page"><i class="feather icon-info me-1"></i>Demo Data</span>
+        <button type="button" class="btn btn-primary" (click)="toggleAddForm()">
+        {{ showAddForm ? 'Cancel' : 'Add Asset' }}
+      </button>
       </div>
     </div>
   </div>
 
+  <div class="card border-0 shadow-sm mb-4" *ngIf="showAddForm">
+    <div class="card-body">
+      <h6 class="mb-3">Add asset</h6>
+      <div class="row g-2 align-items-end">
+        <div class="col-md-2"><input type="text" class="form-control form-control-sm" [(ngModel)]="form.name" placeholder="Name" /></div>
+        <div class="col-md-2"><input type="text" class="form-control form-control-sm" [(ngModel)]="form.category" placeholder="Category" /></div>
+        <div class="col-md-2"><input type="date" class="form-control form-control-sm" [(ngModel)]="form.purchaseDate" placeholder="Purchase date" /></div>
+        <div class="col-md-2"><input type="number" class="form-control form-control-sm" [(ngModel)]="form.value" placeholder="Value" min="0" /></div>
+        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveAsset()">Save</button></div>
+      </div>
+    </div>
+  </div>
   <div class="card table-card-modern">
     <div class="card-header border-0 bg-light py-3">
-      <h5 class="mb-0 fw-semibold">Fixed Assets (Pro)</h5>
+      <h5 class="mb-0 fw-semibold">Fixed Assets</h5>
     </div>
     <div class="table-responsive">
       <table class="table table-modern table-hover mb-0">
@@ -24,7 +38,6 @@
             <th>Category</th>
             <th>Purchase Date</th>
             <th class="text-end">Value (AED)</th>
-            <th>Depreciation</th>
             <th>Status</th>
           </tr>
         </thead>
@@ -35,7 +48,6 @@
             <td>{{ a.category }}</td>
             <td>{{ a.purchaseDate }}</td>
             <td class="text-end">{{ a.value | number }}</td>
-            <td>{{ a.depreciation }}</td>
             <td><span class="status-badge-modern status-approved">{{ a.status }}</span></td>
           </tr>
         </tbody>

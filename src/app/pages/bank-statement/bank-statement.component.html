@@ -1,0 +1,91 @@
+<div class="portal-content">
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 page-header-modern">
+        <div>
+          <h2>{{ title }}</h2>
+          <p class="text-muted mb-0">{{ subtitle }}</p>
+        </div>
+        <button type="button" class="btn btn-primary" (click)="openAdd()">
+        Add Entry
+      </button>
+      </div>
+    </div>
+  </div>
+  <ul class="nav nav-tabs nav-tabs-modern mb-4">
+    <li class="nav-item"><a class="nav-link" [class.active]="activeTab === 'cheque'" href="javascript:void(0)" (click)="activeTab = 'cheque'">Cheque</a></li>
+    <li class="nav-item"><a class="nav-link" [class.active]="activeTab === 'deposits'" href="javascript:void(0)" (click)="activeTab = 'deposits'">Deposits</a></li>
+    <li class="nav-item"><a class="nav-link" [class.active]="activeTab === 'withdrawals'" href="javascript:void(0)" (click)="activeTab = 'withdrawals'">Withdrawals</a></li>
+    <li class="nav-item"><a class="nav-link" [class.active]="activeTab === 'transfer'" href="javascript:void(0)" (click)="activeTab = 'transfer'">Transfer</a></li>
+  </ul>
+  <div class="card border-0 shadow-sm mb-4" *ngIf="showAdd">
+    <div class="card-body">
+      <h6 class="mb-3">Add {{ activeTab }}</h6>
+      <div class="row g-2 align-items-end">
+        <div class="col-md-2"><label class="form-label small">Date</label><input type="date" class="form-control form-control-sm" [(ngModel)]="form.date" /></div>
+        <div class="col-md-2"><label class="form-label small">Ref</label><input type="text" class="form-control form-control-sm" [(ngModel)]="form.ref" placeholder="Ref" /></div>
+        <div class="col-md-2" *ngIf="activeTab === 'cheque'"><label class="form-label small">Payee</label><input type="text" class="form-control form-control-sm" [(ngModel)]="form.description" placeholder="Payee" /></div>
+        <div class="col-md-2" *ngIf="activeTab === 'deposits'"><label class="form-label small">From</label><input type="text" class="form-control form-control-sm" [(ngModel)]="form.description" placeholder="From" /></div>
+        <div class="col-md-2" *ngIf="activeTab === 'withdrawals'"><label class="form-label small">Purpose</label><input type="text" class="form-control form-control-sm" [(ngModel)]="form.description" placeholder="Purpose" /></div>
+        <div class="col-md-2" *ngIf="activeTab === 'transfer'"><label class="form-label small">From</label><input type="text" class="form-control form-control-sm" [(ngModel)]="form.description" placeholder="From" /></div>
+        <div class="col-md-2" *ngIf="activeTab === 'transfer'"><label class="form-label small">To</label><input type="text" class="form-control form-control-sm" [(ngModel)]="form.toFrom" placeholder="To" /></div>
+        <div class="col-md-2"><label class="form-label small">Amount</label><input type="number" class="form-control form-control-sm" [(ngModel)]="form.amount" min="0" /></div>
+        <div class="col-md-2" *ngIf="activeTab === 'cheque'"><label class="form-label small">Status</label><select class="form-select form-select-sm" [(ngModel)]="form.status"><option>Pending</option><option>Cleared</option></select></div>
+        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveEntry()">Save</button><button type="button" class="btn btn-sm btn-outline-secondary ms-1" (click)="showAdd = false">Cancel</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="card table-card-modern" *ngIf="activeTab === 'cheque'">
+    <div class="card-header border-0 bg-light py-3"><h5 class="mb-0 fw-semibold">Cheques</h5></div>
+    <div class="table-responsive">
+      <table class="table table-modern table-hover mb-0">
+        <thead><tr><th>Date</th><th>Cheque No</th><th>Payee</th><th class="text-end">Amount</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let r of chequeRows">
+            <td>{{ r.date }}</td><td><span class="ref-badge">{{ r.ref }}</span></td><td>{{ r.description }}</td>
+            <td class="text-end fw-semibold">{{ r.amount | number }} AED</td><td><span class="status-badge-modern" [ngClass]="r.status === 'Cleared' ? 'status-approved' : 'status-pending'">{{ r.status || 'Pending' }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card table-card-modern" *ngIf="activeTab === 'deposits'">
+    <div class="card-header border-0 bg-light py-3"><h5 class="mb-0 fw-semibold">Deposits</h5></div>
+    <div class="table-responsive">
+      <table class="table table-modern table-hover mb-0">
+        <thead><tr><th>Date</th><th>Ref</th><th>From</th><th class="text-end">Amount</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let r of depositsRows">
+            <td>{{ r.date }}</td><td><span class="ref-badge">{{ r.ref }}</span></td><td>{{ r.description }}</td><td class="text-end fw-semibold">{{ r.amount | number }} AED</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card table-card-modern" *ngIf="activeTab === 'withdrawals'">
+    <div class="card-header border-0 bg-light py-3"><h5 class="mb-0 fw-semibold">Withdrawals</h5></div>
+    <div class="table-responsive">
+      <table class="table table-modern table-hover mb-0">
+        <thead><tr><th>Date</th><th>Ref</th><th>Purpose</th><th class="text-end">Amount</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let r of withdrawalsRows">
+            <td>{{ r.date }}</td><td><span class="ref-badge">{{ r.ref }}</span></td><td>{{ r.description }}</td><td class="text-end fw-semibold">{{ r.amount | number }} AED</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card table-card-modern" *ngIf="activeTab === 'transfer'">
+    <div class="card-header border-0 bg-light py-3"><h5 class="mb-0 fw-semibold">Transfers</h5></div>
+    <div class="table-responsive">
+      <table class="table table-modern table-hover mb-0">
+        <thead><tr><th>Date</th><th>From</th><th>To</th><th class="text-end">Amount</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let r of transferRows">
+            <td>{{ r.date }}</td><td>{{ r.description }}</td><td>{{ r.toFrom }}</td><td class="text-end fw-semibold">{{ r.amount | number }} AED</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

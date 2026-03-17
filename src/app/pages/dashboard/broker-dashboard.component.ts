@@ -1,109 +1,83 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { AppDataService } from '../../services/app-data.service';
 
 @Component({
   selector: 'app-broker-dashboard',
   templateUrl: './broker-dashboard.component.html',
   styleUrls: ['./broker-dashboard.component.scss']
 })
-export class BrokerDashboardComponent {
-  kpis = [
-    {
-      label: 'Total Orders',
-      value: 142,
-      icon: 'feather icon-shopping-cart',
-      trend: 12,
-      subtitle: 'This month',
-      chartData: '0,20 20,25 40,30 60,35 80,40 100,45'
-    },
-    {
-      label: 'Revenue',
-      value: 1250000,
-      icon: 'feather icon-dollar-sign',
-      trend: 8,
-      subtitle: 'AED',
-      chartData: '0,15 20,20 40,25 60,30 80,35 100,40'
-    },
-    {
-      label: 'Gross Profit',
-      value: 375000,
-      icon: 'feather icon-trending-up',
-      trend: 15,
-      subtitle: 'AED',
-      chartData: '0,10 20,15 40,20 60,25 80,30 100,35'
-    },
-    {
-      label: 'Active Clients',
-      value: 48,
-      icon: 'feather icon-users',
-      trend: 5,
-      subtitle: 'Active now',
-      chartData: '0,25 20,28 40,30 60,32 80,35 100,38'
-    }
-  ];
+export class BrokerDashboardComponent implements OnInit {
+  kpis: { label: string; value: number; icon: string; trend: number; subtitle: string; chartData: string }[] = [];
+  revenueData: { label: string; amount: number; value: number }[] = [];
+  quickStats: { icon: string; label: string; value: string; change: number }[] = [];
+  recentActivities: { icon: string; type: string; title: string; time: string; description: string }[] = [];
+  topOrders: { client: string; amount: number; currency: string }[] = [];
+  topDeals = this.topOrders;
+  performance: { label: string; value: string; percentage: number; color: string }[] = [];
+  clientSegments: { label: string; count: number; percentage: number; type: string }[] = [];
 
-  revenueData = [
-    { label: 'Sep', amount: 185000, value: 60 },
-    { label: 'Oct', amount: 220000, value: 71 },
-    { label: 'Nov', amount: 195000, value: 63 },
-    { label: 'Dec', amount: 280000, value: 90 },
-    { label: 'Jan', amount: 245000, value: 79 },
-    { label: 'Feb', amount: 310000, value: 100 }
-  ];
+  constructor(private data: AppDataService) {}
 
-  quickStats = [
-    { icon: 'feather icon-calendar', label: 'Orders This Week', value: '28', change: 14 },
-    { icon: 'feather icon-dollar-sign', label: 'Avg. Order Value', value: '8.8K AED', change: 8 },
-    { icon: 'feather icon-clock', label: 'Avg. Fulfilment', value: '5 days', change: -5 },
-    { icon: 'feather icon-star', label: 'Client Rating', value: '4.8/5', change: 2 }
-  ];
+  ngOnInit(): void {
+    this.refresh();
+  }
 
-  recentActivities = [
-    {
-      icon: 'feather icon-check-circle',
-      type: 'success',
-      title: 'Order delivered - Corporate Gifts Pack',
-      time: '2 hours ago',
-      description: 'Al Raha Events, Value: 18.5K AED'
-    },
-    {
-      icon: 'feather icon-user-plus',
-      type: 'info',
-      title: 'New client - Gulf Advertising LLC',
-      time: '5 hours ago',
-      description: 'Corporate segment, Doha'
-    },
-    {
-      icon: 'feather icon-file-text',
-      type: 'primary',
-      title: 'Contract signed - Expo 2026 Campaign',
-      time: '1 day ago',
-      description: 'Expo 2026 Pavilion, 68K AED'
-    },
-    {
-      icon: 'feather icon-bell',
-      type: 'warning',
-      title: 'Payment received - Branded Merchandise',
-      time: '2 days ago',
-      description: 'Retail Plus, Amount: 28.9K AED'
-    }
-  ];
+  refresh(): void {
+    const invoices = this.data.getInvoices();
+    const pos = this.data.getPurchaseOrders();
+    const totalRevenue = invoices.reduce((s, i) => s + i.amount, 0);
+    const paidRevenue = invoices.filter(i => i.status === 'Paid').reduce((s, i) => s + i.amount, 0);
+    const clientCount = new Set(invoices.map(i => i.client)).size;
 
-  performance = [
-    { label: 'Monthly Target', value: '85%', percentage: 85, color: 'primary' },
-    { label: 'Client Satisfaction', value: '92%', percentage: 92, color: 'success' },
-    { label: 'Order Conversion', value: '68%', percentage: 68, color: 'primary' }
-  ];
+    this.kpis = [
+      { label: 'Total Orders', value: invoices.length + this.data.getSalesOrders().length, icon: 'feather icon-shopping-cart', trend: 12, subtitle: 'This month', chartData: '0,20 20,25 40,30 60,35 80,40 100,45' },
+      { label: 'Revenue', value: totalRevenue, icon: 'feather icon-dollar-sign', trend: 8, subtitle: 'AED', chartData: '0,15 20,20 40,25 60,30 80,35 100,40' },
+      { label: 'Gross Profit', value: Math.round(totalRevenue * 0.3), icon: 'feather icon-trending-up', trend: 15, subtitle: 'AED', chartData: '0,10 20,15 40,20 60,25 80,30 100,35' },
+      { label: 'Active Clients', value: clientCount, icon: 'feather icon-users', trend: 5, subtitle: 'Active now', chartData: '0,25 20,28 40,30 60,32 80,35 100,38' }
+    ];
 
-  topDeals = [
-    { project: 'Expo 2026 Campaign', unit: 'Merchandise pack', client: 'Expo 2026 Pavilion', value: 68000, status: 'CLOSED' },
-    { project: 'Gulf Ad Print', unit: 'Banners, Standees', client: 'Gulf Advertising LLC', value: 42000, status: 'CLOSED' },
-    { project: 'Corporate Gifts Q1', unit: 'Diaries, Pens', client: 'Corporate Gifts Co', value: 24000, status: 'PENDING' },
-    { project: 'Al Raha Branding', unit: 'Promo gifts', client: 'Al Raha Events', value: 18500, status: 'PENDING' }
-  ];
+    this.revenueData = invoices.length ? [
+      { label: 'Invoices', amount: totalRevenue, value: 100 },
+      { label: 'Paid', amount: paidRevenue, value: Math.min(100, Math.round((paidRevenue / totalRevenue) * 100)) }
+    ] : [
+      { label: 'Jan', amount: 0, value: 0 },
+      { label: 'Feb', amount: 0, value: 0 }
+    ];
 
-  clientSegments = [
-    { label: 'Corporate', count: 22, percentage: 46, type: 'corporate' },
-    { label: 'Retail', count: 14, percentage: 29, type: 'retail' },
-    { label: 'Events', count: 12, percentage: 25, type: 'events' }
-  ];
+    this.quickStats = [
+      { icon: 'feather icon-calendar', label: 'Orders This Week', value: String(invoices.length), change: 14 },
+      { icon: 'feather icon-dollar-sign', label: 'Avg. Order Value', value: invoices.length ? (totalRevenue / invoices.length / 1000).toFixed(1) + 'K AED' : '0 AED', change: 8 },
+      { icon: 'feather icon-clock', label: 'Pending POs', value: String(pos.filter(p => p.status === 'Pending').length), change: 0 },
+      { icon: 'feather icon-file-text', label: 'Draft Invoices', value: String(invoices.filter(i => i.status === 'Draft').length), change: 0 }
+    ];
+
+    this.recentActivities = invoices.slice(0, 3).map((inv, i) => ({
+      icon: inv.status === 'Paid' ? 'feather icon-check-circle' : 'feather icon-file-text',
+      type: inv.status === 'Paid' ? 'success' : 'primary',
+      title: inv.status === 'Paid' ? 'Invoice paid' : 'Invoice ' + inv.invoiceNo,
+      time: i === 0 ? 'Recent' : inv.date,
+      description: inv.client + ', ' + inv.amount + ' ' + inv.currency
+    }));
+
+    const byClient = new Map<string, number>();
+    invoices.forEach(i => byClient.set(i.client, (byClient.get(i.client) || 0) + i.amount));
+    this.topOrders = Array.from(byClient.entries()).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([client, amount]) => ({ client, amount, currency: 'AED' }));
+    this.topDeals = this.topOrders;
+    const totalClients = byClient.size;
+    const amounts = Array.from(byClient.values());
+    const high = amounts.filter(a => a >= 50000).length;
+    const mid = amounts.filter(a => a >= 10000 && a < 50000).length;
+    const low = amounts.filter(a => a < 10000).length;
+    this.clientSegments = totalClients ? [
+      { label: 'High value (50K+)', count: high, percentage: Math.round((high / totalClients) * 100), type: 'green' },
+      { label: 'Mid (10K–50K)', count: mid, percentage: Math.round((mid / totalClients) * 100), type: 'blue' },
+      { label: 'Standard (&lt;10K)', count: low, percentage: Math.round((low / totalClients) * 100), type: 'gray' }
+    ] : [];
+    const paidPct = totalRevenue > 0 ? Math.round((paidRevenue / totalRevenue) * 100) : 0;
+    this.performance = [
+      { label: 'Collection Rate', value: paidRevenue + ' AED', percentage: paidPct, color: 'green' },
+      { label: 'Orders Fulfilled', value: String(invoices.filter(i => i.status === 'Paid').length), percentage: invoices.length ? Math.round((invoices.filter(i => i.status === 'Paid').length / invoices.length) * 100) : 0, color: 'blue' },
+      { label: 'Client Reach', value: String(clientCount), percentage: Math.min(100, clientCount * 2), color: 'red' }
+    ];
+  }
 }

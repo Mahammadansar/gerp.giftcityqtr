@@ -6,7 +6,14 @@
           <h2>{{ title }}</h2>
           <p class="text-muted mb-0">{{ subtitle }}</p>
         </div>
-        <span class="demo-badge-page"><i class="feather icon-info me-1"></i>Demo Data</span>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-primary" (click)="toggleLogTime()" *ngIf="activeTab === 'timesheets'">
+            {{ showLogTime ? 'Cancel' : 'Log Time' }}
+          </button>
+          <button type="button" class="btn btn-outline-primary" (click)="toggleAddProject()" *ngIf="activeTab === 'profitability'">
+            {{ showAddProject ? 'Cancel' : 'Add Project' }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -16,6 +23,19 @@
     <li class="nav-item"><a class="nav-link" [class.active]="activeTab === 'profitability'" href="javascript:void(0)" (click)="activeTab = 'profitability'">Project Profitability</a></li>
   </ul>
 
+  <div class="card border-0 shadow-sm mb-4" *ngIf="activeTab === 'timesheets' && showLogTime">
+    <div class="card-body">
+      <h6 class="mb-3">Log time</h6>
+      <div class="row g-2 align-items-end">
+        <div class="col-md-2"><label class="form-label small">Project</label><input type="text" class="form-control form-control-sm" [(ngModel)]="tsForm.project" placeholder="Project" /></div>
+        <div class="col-md-2"><label class="form-label small">Date</label><input type="date" class="form-control form-control-sm" [(ngModel)]="tsForm.date" /></div>
+        <div class="col-md-1"><label class="form-label small">Hours</label><input type="number" class="form-control form-control-sm" [(ngModel)]="tsForm.hours" min="0" step="0.5" /></div>
+        <div class="col-md-2"><label class="form-label small">Task</label><input type="text" class="form-control form-control-sm" [(ngModel)]="tsForm.task" placeholder="Task" /></div>
+        <div class="col-md-2"><label class="form-label small">Billable</label><div class="form-check"><input type="checkbox" class="form-check-input" [(ngModel)]="tsForm.billable" id="tsBillable" /><label class="form-check-label" for="tsBillable">Billable</label></div></div>
+        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveTimesheet()">Save</button></div>
+      </div>
+    </div>
+  </div>
   <div class="card table-card-modern" *ngIf="activeTab === 'timesheets'">
     <div class="card-header border-0 bg-light py-3"><h5 class="mb-0 fw-semibold">Recent Timesheet Entries</h5></div>
     <div class="table-responsive">
@@ -42,6 +62,18 @@
     </div>
   </div>
 
+  <div class="card border-0 shadow-sm mb-4" *ngIf="activeTab === 'profitability' && showAddProject">
+    <div class="card-body">
+      <h6 class="mb-3">Add project profitability</h6>
+      <div class="row g-2 align-items-end">
+        <div class="col-md-2"><label class="form-label small">Project</label><input type="text" class="form-control form-control-sm" [(ngModel)]="projectForm.project" placeholder="Project" /></div>
+        <div class="col-md-2"><label class="form-label small">Client</label><input type="text" class="form-control form-control-sm" [(ngModel)]="projectForm.client" placeholder="Client" /></div>
+        <div class="col-md-2"><label class="form-label small">Revenue</label><input type="number" class="form-control form-control-sm" [(ngModel)]="projectForm.revenue" min="0" /></div>
+        <div class="col-md-2"><label class="form-label small">Cost</label><input type="number" class="form-control form-control-sm" [(ngModel)]="projectForm.cost" min="0" /></div>
+        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveProject()">Save</button></div>
+      </div>
+    </div>
+  </div>
   <div class="card table-card-modern" *ngIf="activeTab === 'profitability'">
     <div class="card-header border-0 bg-light py-3"><h5 class="mb-0 fw-semibold">Project Profitability</h5></div>
     <div class="table-responsive">

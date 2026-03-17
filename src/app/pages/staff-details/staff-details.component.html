@@ -1,0 +1,41 @@
+<div class="portal-content">
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 page-header-modern">
+        <div><h2>{{ title }}</h2><p class="text-muted mb-0">{{ subtitle }}</p></div>
+        <button type="button" class="btn btn-primary" (click)="toggleAddForm()">{{ showAddForm ? 'Cancel' : 'Add Staff' }}</button>
+      </div>
+    </div>
+  </div>
+  <div class="card border-0 shadow-sm mb-4" *ngIf="showAddForm">
+    <div class="card-body">
+      <h6 class="mb-3">Add staff</h6>
+      <div class="row g-2 align-items-end">
+        <div class="col-md-2"><input type="text" class="form-control form-control-sm" [(ngModel)]="form.name" placeholder="Name" /></div>
+        <div class="col-md-2"><input type="text" class="form-control form-control-sm" [(ngModel)]="form.role" placeholder="Role" /></div>
+        <div class="col-md-2"><input type="text" class="form-control form-control-sm" [(ngModel)]="form.department" placeholder="Department" /></div>
+        <div class="col-md-2"><input type="date" class="form-control form-control-sm" [(ngModel)]="form.joinDate" /></div>
+        <div class="col-md-2"><input type="email" class="form-control form-control-sm" [(ngModel)]="form.email" placeholder="Email" /></div>
+        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveStaff()">Save</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="card table-card-modern">
+    <div class="card-header border-0 bg-light py-3"><h5 class="mb-0 fw-semibold">Staff list</h5></div>
+    <div class="table-responsive">
+      <table class="table table-modern table-hover mb-0">
+        <thead><tr><th>ID</th><th>Name</th><th>Role</th><th>Department</th><th>Join Date</th><th>Email</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let s of staff">
+            <td><span class="ref-badge">{{ s.id }}</span></td>
+            <td class="fw-semibold">{{ s.name }}</td>
+            <td>{{ s.role }}</td>
+            <td>{{ s.department }}</td>
+            <td>{{ s.joinDate }}</td>
+            <td class="text-muted small">{{ s.email }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

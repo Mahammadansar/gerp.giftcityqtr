@@ -1,25 +1,38 @@
-import { Component } from '@angular/core';
-
-interface ChatThread {
-  name: string;
-  role: string;
-  lastMessage: string;
-  time: string;
-  unread: number;
-}
+import { Component, OnInit } from '@angular/core';
+import { AppDataService, ChatMessage } from '../../services/app-data.service';
 
 @Component({
   selector: 'app-collaboration',
   templateUrl: './collaboration.component.html',
   styleUrls: ['./collaboration.component.scss']
 })
-export class CollaborationComponent {
+export class CollaborationComponent implements OnInit {
   title = 'Collaboration';
-  subtitle = 'Chat, voice, video and screen sharing with users.';
+  subtitle = 'Chat and messages with your team.';
 
-  threads: ChatThread[] = [
-    { name: 'Ahmed Khan', role: 'Sales', lastMessage: 'Can we schedule a call for the Expo proposal?', time: '10 min ago', unread: 2 },
-    { name: 'Sara Ali', role: 'Finance', lastMessage: 'Invoice approved. Thanks!', time: '1 hour ago', unread: 0 },
-    { name: 'Project Alpha Team', role: 'Group', lastMessage: 'Design review at 3 PM', time: '2 hours ago', unread: 1 }
-  ];
+  messages: ChatMessage[] = [];
+  newFrom = '';
+  newText = '';
+
+  constructor(private data: AppDataService) {}
+
+  ngOnInit(): void {
+    this.load();
+  }
+
+  load(): void {
+    this.messages = this.data.getCollaboration();
+  }
+
+  sendMessage(): void {
+    if (!this.newText.trim()) return;
+    this.data.addChatMessage({
+      id: String(Date.now()),
+      from: this.newFrom || 'You',
+      text: this.newText.trim(),
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    });
+    this.newText = '';
+    this.load();
+  }
 }

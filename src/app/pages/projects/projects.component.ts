@@ -1,42 +1,74 @@
-import { Component } from '@angular/core';
-
-interface TimesheetEntry {
-  project: string;
-  date: string;
-  hours: number;
-  task: string;
-  billable: boolean;
-}
-
-interface ProjectProfit {
-  project: string;
-  client: string;
-  revenue: number;
-  cost: number;
-  profit: number;
-  margin: string;
-}
+import { Component, OnInit } from '@angular/core';
+import { AppDataService, TimesheetEntry, ProjectProfit } from '../../services/app-data.service';
 
 @Component({
   selector: 'app-projects',
   templateUrl: './projects.component.html',
   styleUrls: ['./projects.component.scss']
 })
-export class ProjectsComponent {
+export class ProjectsComponent implements OnInit {
   activeTab: 'timesheets' | 'profitability' = 'timesheets';
   title = 'Projects & Timesheets';
   subtitle = 'Bill timesheets and track project profitability.';
 
-  timesheets: TimesheetEntry[] = [
-    { project: 'Expo 2026 Campaign', date: '2026-02-26', hours: 8, task: 'Design & layout', billable: true },
-    { project: 'Al Raha Branding', date: '2026-02-25', hours: 6, task: 'Client meeting', billable: true },
-    { project: 'Corporate Gifts Q1', date: '2026-02-24', hours: 4, task: 'Sourcing', billable: true },
-    { project: 'Internal', date: '2026-02-23', hours: 2, task: 'Training', billable: false }
-  ];
+  timesheets: TimesheetEntry[] = [];
+  profitability: ProjectProfit[] = [];
+  showLogTime = false;
+  showAddProject = false;
+  tsForm: Partial<TimesheetEntry> = { project: '', date: '', hours: 0, task: '', billable: true };
+  projectForm: Partial<ProjectProfit> = { project: '', client: '', revenue: 0, cost: 0, profit: 0, margin: '' };
 
-  profitability: ProjectProfit[] = [
-    { project: 'Expo 2026 Campaign', client: 'Expo 2026 Pavilion', revenue: 68000, cost: 42000, profit: 26000, margin: '38%' },
-    { project: 'Al Raha Branding', client: 'Al Raha Events', revenue: 18500, cost: 9200, profit: 9300, margin: '50%' },
-    { project: 'Gulf Ad Campaign', client: 'Gulf Advertising LLC', revenue: 42000, cost: 28500, profit: 13500, margin: '32%' }
-  ];
+  constructor(private data: AppDataService) {}
+
+  ngOnInit(): void {
+    this.load();
+  }
+
+  load(): void {
+    this.timesheets = this.data.getTimesheets();
+    this.profitability = this.data.getProjectProfit();
+  }
+
+  toggleLogTime(): void {
+    this.showLogTime = !this.showLogTime;
+    if (this.showLogTime) this.tsForm = { project: '', date: new Date().toISOString().slice(0, 10), hours: 0, task: '', billable: true };
+  }
+
+  saveTimesheet(): void {
+    const t: TimesheetEntry = {
+      id: String(Date.now()),
+      project: this.tsForm.project || '',
+      date: this.tsForm.date || '',
+      hours: this.tsForm.hours || 0,
+      task: this.tsForm.task || '',
+      billable: this.tsForm.billable ?? true
+    };
+    this.data.addTimesheet(t);
+    this.load();
+    this.showLogTime = false;
+  }
+
+  toggleAddProject(): void {
+    this.showAddProject = !this.showAddProject;
+    if (this.showAddProject) this.projectForm = { project: '', client: '', revenue: 0, cost: 0, profit: 0, margin: '' };
+  }
+
+  saveProject(): void {
+    const rev = this.projectForm.revenue || 0;
+    const cost = this.projectForm.cost || 0;
+    const profit = rev - cost;
+    const margin = rev > 0 ? Math.round((profit / rev) * 100) + '%' : '0%';
+    const p: ProjectProfit = {
+      id: String(Date.now()),
+      project: this.projectForm.project || '',
+      client: this.projectForm.client || '',
+      revenue: rev,
+      cost,
+      profit,
+      margin
+    };
+    this.data.addProjectProfit(p);
+    this.load();
+    this.showAddProject = false;
+  }
 }

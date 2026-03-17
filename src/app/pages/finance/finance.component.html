@@ -6,7 +6,14 @@
           <h2>{{ title }}</h2>
           <p class="text-muted mb-0">{{ subtitle }}</p>
         </div>
-        <span class="demo-badge-page"><i class="feather icon-info me-1"></i>Demo Data</span>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-primary" (click)="toggleAddBill()" *ngIf="activeTab === 'bills'">
+            {{ showAddBill ? 'Cancel' : 'Add Vendor Bill' }}
+          </button>
+          <button type="button" class="btn btn-primary" (click)="toggleAddRetainer()" *ngIf="activeTab === 'retainers'">
+            {{ showAddRetainer ? 'Cancel' : 'Add Retainer' }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -18,6 +25,19 @@
     <li class="nav-item"><a class="nav-link" [class.active]="activeTab === 'cashflow'" href="javascript:void(0)" (click)="activeTab = 'cashflow'">Cashflow (Pro)</a></li>
   </ul>
 
+  <div class="card border-0 shadow-sm mb-4" *ngIf="activeTab === 'bills' && showAddBill">
+    <div class="card-body">
+      <h6 class="mb-3">Add vendor bill</h6>
+      <div class="row g-2 align-items-end">
+        <div class="col-md-2"><label class="form-label small">Vendor</label><input type="text" class="form-control form-control-sm" [(ngModel)]="billForm.vendor" placeholder="Vendor" /></div>
+        <div class="col-md-2"><label class="form-label small">Date</label><input type="date" class="form-control form-control-sm" [(ngModel)]="billForm.date" /></div>
+        <div class="col-md-2"><label class="form-label small">Due date</label><input type="date" class="form-control form-control-sm" [(ngModel)]="billForm.dueDate" /></div>
+        <div class="col-md-2"><label class="form-label small">Amount</label><input type="number" class="form-control form-control-sm" [(ngModel)]="billForm.amount" min="0" /></div>
+        <div class="col-md-1"><label class="form-label small">Currency</label><input type="text" class="form-control form-control-sm" [(ngModel)]="billForm.currency" placeholder="AED" /></div>
+        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveBill()">Save</button></div>
+      </div>
+    </div>
+  </div>
   <div class="card table-card-modern" *ngIf="activeTab === 'bills'">
     <div class="card-header border-0 bg-light py-3"><h5 class="mb-0 fw-semibold">Vendor Bills & Payments</h5></div>
     <div class="table-responsive">
@@ -46,6 +66,18 @@
     </div>
   </div>
 
+  <div class="card border-0 shadow-sm mb-4" *ngIf="activeTab === 'retainers' && showAddRetainer">
+    <div class="card-body">
+      <h6 class="mb-3">Add retainer</h6>
+      <div class="row g-2 align-items-end">
+        <div class="col-md-3"><label class="form-label small">Client</label><input type="text" class="form-control form-control-sm" [(ngModel)]="retainerForm.client" placeholder="Client" /></div>
+        <div class="col-md-2"><label class="form-label small">Amount</label><input type="number" class="form-control form-control-sm" [(ngModel)]="retainerForm.amount" placeholder="Amount" /></div>
+        <div class="col-md-2"><label class="form-label small">Currency</label><input type="text" class="form-control form-control-sm" [(ngModel)]="retainerForm.currency" placeholder="AED" /></div>
+        <div class="col-md-2"><label class="form-label small">Start date</label><input type="date" class="form-control form-control-sm" [(ngModel)]="retainerForm.startDate" /></div>
+        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveRetainer()">Save</button></div>
+      </div>
+    </div>
+  </div>
   <div class="card table-card-modern" *ngIf="activeTab === 'retainers'">
     <div class="card-header border-0 bg-light py-3"><h5 class="mb-0 fw-semibold">Retainers</h5></div>
     <div class="table-responsive">

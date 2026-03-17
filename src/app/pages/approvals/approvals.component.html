@@ -6,7 +6,9 @@
           <h2>{{ title }}</h2>
           <p class="text-muted mb-0">{{ subtitle }}</p>
         </div>
-        <span class="demo-badge-page"><i class="feather icon-info me-1"></i>Demo Data</span>
+        <button type="button" class="btn btn-outline-secondary btn-sm" (click)="load()">
+          <i class="feather icon-refresh-cw me-1"></i>Refresh
+        </button>
       </div>
     </div>
   </div>
@@ -25,6 +27,7 @@
             <th class="text-end">Amount</th>
             <th>Date</th>
             <th>Status</th>
+            <th class="text-end">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -40,6 +43,10 @@
                 'status-approved': a.status === 'Approved',
                 'status-rejected': a.status === 'Rejected'
               }">{{ a.status }}</span>
+            </td>
+            <td class="text-end">
+              <button type="button" class="btn btn-sm btn-success me-1" (click)="approve(a)" *ngIf="a.status === 'Pending'">Approve</button>
+              <button type="button" class="btn btn-sm btn-danger" (click)="reject(a)" *ngIf="a.status === 'Pending'">Reject</button>
             </td>
           </tr>
         </tbody>

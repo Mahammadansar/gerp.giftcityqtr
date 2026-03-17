@@ -6,7 +6,17 @@
           <h2>{{ title }}</h2>
           <p class="text-muted mb-0">{{ subtitle }}</p>
         </div>
-        <span class="demo-badge-page"><i class="feather icon-info me-1"></i>Demo Data</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <h6 class="fw-semibold mb-3">Company</h6>
+      <div class="row g-2 align-items-end">
+        <div class="col-md-4"><label class="form-label small">Company name</label><input type="text" class="form-control form-control-sm" [(ngModel)]="companyName" placeholder="Company name" /></div>
+        <div class="col-md-2"><label class="form-label small">Currency</label><input type="text" class="form-control form-control-sm" [(ngModel)]="currency" placeholder="AED" /></div>
+        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveCompany()">Save</button></div>
       </div>
     </div>
   </div>
@@ -14,8 +24,17 @@
   <div class="row">
     <div class="col-lg-6 mb-4">
       <div class="card border-0 shadow-sm">
-        <div class="card-header bg-light border-0 py-3">
+        <div class="card-header bg-light border-0 py-3 d-flex justify-content-between align-items-center">
           <h6 class="mb-0 fw-semibold">Custom User Roles</h6>
+          <button type="button" class="btn btn-sm btn-primary" (click)="toggleAddRole()">{{ showAddRole ? 'Cancel' : 'Add Role' }}</button>
+        </div>
+        <div class="card-body border-bottom" *ngIf="showAddRole">
+          <div class="row g-2 align-items-end">
+            <div class="col-4"><label class="form-label small">Role name</label><input type="text" class="form-control form-control-sm" [(ngModel)]="roleForm.name" placeholder="Name" /></div>
+            <div class="col-2"><label class="form-label small">Users</label><input type="number" class="form-control form-control-sm" [(ngModel)]="roleForm.users" min="0" /></div>
+            <div class="col-4"><label class="form-label small">Description</label><input type="text" class="form-control form-control-sm" [(ngModel)]="roleForm.description" placeholder="Description" /></div>
+            <div class="col-2"><button type="button" class="btn btn-sm btn-primary" (click)="addRole()">Save</button></div>
+          </div>
         </div>
         <div class="table-responsive">
           <table class="table table-modern mb-0">
@@ -39,8 +58,18 @@
     </div>
     <div class="col-lg-6 mb-4">
       <div class="card border-0 shadow-sm">
-        <div class="card-header bg-light border-0 py-3">
+        <div class="card-header bg-light border-0 py-3 d-flex justify-content-between align-items-center">
           <h6 class="mb-0 fw-semibold">Business Workflows</h6>
+          <button type="button" class="btn btn-sm btn-primary" (click)="toggleAddWorkflow()">{{ showAddWorkflow ? 'Cancel' : 'Add Workflow' }}</button>
+        </div>
+        <div class="card-body border-bottom" *ngIf="showAddWorkflow">
+          <div class="row g-2 align-items-end">
+            <div class="col-3"><label class="form-label small">Name</label><input type="text" class="form-control form-control-sm" [(ngModel)]="workflowForm.name" placeholder="Name" /></div>
+            <div class="col-2"><label class="form-label small">Type</label><input type="text" class="form-control form-control-sm" [(ngModel)]="workflowForm.type" placeholder="Type" /></div>
+            <div class="col-2"><label class="form-label small">Steps</label><input type="number" class="form-control form-control-sm" [(ngModel)]="workflowForm.steps" min="1" /></div>
+            <div class="col-2"><label class="form-label small">Status</label><input type="text" class="form-control form-control-sm" [(ngModel)]="workflowForm.status" placeholder="Active" /></div>
+            <div class="col-2"><button type="button" class="btn btn-sm btn-primary" (click)="addWorkflow()">Save</button></div>
+          </div>
         </div>
         <div class="table-responsive">
           <table class="table table-modern mb-0">

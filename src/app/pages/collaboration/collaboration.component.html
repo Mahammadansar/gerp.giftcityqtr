@@ -6,44 +6,41 @@
           <h2>{{ title }}</h2>
           <p class="text-muted mb-0">{{ subtitle }}</p>
         </div>
-        <span class="demo-badge-page"><i class="feather icon-info me-1"></i>Demo Data</span>
       </div>
     </div>
   </div>
 
-  <div class="row">
-    <div class="col-lg-4 mb-4">
-      <div class="card border-0 shadow-sm h-100">
-        <div class="card-header bg-light border-0 py-3">
-          <h6 class="mb-0 fw-semibold">Recent Chats</h6>
-        </div>
-        <div class="card-body p-0">
-          <div class="collab-thread list-group list-group-flush" *ngFor="let t of threads">
-            <a href="javascript:void(0)" class="list-group-item list-group-item-action d-flex align-items-center">
-              <div class="thread-avatar me-3">{{ t.name.charAt(0) }}</div>
-              <div class="flex-grow-1 min-w-0">
-                <div class="d-flex justify-content-between">
-                  <span class="fw-semibold">{{ t.name }}</span>
-                  <span class="text-muted small">{{ t.time }}</span>
-                </div>
-                <div class="text-muted small text-truncate">{{ t.lastMessage }}</div>
-              </div>
-              <span class="badge bg-primary rounded-pill ms-2" *ngIf="t.unread">{{ t.unread }}</span>
-            </a>
-          </div>
-        </div>
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <h6 class="mb-3">Send message</h6>
+      <div class="row g-2 align-items-end">
+        <div class="col-md-2"><input type="text" class="form-control form-control-sm" [(ngModel)]="newFrom" placeholder="Your name" /></div>
+        <div class="col-md-6"><input type="text" class="form-control form-control-sm" [(ngModel)]="newText" placeholder="Message" (keyup.enter)="sendMessage()" /></div>
+        <div class="col-md-2"><button type="button" class="btn btn-primary btn-sm" (click)="sendMessage()">Send</button></div>
       </div>
     </div>
-    <div class="col-lg-8">
-      <div class="card border-0 shadow-sm">
-        <div class="card-body text-center py-5">
-          <div class="collab-placeholder-icon mb-3">
-            <i class="feather icon-message-circle"></i>
+  </div>
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-header bg-light border-0 py-3">
+      <h6 class="mb-0 fw-semibold">Messages</h6>
+    </div>
+    <div class="card-body p-0">
+      <div class="list-group list-group-flush" *ngIf="messages.length; else noMessages">
+        <div class="list-group-item d-flex align-items-start" *ngFor="let m of messages">
+          <div class="thread-avatar me-3">{{ m.from.charAt(0) }}</div>
+          <div class="flex-grow-1">
+            <div class="d-flex justify-content-between">
+              <span class="fw-semibold">{{ m.from }}</span>
+              <span class="text-muted small">{{ m.time }}</span>
+            </div>
+            <div class="text-muted small">{{ m.text }}</div>
           </div>
-          <h5 class="fw-semibold">Chat, voice & video</h5>
-          <p class="text-muted mb-0">Select a conversation or start a new one. Screen sharing available in calls.</p>
         </div>
       </div>
+      <ng-template #noMessages>
+        <div class="p-4 text-center text-muted">No messages yet. Send one above.</div>
+      </ng-template>
     </div>
   </div>
 </div>

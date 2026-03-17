@@ -9,7 +9,7 @@
             <p class="dashboard-subtitle">Gift City Qatar — business performance at a glance.</p>
           </div>
           <div class="header-actions">
-            <button class="btn btn-icon-modern" title="Refresh">
+            <button class="btn btn-icon-modern" title="Refresh" (click)="refresh()">
               <i class="feather icon-refresh-cw"></i>
             </button>
             <button class="btn btn-icon-modern" title="Settings">
@@ -191,18 +191,16 @@
               <tr *ngFor="let deal of topDeals">
                 <td>
                   <div class="deal-info">
-                    <strong>{{ deal.project }}</strong>
-                    <small>{{ deal.unit }}</small>
+                    <strong>{{ deal.client }}</strong>
+                    <small>{{ deal.currency }}</small>
                   </div>
                 </td>
                 <td>{{ deal.client }}</td>
                 <td class="text-end">
-                  <strong>{{ deal.value | number:'1.0-0' }} <small>AED</small></strong>
+                  <strong>{{ deal.amount | number:'1.0-0' }} <small>AED</small></strong>
                 </td>
                 <td>
-                  <span class="status-badge" [ngClass]="'status-' + deal.status.toLowerCase()">
-                    {{ deal.status }}
-                  </span>
+                  <span class="status-badge status-approved">Active</span>
                 </td>
               </tr>
             </tbody>
