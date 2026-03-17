@@ -59,14 +59,26 @@ body.sidebar-open {
       transform: translateX(0) !important;
     }
     .main-wrapper::before {
-      content: '';
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 998;
-      opacity: 1;
-      visibility: visible;
+      display: none; /* use .sidebar-backdrop instead so it can close on tap */
+    }
+    .sidebar-backdrop {
+      display: block !important;
       pointer-events: all;
     }
+  }
+}
+
+/* Backdrop for mobile sidebar - tap to close */
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+  @media (min-width: 992px) {
+    display: none !important;
   }
 }

@@ -179,6 +179,9 @@
     </div>
   </nav>
 
+  <!-- Backdrop: tap outside to close sidebar on mobile -->
+  <div class="sidebar-backdrop" (click)="closeSidebarMobile()" aria-hidden="true"></div>
+
   <div class="page-wrapper">
     <nav class="navbar">
       <button type="button" class="sidebar-toggler" (click)="toggleSidebar()" aria-label="Toggle sidebar">
