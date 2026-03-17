@@ -42,6 +42,14 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     }
   }
 
+  /** Close sidebar on mobile as soon as a menu link is tapped (so one tap navigates + closes) */
+  onSidebarNavClick(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (target.closest('a[routerLink]')) {
+      this.closeSidebarMobile();
+    }
+  }
+
   logout(): void {
     this.isLoggedIn = false;
     this.router.navigate(['/dashboard']);

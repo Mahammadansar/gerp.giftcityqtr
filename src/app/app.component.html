@@ -23,7 +23,7 @@
       </a>
     </div>
 
-    <div class="sidebar-body" [perfectScrollbar]>
+    <div class="sidebar-body" [perfectScrollbar] (click)="onSidebarNavClick($event)">
       <ul class="sidebar-nav metismenu" id="sidebar-menu">
         <li class="nav-item nav-category">Main</li>
         <li class="nav-item">
