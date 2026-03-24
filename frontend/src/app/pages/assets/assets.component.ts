@@ -14,6 +14,7 @@ export class AssetsComponent implements OnInit {
   assets: Asset[] = [];
   showAddForm = false;
   error = '';
+  loading = false;
   form: Partial<Asset> = { name: '', category: 'Equipment', purchaseDate: '', value: 0, status: 'Active' };
 
   constructor(private opsApi: OpsApiService) {}
@@ -21,9 +22,11 @@ export class AssetsComponent implements OnInit {
   ngOnInit(): void { this.load(); }
 
   load(): void {
+    this.loading = true;
     this.opsApi.listAssets().subscribe({
-      next: (res) => { this.assets = (res.data || []).map((a) => ({ ...a, purchaseDate: String(a.purchaseDate).slice(0, 10) })); },
-      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to load assets'); }
+      next: (res) => { this.assets = (res.data || []).map((a) => ({ ...a, purchaseDate: String(a.purchaseDate).slice(0, 10) }));
+        this.loading = false; },
+      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to load assets'); this.loading = false; }
     });
   }
 

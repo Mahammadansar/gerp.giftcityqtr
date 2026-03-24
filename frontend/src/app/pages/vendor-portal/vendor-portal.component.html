@@ -13,6 +13,9 @@
     </div>
   </div>
 
+  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+  <div class="text-muted small mb-3" *ngIf="loading">Loading vendor data...</div>
+
   <div class="card border-0 shadow-sm mb-4" *ngIf="showAddPO">
     <div class="card-body">
       <h6 class="mb-3">Create purchase order</h6>

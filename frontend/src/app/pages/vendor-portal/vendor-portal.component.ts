@@ -16,6 +16,7 @@ export class VendorPortalComponent implements OnInit {
   pos: { poNo: string; vendor: string; date: string; total: number; status: string }[] = [];
   showAddPO = false;
   error = '';
+  loading = false;
   poForm: { vendor: string; date: string; deliveryDate: string; total: number; currency: string; items: string } = { vendor: '', date: '', deliveryDate: '', total: 0, currency: 'AED', items: '' };
 
   constructor(private pqiApi: PqiApiService) {}
@@ -41,6 +42,7 @@ export class VendorPortalComponent implements OnInit {
   }
 
   load(): void {
+    this.loading = true;
     this.pqiApi.listPurchaseOrders().subscribe({
       next: (res) => {
         const orders = (res.data || []).map((po) => ({ ...po, date: String(po.date).slice(0, 10) }));
@@ -52,8 +54,9 @@ export class VendorPortalComponent implements OnInit {
         this.vendors = Array.from(byVendor.entries()).map(([name, v]) => ({ name, poCount: v.count, lastActive: v.lastDate }));
         this.activity = orders.slice(0, 15).map((po) => ({ vendor: po.vendor, action: `PO ${po.status}`, date: po.date, ref: po.poNo }));
         this.pos = orders.map((po) => ({ poNo: po.poNo, vendor: po.vendor, date: po.date, total: po.total, status: po.status }));
+        this.loading = false;
       },
-      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to load vendor portal data'); }
+      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to load vendor portal data'); this.loading = false; }
     });
   }
 }

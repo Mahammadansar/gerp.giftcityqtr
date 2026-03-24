@@ -36,6 +36,9 @@
     </div>
   </div>
 
+  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+  <div class="text-muted small mb-3" *ngIf="loading">Loading reports...</div>
+
   <div class="card table-card-modern" *ngIf="activeTab === 'receipts'">
     <div class="card-header border-0 bg-light py-3"><h5 class="mb-0 fw-semibold">Receipts</h5></div>
     <div class="table-responsive">

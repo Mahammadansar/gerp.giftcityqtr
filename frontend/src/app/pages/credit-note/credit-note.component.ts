@@ -13,6 +13,7 @@ export class CreditNoteComponent implements OnInit {
   showCreateForm = false;
   creditNotes: CreditNote[] = [];
   error = '';
+  loading = false;
 
   form = {
     invoiceNo: '',
@@ -28,11 +29,13 @@ export class CreditNoteComponent implements OnInit {
   ngOnInit(): void { this.loadNotes(); }
 
   loadNotes(): void {
+    this.loading = true;
     this.opsApi.listCreditNotes().subscribe({
       next: (res) => {
         this.creditNotes = (res.data || []).map((cn) => ({ ...cn, date: String(cn.date).slice(0, 10) }));
+        this.loading = false;
       },
-      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to load credit notes'); }
+      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to load credit notes'); this.loading = false; }
     });
   }
 

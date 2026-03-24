@@ -15,15 +15,17 @@ export class CollaborationComponent implements OnInit {
   newFrom = '';
   newText = '';
   error = '';
+  loading = false;
 
   constructor(private opsApi: OpsApiService) {}
 
   ngOnInit(): void { this.load(); }
 
   load(): void {
+    this.loading = true;
     this.opsApi.listChatMessages().subscribe({
-      next: (res) => { this.messages = res.data || []; },
-      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to load messages'); }
+      next: (res) => { this.messages = res.data || []; this.loading = false; },
+      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to load messages'); this.loading = false; }
     });
   }
 

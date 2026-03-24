@@ -13,6 +13,7 @@ export class DamageSectionComponent implements OnInit {
   showCreateForm = false;
   entries: DamageEntry[] = [];
   error = '';
+  loading = false;
 
   form = { itemName: '', sku: '', size: '', qty: 1, reason: '', reportedBy: '' };
 
@@ -21,9 +22,11 @@ export class DamageSectionComponent implements OnInit {
   ngOnInit(): void { this.loadEntries(); }
 
   loadEntries(): void {
+    this.loading = true;
     this.opsApi.listDamageEntries().subscribe({
-      next: (res) => { this.entries = (res.data || []).map((e) => ({ ...e, date: String(e.date).slice(0, 10) })); },
-      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to load damage entries'); }
+      next: (res) => { this.entries = (res.data || []).map((e) => ({ ...e, date: String(e.date).slice(0, 10) }));
+        this.loading = false; },
+      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to load damage entries'); this.loading = false; }
     });
   }
 

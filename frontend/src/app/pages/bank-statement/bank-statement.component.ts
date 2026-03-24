@@ -24,6 +24,7 @@ export class BankStatementComponent implements OnInit {
   withdrawalsRows: BankEntry[] = [];
   transferRows: BankEntry[] = [];
   error = '';
+  loading = false;
 
   showAdd = false;
   form: Partial<BankEntry> = { type: 'cheque', date: '', ref: '', description: '', amount: 0, status: 'Pending' };
@@ -33,6 +34,7 @@ export class BankStatementComponent implements OnInit {
   ngOnInit(): void { this.load(); }
 
   load(): void {
+    this.loading = true;
     this.opsApi.listBankEntries().subscribe({
       next: (res) => {
         this.entries = (res.data || []).map((e) => ({ ...e, date: String(e.date).slice(0, 10) }));
@@ -40,8 +42,9 @@ export class BankStatementComponent implements OnInit {
         this.depositsRows = this.entries.filter((e) => e.type === 'deposit');
         this.withdrawalsRows = this.entries.filter((e) => e.type === 'withdrawal');
         this.transferRows = this.entries.filter((e) => e.type === 'transfer');
+        this.loading = false;
       },
-      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to load bank entries'); }
+      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to load bank entries'); this.loading = false; }
     });
   }
 
