@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { AppDataService, Retainer } from '../../services/app-data.service';
+import { PqiApiService } from '../../services/pqi-api.service';
+import { FinanceApiService } from '../../services/finance-api.service';
 
 @Component({
   selector: 'app-finance',
@@ -12,10 +13,11 @@ export class FinanceComponent implements OnInit {
   subtitle = 'Vendor bills, payments, retainers, multi-currency.';
 
   vendorBills: { ref: string; vendor: string; date: string; dueDate: string; amount: number; currency: string; status: string }[] = [];
-  retainers: Retainer[] = [];
+  retainers: any[] = [];
   showAddRetainer = false;
   showAddBill = false;
-  retainerForm: Partial<Retainer> = { client: '', amount: 0, currency: 'AED', startDate: '', status: 'Active' };
+  error = '';
+  retainerForm: any = { client: '', amount: 0, currency: 'AED', startDate: '', status: 'Active' };
   billForm: { vendor: string; date: string; dueDate: string; amount: number; currency: string } = { vendor: '', date: '', dueDate: '', amount: 0, currency: 'AED' };
 
   currencies = [
@@ -26,32 +28,21 @@ export class FinanceComponent implements OnInit {
 
   cashflowMonths: { month: string; inflow: number; outflow: number }[] = [];
 
-  constructor(private data: AppDataService) {}
+  constructor(private pqiApi: PqiApiService, private financeApi: FinanceApiService) {}
 
-  ngOnInit(): void {
-    this.load();
-  }
+  ngOnInit(): void { this.load(); }
 
   load(): void {
-    const pos = this.data.getPurchaseOrders();
-    this.vendorBills = pos.map(po => ({
-      ref: po.poNo,
-      vendor: po.vendor,
-      date: po.date,
-      dueDate: po.deliveryDate || po.date,
-      amount: po.total,
-      currency: po.currency,
-      status: po.status
-    }));
-    this.retainers = this.data.getRetainers();
-    const inv = this.data.getInvoices();
-    const paid = inv.filter(i => i.status === 'Paid').reduce((s, i) => s + i.amount, 0);
-    const pending = inv.filter(i => i.status !== 'Paid').reduce((s, i) => s + i.amount, 0);
-    const out = pos.filter(p => p.status === 'Paid').reduce((s, p) => s + p.total, 0);
-    this.cashflowMonths = [
-      { month: 'Current', inflow: paid, outflow: out },
-      { month: 'Expected', inflow: paid + pending, outflow: out + pos.filter(p => p.status === 'Pending').reduce((s, p) => s + p.total, 0) }
-    ];
+    this.financeApi.getOverview().subscribe({
+      next: (res: any) => {
+        const d = res.data;
+        this.vendorBills = d.vendorBills.map((b: any) => ({ ...b, date: String(b.date).slice(0, 10), dueDate: String(b.dueDate).slice(0, 10) }));
+        this.retainers = d.retainers || [];
+        this.cashflowMonths = d.cashflowMonths || [];
+        this.currencies = d.currencies || this.currencies;
+      },
+      error: (e) => { this.error = e?.error?.error?.message || 'Failed to load finance data'; }
+    });
   }
 
   toggleAddBill(): void {
@@ -60,37 +51,35 @@ export class FinanceComponent implements OnInit {
   }
 
   saveBill(): void {
-    const due = this.billForm.dueDate || this.billForm.date;
-    this.data.addPurchaseOrder({
-      poNo: this.data.getNextPONumber(),
+    this.error = '';
+    this.pqiApi.createPurchaseOrder({
+      vendor: this.billForm.vendor,
       date: this.billForm.date,
-      deliveryDate: due,
-      vendor: this.billForm.vendor || 'Vendor',
-      items: 'Vendor bill',
-      total: this.billForm.amount || 0,
-      currency: this.billForm.currency || 'AED',
-      status: 'Pending'
+      deliveryDate: this.billForm.dueDate || this.billForm.date,
+      currency: this.billForm.currency,
+      lines: [{ description: 'Vendor bill', size: '', qty: 1, unitPrice: this.billForm.amount, amount: this.billForm.amount }]
+    }).subscribe({
+      next: () => { this.load(); this.showAddBill = false; },
+      error: (e) => { this.error = e?.error?.error?.message || 'Failed to save vendor bill'; }
     });
-    this.load();
-    this.showAddBill = false;
   }
 
-  toggleAddRetainer(): void {
-    this.showAddRetainer = !this.showAddRetainer;
-    if (this.showAddRetainer) this.retainerForm = { client: '', amount: 0, currency: 'AED', startDate: new Date().toISOString().slice(0, 10), status: 'Active' };
-  }
-
+  toggleAddRetainer(): void { this.showAddRetainer = !this.showAddRetainer; }
   saveRetainer(): void {
-    const r: Retainer = {
-      id: String(Date.now()),
+    this.error = '';
+    this.financeApi.createRetainer({
       client: this.retainerForm.client || '',
-      amount: this.retainerForm.amount || 0,
+      amount: Number(this.retainerForm.amount || 0),
       currency: this.retainerForm.currency || 'AED',
-      startDate: this.retainerForm.startDate || '',
+      startDate: this.retainerForm.startDate || new Date().toISOString().slice(0, 10),
       status: this.retainerForm.status || 'Active'
-    };
-    this.data.addRetainer(r);
-    this.load();
-    this.showAddRetainer = false;
+    }).subscribe({
+      next: () => {
+        this.load();
+        this.showAddRetainer = false;
+        this.retainerForm = { client: '', amount: 0, currency: 'AED', startDate: '', status: 'Active' };
+      },
+      error: (e) => { this.error = e?.error?.error?.message || 'Failed to save retainer'; }
+    });
   }
 }

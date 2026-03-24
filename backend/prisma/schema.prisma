@@ -58,6 +58,7 @@ model Organization {
   projects    Project[]
   timesheets  TimesheetEntry[]
   documentSequences DocumentSequence[]
+  retainers   Retainer[]
 }
 
 model User {
@@ -348,4 +349,19 @@ model TimesheetEntry {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+}
+
+model Retainer {
+  id           String   @id @default(cuid())
+  orgId        String
+  client       String
+  amount       Float
+  currency     String
+  startDate    DateTime
+  status       String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId, startDate])
 }

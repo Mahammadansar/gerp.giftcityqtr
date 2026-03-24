@@ -25,6 +25,8 @@
     <li class="nav-item"><a class="nav-link" [class.active]="activeTab === 'cashflow'" href="javascript:void(0)" (click)="activeTab = 'cashflow'">Cashflow (Pro)</a></li>
   </ul>
 
+  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
   <div class="card border-0 shadow-sm mb-4" *ngIf="activeTab === 'bills' && showAddBill">
     <div class="card-body">
       <h6 class="mb-3">Add vendor bill</h6>

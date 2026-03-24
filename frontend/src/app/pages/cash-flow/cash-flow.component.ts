@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AppDataService } from '../../services/app-data.service';
+import { FinanceApiService } from '../../services/finance-api.service';
 
 @Component({
   selector: 'app-cash-flow',
@@ -20,36 +20,23 @@ export class CashFlowComponent implements OnInit {
   openingBalance = 0;
   closingBalance = 0;
 
-  constructor(private data: AppDataService) {}
+  constructor(private financeApi: FinanceApiService) {}
 
-  ngOnInit(): void {
-    this.refresh();
-  }
+  ngOnInit(): void { this.refresh(); }
 
   refresh(): void {
-    const now = new Date();
-    this.period = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
-    const inv = this.data.getInvoices();
-    const pos = this.data.getPurchaseOrders();
-    const bank = this.data.getBankEntries();
-    const fromCustomers = inv.filter(i => i.status === 'Paid').reduce((s, i) => s + i.amount, 0);
-    const toSuppliers = pos.filter(p => p.status === 'Paid').reduce((s, p) => s + p.total, 0);
-    const deposits = bank.filter(e => e.type === 'deposit').reduce((s, e) => s + e.amount, 0);
-    const withdrawals = bank.filter(e => e.type === 'withdrawal' || e.type === 'cheque').reduce((s, e) => s + e.amount, 0);
-    this.operating = [
-      { label: 'Cash from customers', amount: fromCustomers },
-      { label: 'Cash to suppliers', amount: -toSuppliers },
-      { label: 'Other operating', amount: deposits - withdrawals - fromCustomers + toSuppliers }
-    ].filter(x => x.amount !== 0);
-    if (this.operating.length === 0) this.operating = [{ label: 'Net operating', amount: 0 }];
-    this.netOperating = this.operating.reduce((s, o) => s + o.amount, 0);
-    this.investing = [{ label: 'Equipment / assets', amount: -this.data.getAssets().reduce((s, a) => s + Math.round(a.value * 0.1), 0) }].filter(i => i.amount !== 0);
-    if (this.investing.length === 0) this.investing = [{ label: '—', amount: 0 }];
-    this.netInvesting = this.investing.reduce((s, i) => s + i.amount, 0);
-    this.financing = [{ label: 'Net financing', amount: 0 }];
-    this.netFinancing = 0;
-    this.netChange = this.netOperating + this.netInvesting + this.netFinancing;
-    this.openingBalance = Math.max(0, fromCustomers - toSuppliers - this.netChange);
-    this.closingBalance = this.openingBalance + this.netChange;
+    this.financeApi.getCashFlow().subscribe((res: any) => {
+      const d = res.data;
+      this.period = d.period;
+      this.operating = d.operating;
+      this.investing = d.investing;
+      this.financing = d.financing;
+      this.netOperating = d.netOperating;
+      this.netInvesting = d.netInvesting;
+      this.netFinancing = d.netFinancing;
+      this.netChange = d.netChange;
+      this.openingBalance = d.openingBalance;
+      this.closingBalance = d.closingBalance;
+    });
   }
 }

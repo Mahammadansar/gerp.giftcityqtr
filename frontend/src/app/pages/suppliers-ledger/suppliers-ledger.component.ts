@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AppDataService } from '../../services/app-data.service';
+import { FinanceApiService } from '../../services/finance-api.service';
 
 @Component({
   selector: 'app-suppliers-ledger',
@@ -11,27 +11,13 @@ export class SuppliersLedgerComponent implements OnInit {
   subtitle = 'Supplier-wise payables and payment history.';
   suppliers: { name: string; opening: number; purchases: number; payments: number; balance: number }[] = [];
 
-  constructor(private data: AppDataService) {}
+  constructor(private financeApi: FinanceApiService) {}
 
-  ngOnInit(): void {
-    this.refresh();
-  }
+  ngOnInit(): void { this.refresh(); }
 
   refresh(): void {
-    const pos = this.data.getPurchaseOrders();
-    const byVendor = new Map<string, { purchases: number; paid: number }>();
-    for (const p of pos) {
-      const v = byVendor.get(p.vendor) || { purchases: 0, paid: 0 };
-      v.purchases += p.total;
-      if (p.status === 'Received' || p.status === 'Approved') v.paid += p.total;
-      byVendor.set(p.vendor, v);
-    }
-    this.suppliers = Array.from(byVendor.entries()).map(([name, v]) => ({
-      name,
-      opening: 0,
-      purchases: v.purchases,
-      payments: v.paid,
-      balance: v.purchases - v.paid
-    }));
+    this.financeApi.getSuppliersLedger().subscribe((res: any) => {
+      this.suppliers = res.data;
+    });
   }
 }
