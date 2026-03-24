@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AppDataService, TimesheetEntry, ProjectProfit } from '../../services/app-data.service';
+import { ProfitabilityRow, ProjectsApiService, TimesheetRow } from '../../services/projects-api.service';
 
 @Component({
   selector: 'app-projects',
@@ -11,22 +11,38 @@ export class ProjectsComponent implements OnInit {
   title = 'Projects & Timesheets';
   subtitle = 'Bill timesheets and track project profitability.';
 
-  timesheets: TimesheetEntry[] = [];
-  profitability: ProjectProfit[] = [];
+  timesheets: TimesheetRow[] = [];
+  profitability: ProfitabilityRow[] = [];
   showLogTime = false;
   showAddProject = false;
-  tsForm: Partial<TimesheetEntry> = { project: '', date: '', hours: 0, task: '', billable: true };
-  projectForm: Partial<ProjectProfit> = { project: '', client: '', revenue: 0, cost: 0, profit: 0, margin: '' };
+  error = '';
+  tsForm: Partial<TimesheetRow> = { project: '', date: '', hours: 0, task: '', billable: true };
+  projectForm: Partial<ProfitabilityRow> = { project: '', client: '', revenue: 0, cost: 0, profit: 0, margin: '' };
 
-  constructor(private data: AppDataService) {}
+  constructor(private projectsApi: ProjectsApiService) {}
 
   ngOnInit(): void {
     this.load();
   }
 
   load(): void {
-    this.timesheets = this.data.getTimesheets();
-    this.profitability = this.data.getProjectProfit();
+    this.projectsApi.listTimesheets().subscribe({
+      next: (res) => {
+        this.timesheets = (res.data || []).map((t) => ({ ...t, date: String(t.date).slice(0, 10) }));
+      },
+      error: (e) => {
+        this.error = e?.error?.error?.message || 'Failed to load timesheets';
+      }
+    });
+
+    this.projectsApi.listProfitability().subscribe({
+      next: (res) => {
+        this.profitability = res.data || [];
+      },
+      error: (e) => {
+        this.error = e?.error?.error?.message || 'Failed to load project profitability';
+      }
+    });
   }
 
   toggleLogTime(): void {
@@ -35,17 +51,22 @@ export class ProjectsComponent implements OnInit {
   }
 
   saveTimesheet(): void {
-    const t: TimesheetEntry = {
-      id: String(Date.now()),
+    this.error = '';
+    this.projectsApi.createTimesheet({
       project: this.tsForm.project || '',
-      date: this.tsForm.date || '',
-      hours: this.tsForm.hours || 0,
+      date: this.tsForm.date || new Date().toISOString().slice(0, 10),
+      hours: Number(this.tsForm.hours || 0),
       task: this.tsForm.task || '',
       billable: this.tsForm.billable ?? true
-    };
-    this.data.addTimesheet(t);
-    this.load();
-    this.showLogTime = false;
+    }).subscribe({
+      next: () => {
+        this.load();
+        this.showLogTime = false;
+      },
+      error: (e) => {
+        this.error = e?.error?.error?.message || 'Failed to save timesheet';
+      }
+    });
   }
 
   toggleAddProject(): void {
@@ -54,21 +75,20 @@ export class ProjectsComponent implements OnInit {
   }
 
   saveProject(): void {
-    const rev = this.projectForm.revenue || 0;
-    const cost = this.projectForm.cost || 0;
-    const profit = rev - cost;
-    const margin = rev > 0 ? Math.round((profit / rev) * 100) + '%' : '0%';
-    const p: ProjectProfit = {
-      id: String(Date.now()),
+    this.error = '';
+    this.projectsApi.createProfitability({
       project: this.projectForm.project || '',
       client: this.projectForm.client || '',
-      revenue: rev,
-      cost,
-      profit,
-      margin
-    };
-    this.data.addProjectProfit(p);
-    this.load();
-    this.showAddProject = false;
+      revenue: Number(this.projectForm.revenue || 0),
+      cost: Number(this.projectForm.cost || 0)
+    }).subscribe({
+      next: () => {
+        this.load();
+        this.showAddProject = false;
+      },
+      error: (e) => {
+        this.error = e?.error?.error?.message || 'Failed to save project';
+      }
+    });
   }
 }

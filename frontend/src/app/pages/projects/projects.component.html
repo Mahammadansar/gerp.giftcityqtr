@@ -23,6 +23,8 @@
     <li class="nav-item"><a class="nav-link" [class.active]="activeTab === 'profitability'" href="javascript:void(0)" (click)="activeTab = 'profitability'">Project Profitability</a></li>
   </ul>
 
+  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
   <div class="card border-0 shadow-sm mb-4" *ngIf="activeTab === 'timesheets' && showLogTime">
     <div class="card-body">
       <h6 class="mb-3">Log time</h6>
