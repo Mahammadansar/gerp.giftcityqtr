@@ -10,6 +10,7 @@
           <i class="feather icon-refresh-cw me-1"></i>Refresh
         </button>
       </div>
+      <div class="alert alert-danger mt-3" *ngIf="error">{{ error }}</div>
     </div>
   </div>
 
@@ -45,8 +46,8 @@
               }">{{ a.status }}</span>
             </td>
             <td class="text-end">
-              <button type="button" class="btn btn-sm btn-success me-1" (click)="approve(a)" *ngIf="a.status === 'Pending'">Approve</button>
-              <button type="button" class="btn btn-sm btn-danger" (click)="reject(a)" *ngIf="a.status === 'Pending'">Reject</button>
+              <button type="button" class="btn btn-sm btn-success me-1" (click)="approve(a)" *ngIf="a.status === 'Pending' && a.type === 'Purchase Order'">Approve</button>
+              <button type="button" class="btn btn-sm btn-danger" (click)="reject(a)" *ngIf="a.status === 'Pending' && a.type === 'Purchase Order'">Reject</button>
             </td>
           </tr>
         </tbody>

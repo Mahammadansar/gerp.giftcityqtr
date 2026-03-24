@@ -7,12 +7,13 @@
           <p class="text-muted mb-0">{{ subtitle }}</p>
         </div>
         <div class="d-flex align-items-center gap-2">
-          <span class="demo-badge-page"><i class="feather icon-info me-1"></i>Demo Data</span>
+          <span class="demo-badge-page"><i class="feather icon-database me-1"></i>Live API</span>
           <button type="button" class="btn btn-primary btn-modern" (click)="toggleCreateForm()">
             <i class="feather icon-plus me-2"></i>{{ showCreateForm ? 'Cancel' : 'Create PO' }}
           </button>
         </div>
       </div>
+      <div class="alert alert-danger mt-3" *ngIf="error">{{ error }}</div>
     </div>
   </div>
 

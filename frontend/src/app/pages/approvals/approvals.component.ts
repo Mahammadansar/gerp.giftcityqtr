@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AppDataService } from '../../services/app-data.service';
+import { PqiApiService, ApprovalItem } from '../../services/pqi-api.service';
 
 @Component({
   selector: 'app-approvals',
@@ -9,33 +9,43 @@ import { AppDataService } from '../../services/app-data.service';
 export class ApprovalsComponent implements OnInit {
   title = 'Approvals';
   subtitle = 'Sales and purchase approval workflows.';
+  items: ApprovalItem[] = [];
+  error = '';
 
-  items: { type: string; ref: string; requester: string; amount: number; currency: string; date: string; status: string; id?: string; poNo?: string }[] = [];
-
-  constructor(private data: AppDataService) {}
+  constructor(private pqiApi: PqiApiService) {}
 
   ngOnInit(): void {
     this.load();
   }
 
   load(): void {
-    const pos = this.data.getPurchaseOrders().filter(p => p.status === 'Pending' || p.status === 'Approved' || p.status === 'Rejected');
-    const sos = this.data.getSalesOrders().filter(s => s.status === 'Pending' || s.status === 'Confirmed' || s.status === 'Delivered' || s.status === 'Rejected');
-    this.items = [
-      ...pos.map(p => ({ type: 'Purchase Order', ref: p.poNo, requester: p.vendor, amount: p.total, currency: p.currency, date: p.date, status: p.status, poNo: p.poNo })),
-      ...sos.map(s => ({ type: 'Sales Order', ref: s.orderNo, requester: s.client, amount: s.total, currency: s.currency, date: s.date, status: s.status === 'Confirmed' || s.status === 'Delivered' ? 'Approved' : s.status, id: s.id }))
-    ].sort((a, b) => b.date.localeCompare(a.date));
+    this.pqiApi.listApprovals().subscribe({
+      next: (res) => {
+        this.items = res.data.map((x) => ({ ...x, date: String(x.date).slice(0, 10) }));
+      },
+      error: (e) => {
+        this.error = e?.error?.error?.message || 'Failed to load approvals';
+      }
+    });
   }
 
-  approve(item: { type: string; ref?: string; poNo?: string; id?: string }): void {
-    if (item.type === 'Purchase Order' && item.poNo) this.data.updatePOStatus(item.poNo, 'Approved');
-    if (item.type === 'Sales Order' && item.id) this.data.updateSalesOrderStatus(item.id, 'Confirmed');
-    this.load();
+  approve(item: ApprovalItem): void {
+    if (item.type !== 'Purchase Order') return;
+    this.pqiApi.approvePurchaseOrder(item.id).subscribe({
+      next: () => this.load(),
+      error: (e) => {
+        this.error = e?.error?.error?.message || 'Failed to approve item';
+      }
+    });
   }
 
-  reject(item: { type: string; ref?: string; poNo?: string; id?: string }): void {
-    if (item.type === 'Purchase Order' && item.poNo) this.data.updatePOStatus(item.poNo, 'Rejected');
-    if (item.type === 'Sales Order' && item.id) this.data.updateSalesOrderStatus(item.id, 'Rejected');
-    this.load();
+  reject(item: ApprovalItem): void {
+    if (item.type !== 'Purchase Order') return;
+    this.pqiApi.rejectPurchaseOrder(item.id).subscribe({
+      next: () => this.load(),
+      error: (e) => {
+        this.error = e?.error?.error?.message || 'Failed to reject item';
+      }
+    });
   }
 }

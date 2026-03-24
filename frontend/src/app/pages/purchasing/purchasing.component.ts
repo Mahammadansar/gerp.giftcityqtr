@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { AppDataService, PurchaseOrder } from '../../services/app-data.service';
+import { PurchaseOrder } from '../../services/app-data.service';
+import { PqiApiService } from '../../services/pqi-api.service';
 
 interface POLine {
   description: string;
@@ -19,6 +20,7 @@ export class PurchasingComponent implements OnInit {
   subtitle = 'Create and manage purchase orders from vendors.';
   showCreateForm = false;
   orders: PurchaseOrder[] = [];
+  error = '';
 
   form = {
     vendor: '',
@@ -29,14 +31,21 @@ export class PurchasingComponent implements OnInit {
   };
   poLines: POLine[] = [{ description: '', size: '', qty: 1, unitPrice: 0, amount: 0 }];
 
-  constructor(private data: AppDataService) {}
+  constructor(private pqiApi: PqiApiService) {}
 
   ngOnInit(): void {
     this.loadOrders();
   }
 
   loadOrders(): void {
-    this.orders = this.data.getPurchaseOrders();
+    this.pqiApi.listPurchaseOrders().subscribe({
+      next: (res) => {
+        this.orders = res.data.map((o) => ({ ...o, date: String(o.date).slice(0, 10), deliveryDate: o.deliveryDate ? String(o.deliveryDate).slice(0, 10) : undefined }));
+      },
+      error: (e) => {
+        this.error = e?.error?.error?.message || 'Failed to load purchase orders';
+      }
+    });
   }
 
   get poSubtotal(): number {
@@ -54,35 +63,27 @@ export class PurchasingComponent implements OnInit {
     }
   }
 
-  addPOLine(): void {
-    this.poLines.push({ description: '', size: '', qty: 1, unitPrice: 0, amount: 0 });
-  }
-
-  removePOLine(index: number): void {
-    if (this.poLines.length > 1) this.poLines.splice(index, 1);
-  }
-
-  updatePOLineAmount(i: number): void {
-    const l = this.poLines[i];
-    l.amount = l.qty * l.unitPrice;
-  }
+  addPOLine(): void { this.poLines.push({ description: '', size: '', qty: 1, unitPrice: 0, amount: 0 }); }
+  removePOLine(index: number): void { if (this.poLines.length > 1) this.poLines.splice(index, 1); }
+  updatePOLineAmount(i: number): void { const l = this.poLines[i]; l.amount = l.qty * l.unitPrice; }
 
   savePO(): void {
-    const itemsSummary = this.poLines.map(l => l.description || 'Item').filter(Boolean).slice(0, 3).join(', ');
-    const po: PurchaseOrder = {
-      poNo: this.data.getNextPONumber(),
+    this.error = '';
+    this.pqiApi.createPurchaseOrder({
+      vendor: this.form.vendor,
       date: this.form.orderDate,
       deliveryDate: this.form.deliveryDate || this.form.orderDate,
-      vendor: this.form.vendor || 'Vendor',
-      items: itemsSummary || '—',
-      total: this.poSubtotal,
       currency: this.form.currency,
-      status: 'Pending',
-      notes: this.form.notes || '',
-      lines: this.poLines.map(l => ({ ...l, amount: l.qty * l.unitPrice }))
-    };
-    this.data.addPurchaseOrder(po);
-    this.loadOrders();
-    this.showCreateForm = false;
+      notes: this.form.notes,
+      lines: this.poLines.map((l) => ({ ...l, amount: l.qty * l.unitPrice }))
+    }).subscribe({
+      next: () => {
+        this.loadOrders();
+        this.showCreateForm = false;
+      },
+      error: (e) => {
+        this.error = e?.error?.error?.message || 'Failed to create purchase order';
+      }
+    });
   }
 }
