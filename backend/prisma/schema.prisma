@@ -1,0 +1,283 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Organization {
+  id          String           @id @default(cuid())
+  name        String
+  code        String           @unique
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  users       User[]
+  roles       Role[]
+  customers   Customer[]
+  suppliers   Supplier[]
+  quotations  Quotation[]
+  invoices    Invoice[]
+  purchaseOrders PurchaseOrder[]
+  inventoryItems InventoryItem[]
+  assets      Asset[]
+  staff       Staff[]
+  leaveRequests LeaveRequest[]
+  projects    Project[]
+  timesheets  TimesheetEntry[]
+}
+
+model User {
+  id           String     @id @default(cuid())
+  orgId        String
+  fullName     String
+  email        String     @unique
+  passwordHash String
+  isActive     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  sessions     Session[]
+  userRoles    UserRole[]
+}
+
+model Session {
+  id               String   @id @default(cuid())
+  userId           String
+  refreshTokenHash String   @unique
+  tokenFamily      String
+  expiresAt        DateTime
+  createdAt        DateTime @default(now())
+  revokedAt        DateTime?
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Role {
+  id              String           @id @default(cuid())
+  orgId           String
+  name            String
+  createdAt       DateTime         @default(now())
+  organization    Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  userRoles       UserRole[]
+  rolePermissions RolePermission[]
+
+  @@unique([orgId, name])
+}
+
+model Permission {
+  id              String           @id @default(cuid())
+  action          String
+  resource        String
+  rolePermissions RolePermission[]
+
+  @@unique([action, resource])
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+}
+
+model UserRole {
+  userId String
+  roleId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  orgId     String
+  name      String
+  email     String?
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+}
+
+model Supplier {
+  id        String   @id @default(cuid())
+  orgId     String
+  name      String
+  email     String?
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+}
+
+model Quotation {
+  id         String          @id @default(cuid())
+  orgId      String
+  quoteNo    String
+  client     String
+  date       DateTime
+  validUntil DateTime
+  amount     Float
+  currency   String
+  status     String
+  notes      String?
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+  lines      QuotationLine[]
+  organization Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+}
+
+model QuotationLine {
+  id          String    @id @default(cuid())
+  quotationId String
+  description String
+  size        String?
+  qty         Int
+  unitPrice   Float
+  amount      Float
+  quotation   Quotation @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+}
+
+model Invoice {
+  id         String        @id @default(cuid())
+  orgId      String
+  invoiceNo  String
+  client     String
+  date       DateTime
+  dueDate    DateTime
+  amount     Float
+  currency   String
+  status     String
+  taxPercent Float?
+  notes      String?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  lines      InvoiceLine[]
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+}
+
+model InvoiceLine {
+  id          String  @id @default(cuid())
+  invoiceId   String
+  description String
+  size        String?
+  qty         Int
+  unitPrice   Float
+  amount      Float
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+model PurchaseOrder {
+  id           String              @id @default(cuid())
+  orgId        String
+  poNo         String
+  date         DateTime
+  deliveryDate DateTime?
+  vendor       String
+  items        String
+  total        Float
+  currency     String
+  status       String
+  notes        String?
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  lines        PurchaseOrderLine[]
+  organization Organization        @relation(fields: [orgId], references: [id], onDelete: Cascade)
+}
+
+model PurchaseOrderLine {
+  id              String        @id @default(cuid())
+  purchaseOrderId String
+  description     String
+  size            String?
+  qty             Int
+  unitPrice       Float
+  amount          Float
+  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+}
+
+model InventoryItem {
+  id           String   @id @default(cuid())
+  orgId        String
+  sku          String
+  name         String
+  category     String
+  size         String?
+  qty          Int
+  unit         String
+  reorderLevel Int
+  status       String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+}
+
+model Asset {
+  id           String   @id @default(cuid())
+  orgId        String
+  name         String
+  category     String
+  purchaseDate DateTime
+  value        Float
+  status       String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+}
+
+model Staff {
+  id         String   @id @default(cuid())
+  orgId      String
+  name       String
+  role       String
+  department String
+  joinDate   DateTime
+  email      String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+}
+
+model LeaveRequest {
+  id         String   @id @default(cuid())
+  orgId      String
+  employee   String
+  type       String
+  fromDate   DateTime
+  toDate     DateTime
+  days       Int
+  status     String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+}
+
+model Project {
+  id         String   @id @default(cuid())
+  orgId      String
+  name       String
+  client     String?
+  revenue    Float?
+  cost       Float?
+  status     String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+}
+
+model TimesheetEntry {
+  id         String   @id @default(cuid())
+  orgId      String
+  project    String
+  date       DateTime
+  hours      Float
+  task       String
+  billable   Boolean
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+}
