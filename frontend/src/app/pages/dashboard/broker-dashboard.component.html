@@ -22,6 +22,8 @@
     </div>
   </div>
 
+  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
   <!-- KPI Cards Row -->
   <div class="row g-4 mb-4">
     <div class="col-xl-3 col-md-6 col-12" *ngFor="let k of kpis; let i = index">
