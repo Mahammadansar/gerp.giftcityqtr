@@ -10,6 +10,7 @@ import { erpRouter } from './modules/erp.routes.js';
 import { adminRouter } from './modules/admin/admin.routes.js';
 import { sqiRouter } from './modules/sqi/sqi.routes.js';
 import { pqiRouter } from './modules/pqi/pqi.routes.js';
+import { inventoryRouter } from './modules/inventory/inventory.routes.js';
 import { errorHandler, notFound } from './middleware/error.js';
 
 export const app = express();
@@ -33,6 +34,7 @@ app.use('/api/v1/admin', adminRouter);
 app.use('/api/v1/dashboard', dashboardRouter);
 app.use('/api/v1/sqi', sqiRouter);
 app.use('/api/v1/pqi', pqiRouter);
+app.use('/api/v1/inventory', inventoryRouter);
 app.use('/api/v1/erp', erpRouter);
 app.use('/api/v1', crudRouter);
 

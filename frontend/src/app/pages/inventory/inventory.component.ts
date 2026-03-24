@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { AppDataService, InventoryItem } from '../../services/app-data.service';
+import { InventoryItem } from '../../services/app-data.service';
+import { InventoryApiService } from '../../services/inventory-api.service';
 
 @Component({
   selector: 'app-inventory',
@@ -11,16 +12,24 @@ export class InventoryComponent implements OnInit {
   subtitle = 'Track stock of gifts and promotional items.';
   items: InventoryItem[] = [];
   showAddForm = false;
+  error = '';
   form: Partial<InventoryItem> = { sku: '', name: '', category: 'Gifts', size: '', qty: 0, unit: 'pcs', reorderLevel: 0, status: 'In Stock' };
 
-  constructor(private data: AppDataService) {}
+  constructor(private inventoryApi: InventoryApiService) {}
 
   ngOnInit(): void {
     this.load();
   }
 
   load(): void {
-    this.items = this.data.getInventory();
+    this.inventoryApi.listItems().subscribe({
+      next: (res) => {
+        this.items = res.data;
+      },
+      error: (e) => {
+        this.error = e?.error?.error?.message || 'Failed to load inventory';
+      }
+    });
   }
 
   get lowStockCount(): number {
@@ -39,26 +48,33 @@ export class InventoryComponent implements OnInit {
   }
 
   saveItem(): void {
-    const item: InventoryItem = {
-      id: String(Date.now()),
-      sku: this.form.sku || 'SKU',
-      name: this.form.name || 'Item',
+    this.error = '';
+    this.inventoryApi.createItem({
+      sku: this.form.sku || '',
+      name: this.form.name || '',
       category: this.form.category || 'Gifts',
-      size: this.form.size || '—',
-      qty: this.form.qty || 0,
+      size: this.form.size || '',
+      qty: Number(this.form.qty || 0),
       unit: this.form.unit || 'pcs',
-      reorderLevel: this.form.reorderLevel || 0,
-      status: (this.form.qty || 0) <= (this.form.reorderLevel || 0) ? 'Low Stock' : 'In Stock'
-    };
-    this.data.addInventoryItem(item);
-    this.load();
-    this.showAddForm = false;
+      reorderLevel: Number(this.form.reorderLevel || 0)
+    }).subscribe({
+      next: () => {
+        this.showAddForm = false;
+        this.load();
+      },
+      error: (e) => {
+        this.error = e?.error?.error?.message || 'Failed to create item';
+      }
+    });
   }
 
   adjustQty(item: InventoryItem, newQty: number): void {
-    if (newQty >= 0) {
-      this.data.updateInventoryItem(item.id, newQty);
-      this.load();
-    }
+    if (newQty < 0) return;
+    this.inventoryApi.adjustItem(item.id, { movementType: 'ADJUST', quantity: newQty }).subscribe({
+      next: () => this.load(),
+      error: (e) => {
+        this.error = e?.error?.error?.message || 'Failed to adjust quantity';
+      }
+    });
   }
 }

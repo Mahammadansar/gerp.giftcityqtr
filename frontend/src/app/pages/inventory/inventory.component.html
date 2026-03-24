@@ -10,6 +10,7 @@
         {{ showAddForm ? 'Cancel' : 'Add Item' }}
       </button>
       </div>
+      <div class="alert alert-danger mt-3" *ngIf="error">{{ error }}</div>
     </div>
   </div>
 
