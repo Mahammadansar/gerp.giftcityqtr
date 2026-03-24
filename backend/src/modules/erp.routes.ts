@@ -1,14 +1,18 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma.js';
+import { requireAuth } from '../middleware/auth.js';
+import { requireAnyPermission } from '../middleware/rbac.js';
 
 export const erpRouter = Router();
 
-erpRouter.post('/quotations/:id/convert-to-invoice', async (req, res) => {
-  const quotation = await prisma.quotation.findUnique({ where: { id: req.params.id }, include: { lines: true } });
+erpRouter.post('/quotations/:id/convert-to-invoice', requireAuth, requireAnyPermission(['write:erp', 'manage:all']), async (req, res) => {
+  const quotationId = String(req.params.id);
+  const quotation = await prisma.quotation.findUnique({ where: { id: quotationId } });
   if (!quotation) {
     res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Quotation not found' } });
     return;
   }
+  const lines = await prisma.quotationLine.findMany({ where: { quotationId } });
 
   const invoice = await prisma.invoice.create({
     data: {
@@ -21,7 +25,7 @@ erpRouter.post('/quotations/:id/convert-to-invoice', async (req, res) => {
       currency: quotation.currency,
       status: 'Draft',
       lines: {
-        create: quotation.lines.map((line) => ({
+        create: lines.map((line) => ({
           description: line.description,
           size: line.size,
           qty: line.qty,
@@ -37,12 +41,12 @@ erpRouter.post('/quotations/:id/convert-to-invoice', async (req, res) => {
   res.status(201).json({ data: invoice });
 });
 
-erpRouter.post('/purchase-orders/:id/approve', async (req, res) => {
-  const data = await prisma.purchaseOrder.update({ where: { id: req.params.id }, data: { status: 'Approved' } });
+erpRouter.post('/purchase-orders/:id/approve', requireAuth, requireAnyPermission(['approve:purchaseOrder', 'manage:all']), async (req, res) => {
+  const data = await prisma.purchaseOrder.update({ where: { id: String(req.params.id) }, data: { status: 'Approved' } });
   res.json({ data });
 });
 
-erpRouter.post('/purchase-orders/:id/reject', async (req, res) => {
-  const data = await prisma.purchaseOrder.update({ where: { id: req.params.id }, data: { status: 'Rejected' } });
+erpRouter.post('/purchase-orders/:id/reject', requireAuth, requireAnyPermission(['approve:purchaseOrder', 'manage:all']), async (req, res) => {
+  const data = await prisma.purchaseOrder.update({ where: { id: String(req.params.id) }, data: { status: 'Rejected' } });
   res.json({ data });
 });

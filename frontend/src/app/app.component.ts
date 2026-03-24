@@ -1,39 +1,51 @@
-import { Component, Inject, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, Inject, AfterViewInit, OnDestroy, OnInit } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
+import { AuthService, AuthUser } from './auth/auth.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements AfterViewInit, OnDestroy {
-  isLoggedIn = true;
-  private routerSub: any;
-
-  user_data = {
-    userID: 'giftcity-admin',
-    type: 'ADMIN',
-    first_name: 'Admin',
-    last_name: 'User',
-    job: 'Admin',
-    company: 'Gift City Qatar',
-    dp: null as string | null
-  };
+export class AppComponent implements AfterViewInit, OnDestroy, OnInit {
+  isLoggedIn = false;
+  currentUser: AuthUser | null = null;
+  private routerSub?: Subscription;
+  private userSub?: Subscription;
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
-    private router: Router
+    private router: Router,
+    private auth: AuthService
   ) {
-    // On mobile, close sidebar when navigation completes (so menu tap navigates and closes)
     this.routerSub = this.router.events.pipe(
       filter((e): e is NavigationEnd => e instanceof NavigationEnd)
     ).subscribe(() => this.closeSidebarMobile());
   }
 
+  ngOnInit(): void {
+    this.userSub = this.auth.user$.subscribe((user) => {
+      this.currentUser = user;
+      this.isLoggedIn = !!user;
+    });
+
+    this.auth.hydrateSession().subscribe();
+  }
+
   ngOnDestroy(): void {
-    if (this.routerSub) this.routerSub.unsubscribe();
+    this.routerSub?.unsubscribe();
+    this.userSub?.unsubscribe();
+  }
+
+  can(permission: string): boolean {
+    return this.auth.hasPermission(permission);
+  }
+
+  showShell(): boolean {
+    return this.isLoggedIn && this.router.url !== '/login';
   }
 
   closeSidebarMobile(): void {
@@ -42,21 +54,13 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  /** Close sidebar on mobile as soon as a menu link is tapped (so one tap navigates + closes) */
   onSidebarNavClick(event: Event): void {
     const target = event.target as HTMLElement;
-    if (target.closest('a[routerLink]')) {
-      this.closeSidebarMobile();
-    }
+    if (target.closest('a[routerLink]')) this.closeSidebarMobile();
   }
 
   logout(): void {
-    this.isLoggedIn = false;
-    this.router.navigate(['/dashboard']);
-  }
-
-  signInAgain(): void {
-    this.isLoggedIn = true;
+    this.auth.logout().subscribe(() => this.router.navigate(['/login']));
   }
 
   toggleSidebar() {

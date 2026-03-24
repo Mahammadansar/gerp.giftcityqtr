@@ -1,0 +1,24 @@
+<div class="login-page">
+  <div class="login-card">
+    <h3>Gift City Qatar ERP</h3>
+    <p class="text-muted mb-4">Sign in to continue</p>
+
+    <form (ngSubmit)="submit()">
+      <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input class="form-control" name="email" [(ngModel)]="email" type="email" required />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input class="form-control" name="password" [(ngModel)]="password" type="password" required />
+      </div>
+
+      <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
+      <button class="btn btn-primary w-100" [disabled]="loading" type="submit">
+        {{ loading ? 'Signing in...' : 'Sign In' }}
+      </button>
+    </form>
+  </div>
+</div>

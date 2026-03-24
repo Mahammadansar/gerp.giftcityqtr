@@ -5,9 +5,19 @@ const prisma = new PrismaClient();
 
 async function main() {
   const permissions = [
+    ['manage', 'all'],
+    ['read', 'dashboard'],
     ['read', 'erp'],
     ['write', 'erp'],
     ['approve', 'purchaseOrder'],
+    ['read', 'sales'],
+    ['read', 'purchasing'],
+    ['read', 'inventory'],
+    ['read', 'finance'],
+    ['read', 'hr'],
+    ['read', 'projects'],
+    ['read', 'approvals'],
+    ['read', 'settings'],
     ['manage', 'users']
   ];
 
@@ -25,32 +35,32 @@ async function main() {
     create: { name: 'Gift City Qatar', code: 'GCQ' }
   });
 
-  const adminRole = await prisma.role.upsert({
-    where: { orgId_name: { orgId: org.id, name: 'admin' } },
+  const superAdminRole = await prisma.role.upsert({
+    where: { orgId_name: { orgId: org.id, name: 'super_admin' } },
     update: {},
-    create: { orgId: org.id, name: 'admin' }
+    create: { orgId: org.id, name: 'super_admin' }
   });
 
   const allPerms = await prisma.permission.findMany();
   for (const p of allPerms) {
     await prisma.rolePermission.upsert({
-      where: { roleId_permissionId: { roleId: adminRole.id, permissionId: p.id } },
+      where: { roleId_permissionId: { roleId: superAdminRole.id, permissionId: p.id } },
       update: {},
-      create: { roleId: adminRole.id, permissionId: p.id }
+      create: { roleId: superAdminRole.id, permissionId: p.id }
     });
   }
 
-  const passwordHash = await bcrypt.hash('admin@123', 12);
+  const passwordHash = await bcrypt.hash('Admin@12345', 12);
   const admin = await prisma.user.upsert({
     where: { email: 'admin@giftcity.qa' },
-    update: {},
+    update: { passwordHash, orgId: org.id, fullName: 'System Admin' },
     create: { orgId: org.id, fullName: 'System Admin', email: 'admin@giftcity.qa', passwordHash }
   });
 
   await prisma.userRole.upsert({
-    where: { userId_roleId: { userId: admin.id, roleId: adminRole.id } },
+    where: { userId_roleId: { userId: admin.id, roleId: superAdminRole.id } },
     update: {},
-    create: { userId: admin.id, roleId: adminRole.id }
+    create: { userId: admin.id, roleId: superAdminRole.id }
   });
 
   await prisma.customer.createMany({

@@ -1,9 +1,11 @@
 import { Router } from 'express';
 import { prisma } from '../../lib/prisma.js';
+import { requireAuth } from '../../middleware/auth.js';
+import { requireAnyPermission } from '../../middleware/rbac.js';
 
 export const dashboardRouter = Router();
 
-dashboardRouter.get('/summary', async (req, res) => {
+dashboardRouter.get('/summary', requireAuth, requireAnyPermission(['read:dashboard', 'manage:all']), async (req, res) => {
   const orgId = String(req.query.orgId || '');
 
   const [invoiceTotal, pendingPo, inventoryCount] = await Promise.all([

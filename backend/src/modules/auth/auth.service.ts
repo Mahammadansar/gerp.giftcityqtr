@@ -30,10 +30,10 @@ export async function register(data: { orgName: string; fullName: string; email:
       data: { orgId: org.id, fullName: data.fullName, email: data.email, passwordHash }
     });
 
-    const adminRole = await tx.role.findFirst({ where: { orgId: org.id, name: 'admin' } });
-    if (!adminRole) throw new Error('Admin role not provisioned');
+    const superAdminRole = await tx.role.findFirst({ where: { orgId: org.id, name: 'super_admin' } });
+    if (!superAdminRole) throw new Error('super_admin role not provisioned');
 
-    await tx.userRole.create({ data: { userId: user.id, roleId: adminRole.id } });
+    await tx.userRole.create({ data: { userId: user.id, roleId: superAdminRole.id } });
 
     return { org, user };
   });

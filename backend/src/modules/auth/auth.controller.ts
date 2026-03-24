@@ -8,9 +8,10 @@ import { env } from '../../config/env.js';
 
 const cookieOptions = {
   httpOnly: true,
-  secure: false,
+  secure: env.nodeEnv === 'production',
   sameSite: 'lax' as const,
-  path: '/'
+  path: '/',
+  domain: env.cookieDomain || undefined
 };
 
 export async function registerHandler(req: Request, res: Response) {
@@ -63,7 +64,13 @@ export async function meHandler(req: Request, res: Response) {
     return;
   }
 
-  const auth = jwt.verify(accessToken, env.accessSecret) as { sub: string };
+  let auth: { sub: string };
+  try {
+    auth = jwt.verify(accessToken, env.accessSecret) as { sub: string };
+  } catch {
+    res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'Invalid token' } });
+    return;
+  }
   const user = await prisma.user.findUnique({
     where: { id: auth.sub },
     include: {
