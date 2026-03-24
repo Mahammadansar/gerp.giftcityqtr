@@ -13,6 +13,7 @@
           </button>
         </div>
       </div>
+      <div class="alert alert-danger mt-3" *ngIf="error">{{ error }}</div>
     </div>
   </div>
 
@@ -156,9 +157,11 @@
               <button type="button" class="btn btn-sm btn-outline-secondary me-1" (click)="downloadInvoice(inv)" title="Print / PDF">
                 <i class="feather icon-download"></i>
               </button>
-              <div class="btn-group btn-group-sm" *ngIf="inv.status === 'Draft' || inv.status === 'Sent'">
+              <div class="btn-group btn-group-sm" *ngIf="inv.status === 'Draft' || inv.status === 'Sent' || inv.status === 'PartiallyPaid'">
                 <button type="button" class="btn btn-outline-success" (click)="updateStatus(inv, 'Sent')" *ngIf="inv.status === 'Draft'" title="Mark Sent">Sent</button>
-                <button type="button" class="btn btn-outline-success" (click)="updateStatus(inv, 'Paid')" title="Mark Paid">Paid</button>
+                <button type="button" class="btn btn-outline-success" (click)="updateStatus(inv, 'PartiallyPaid')" *ngIf="inv.status === 'Sent'" title="Mark Partially Paid">Partially Paid</button>
+                <button type="button" class="btn btn-outline-success" (click)="updateStatus(inv, 'Paid')" *ngIf="inv.status !== 'Draft'" title="Mark Paid">Paid</button>
+                <button type="button" class="btn btn-outline-danger" (click)="updateStatus(inv, 'Cancelled')" *ngIf="inv.status === 'Draft' || inv.status === 'Sent' || inv.status === 'PartiallyPaid'" title="Cancel">Cancel</button>
               </div>
             </td>
           </tr>

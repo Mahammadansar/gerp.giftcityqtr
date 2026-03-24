@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AppDataService, AppSettings } from '../../services/app-data.service';
+import { AdminManagementService, PermissionItem, RoleItem, UserItem } from '../../services/admin-management.service';
 
 @Component({
   selector: 'app-settings',
@@ -8,57 +9,181 @@ import { AppDataService, AppSettings } from '../../services/app-data.service';
 })
 export class SettingsComponent implements OnInit {
   title = 'Settings';
-  subtitle = 'Company and application settings.';
-
-  roles = [
-    { name: 'Admin', users: 2, description: 'Full access' },
-    { name: 'Sales Manager', users: 3, description: 'Sales, orders, clients' },
-    { name: 'Finance', users: 1, description: 'Bills, payments, reports' },
-    { name: 'Vendor', users: 5, description: 'Portal only' }
-  ];
-  workflows = [
-    { name: 'PO Approval', type: 'Purchase', steps: 2, status: 'Active' },
-    { name: 'Sales Discount', type: 'Sales', steps: 1, status: 'Active' },
-    { name: 'Vendor Onboarding', type: 'Setup', steps: 3, status: 'Active' }
-  ];
+  subtitle = 'Company, users, and role access control.';
 
   settings: AppSettings = { companyName: '', currency: 'AED' };
   companyName = '';
   currency = 'AED';
-  showAddRole = false;
-  showAddWorkflow = false;
-  roleForm: { name: string; users: number; description: string } = { name: '', users: 0, description: '' };
-  workflowForm: { name: string; type: string; steps: number; status: string } = { name: '', type: '', steps: 1, status: 'Active' };
 
-  constructor(private data: AppDataService) {}
+  users: UserItem[] = [];
+  roles: RoleItem[] = [];
+  permissions: PermissionItem[] = [];
+
+  loading = false;
+  message = '';
+  error = '';
+
+  showAddUser = false;
+  showAddRole = false;
+
+  userForm = {
+    fullName: '',
+    email: '',
+    password: '',
+    roleId: ''
+  };
+
+  roleForm = {
+    name: '',
+    permissionIds: [] as string[]
+  };
+
+  selectedRoleId = '';
+  selectedRolePermissionIds: string[] = [];
+
+  constructor(private data: AppDataService, private adminApi: AdminManagementService) {}
 
   ngOnInit(): void {
     this.settings = this.data.getSettings();
     this.companyName = this.settings.companyName;
     this.currency = this.settings.currency;
+    this.loadAdminData();
   }
 
   saveCompany(): void {
     this.data.saveSettings({ companyName: this.companyName, currency: this.currency });
+    this.message = 'Company settings saved';
+  }
+
+  loadAdminData(): void {
+    this.loading = true;
+    this.error = '';
+
+    this.adminApi.getPermissions().subscribe({
+      next: (p) => {
+        this.permissions = p.data;
+        this.adminApi.getRoles().subscribe({
+          next: (r) => {
+            this.roles = r.data;
+            if (this.roles.length && !this.selectedRoleId) {
+              this.onRoleSelected(this.roles[0].id);
+            }
+            this.adminApi.getUsers().subscribe({
+              next: (u) => {
+                this.users = u.data;
+                this.loading = false;
+              },
+              error: () => {
+                this.error = 'Failed to load users';
+                this.loading = false;
+              }
+            });
+          },
+          error: () => {
+            this.error = 'Failed to load roles';
+            this.loading = false;
+          }
+        });
+      },
+      error: () => {
+        this.error = 'Failed to load permissions';
+        this.loading = false;
+      }
+    });
+  }
+
+  toggleAddUser(): void {
+    this.showAddUser = !this.showAddUser;
+    if (this.showAddUser) {
+      this.userForm = { fullName: '', email: '', password: '', roleId: this.roles[0]?.id || '' };
+    }
+  }
+
+  createUser(): void {
+    this.error = '';
+    this.message = '';
+
+    this.adminApi.createUser(this.userForm).subscribe({
+      next: () => {
+        this.message = 'User created';
+        this.showAddUser = false;
+        this.loadAdminData();
+      },
+      error: (e) => {
+        this.error = e?.error?.error?.message || 'Failed to create user';
+      }
+    });
+  }
+
+  onChangeUserRole(userId: string, roleId: string): void {
+    this.adminApi.updateUserRole(userId, roleId).subscribe({
+      next: () => {
+        this.message = 'User role updated';
+        this.loadAdminData();
+      },
+      error: () => {
+        this.error = 'Failed to update user role';
+      }
+    });
   }
 
   toggleAddRole(): void {
     this.showAddRole = !this.showAddRole;
-    if (this.showAddRole) this.roleForm = { name: '', users: 0, description: '' };
+    if (this.showAddRole) {
+      this.roleForm = { name: '', permissionIds: [] };
+    }
   }
 
-  addRole(): void {
-    this.roles.push({ name: this.roleForm.name || 'Role', users: this.roleForm.users || 0, description: this.roleForm.description || '' });
-    this.showAddRole = false;
+  createRole(): void {
+    this.adminApi.createRole(this.roleForm).subscribe({
+      next: () => {
+        this.message = 'Role created';
+        this.showAddRole = false;
+        this.loadAdminData();
+      },
+      error: () => {
+        this.error = 'Failed to create role';
+      }
+    });
   }
 
-  toggleAddWorkflow(): void {
-    this.showAddWorkflow = !this.showAddWorkflow;
-    if (this.showAddWorkflow) this.workflowForm = { name: '', type: 'General', steps: 1, status: 'Active' };
+  onRoleSelected(roleId: string): void {
+    this.selectedRoleId = roleId;
+    const role = this.roles.find((r) => r.id === roleId);
+    this.selectedRolePermissionIds = role ? role.permissions.map((p) => p.id) : [];
   }
 
-  addWorkflow(): void {
-    this.workflows.push({ name: this.workflowForm.name || 'Workflow', type: this.workflowForm.type || 'General', steps: this.workflowForm.steps || 1, status: this.workflowForm.status || 'Active' });
-    this.showAddWorkflow = false;
+  togglePermission(permissionId: string): void {
+    if (this.selectedRolePermissionIds.includes(permissionId)) {
+      this.selectedRolePermissionIds = this.selectedRolePermissionIds.filter((id) => id !== permissionId);
+    } else {
+      this.selectedRolePermissionIds = [...this.selectedRolePermissionIds, permissionId];
+    }
+  }
+
+  toggleNewRolePermission(permissionId: string): void {
+    if (this.roleForm.permissionIds.includes(permissionId)) {
+      this.roleForm.permissionIds = this.roleForm.permissionIds.filter((id) => id !== permissionId);
+    } else {
+      this.roleForm.permissionIds = [...this.roleForm.permissionIds, permissionId];
+    }
+  }
+
+  saveRolePermissions(): void {
+    if (!this.selectedRoleId) return;
+
+    this.adminApi.updateRolePermissions(this.selectedRoleId, this.selectedRolePermissionIds).subscribe({
+      next: () => {
+        this.message = 'Role permissions updated';
+        this.loadAdminData();
+      },
+      error: () => {
+        this.error = 'Failed to update role permissions';
+      }
+    });
+  }
+
+  roleOf(user: UserItem): string {
+    return user.roles[0]?.name || 'Unassigned';
   }
 }

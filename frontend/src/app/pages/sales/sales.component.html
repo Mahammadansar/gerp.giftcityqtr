@@ -16,6 +16,7 @@
           </button>
         </div>
       </div>
+      <div class="alert alert-danger mt-3" *ngIf="error">{{ error }}</div>
     </div>
   </div>
 
@@ -82,11 +83,11 @@
             <td>
               <span class="status-badge-modern" [ngClass]="{
                 'status-approved': o.status === 'Delivered' || o.status === 'Confirmed',
-                'status-pending': o.status === 'Pending'
+                'status-pending': o.status === 'Draft'
               }">{{ o.status }}</span>
-              <span class="ms-1" *ngIf="o.status === 'Pending' || o.status === 'Confirmed'">
-                <button type="button" class="btn btn-sm btn-outline-success" (click)="updateOrderStatus(o, o.status === 'Pending' ? 'Confirmed' : 'Delivered')">
-                  {{ o.status === 'Pending' ? 'Confirm' : 'Mark Delivered' }}
+              <span class="ms-1" *ngIf="o.status === 'Draft' || o.status === 'Confirmed'">
+                <button type="button" class="btn btn-sm btn-outline-success" (click)="updateOrderStatus(o, o.status === 'Draft' ? 'Confirmed' : 'Delivered')">
+                  {{ o.status === 'Draft' ? 'Confirm' : 'Mark Delivered' }}
                 </button>
               </span>
             </td>

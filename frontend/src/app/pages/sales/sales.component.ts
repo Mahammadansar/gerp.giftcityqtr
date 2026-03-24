@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { AppDataService, SalesOrder, PriceList } from '../../services/app-data.service';
+import { SalesOrder, PriceList } from '../../services/app-data.service';
+import { SqiApiService } from '../../services/sqi-api.service';
 
 @Component({
   selector: 'app-sales',
@@ -14,62 +15,68 @@ export class SalesComponent implements OnInit {
   priceLists: PriceList[] = [];
   showAddOrder = false;
   showAddPriceList = false;
-  orderForm: Partial<SalesOrder> = { client: '', items: '', total: 0, currency: 'AED', date: '', status: 'Pending' };
+  error = '';
+
+  orderForm: Partial<SalesOrder> = { client: '', items: '', total: 0, currency: 'AED', date: '', status: 'Draft' };
   priceListForm: Partial<PriceList> = { name: '', type: 'Gifts', validFrom: '', items: 0, status: 'Active' };
 
-  constructor(private data: AppDataService) {}
+  constructor(private sqiApi: SqiApiService) {}
 
   ngOnInit(): void {
     this.load();
   }
 
   load(): void {
-    this.salesOrders = this.data.getSalesOrders();
-    this.priceLists = this.data.getPriceLists();
+    this.sqiApi.listSalesOrders().subscribe({
+      next: (res) => {
+        this.salesOrders = res.data.map((o) => ({ ...o, date: String(o.date).slice(0, 10) }));
+      },
+      error: (e) => {
+        this.error = e?.error?.error?.message || 'Failed to load sales orders';
+      }
+    });
+    this.priceLists = [];
   }
 
   toggleAddOrder(): void {
     this.showAddOrder = !this.showAddOrder;
-    if (this.showAddOrder) this.orderForm = { client: '', items: '', total: 0, currency: 'AED', date: new Date().toISOString().slice(0, 10), status: 'Pending' };
+    if (this.showAddOrder) this.orderForm = { client: '', items: '', total: 0, currency: 'AED', date: new Date().toISOString().slice(0, 10), status: 'Draft' };
   }
 
   saveOrder(): void {
-    const so: SalesOrder = {
-      id: String(Date.now()),
-      orderNo: 'SO-' + new Date().getFullYear() + '-' + String(this.salesOrders.length + 1).padStart(3, '0'),
-      date: this.orderForm.date || '',
+    this.error = '';
+    this.sqiApi.createSalesOrder({
       client: this.orderForm.client || '',
       items: this.orderForm.items || '',
-      total: this.orderForm.total || 0,
+      total: Number(this.orderForm.total || 0),
       currency: this.orderForm.currency || 'AED',
-      status: this.orderForm.status || 'Pending'
-    };
-    this.data.addSalesOrder(so);
-    this.load();
-    this.showAddOrder = false;
+      date: this.orderForm.date || new Date().toISOString().slice(0, 10),
+      status: 'Draft'
+    }).subscribe({
+      next: () => {
+        this.load();
+        this.showAddOrder = false;
+      },
+      error: (e) => {
+        this.error = e?.error?.error?.message || 'Failed to save sales order';
+      }
+    });
   }
 
   toggleAddPriceList(): void {
     this.showAddPriceList = !this.showAddPriceList;
-    if (this.showAddPriceList) this.priceListForm = { name: '', type: 'Gifts', validFrom: new Date().toISOString().slice(0, 10), items: 0, status: 'Active' };
   }
 
   savePriceList(): void {
-    const pl: PriceList = {
-      id: String(Date.now()),
-      name: this.priceListForm.name || '',
-      type: this.priceListForm.type || 'Gifts',
-      validFrom: this.priceListForm.validFrom || '',
-      items: this.priceListForm.items || 0,
-      status: this.priceListForm.status || 'Active'
-    };
-    this.data.addPriceList(pl);
-    this.load();
-    this.showAddPriceList = false;
+    this.error = 'Price list is not part of this backend-first phase.';
   }
 
   updateOrderStatus(order: SalesOrder, status: string): void {
-    this.data.updateSalesOrderStatus(order.id, status);
-    this.load();
+    this.sqiApi.updateSalesOrderStatus(order.id, status).subscribe({
+      next: () => this.load(),
+      error: (e) => {
+        this.error = e?.error?.error?.message || 'Failed to update sales order status';
+      }
+    });
   }
 }

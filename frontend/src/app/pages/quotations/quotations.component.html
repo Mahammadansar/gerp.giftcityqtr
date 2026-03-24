@@ -13,6 +13,7 @@
           </button>
         </div>
       </div>
+      <div class="alert alert-danger mt-3" *ngIf="error">{{ error }}</div>
     </div>
   </div>
 
@@ -123,7 +124,7 @@
               <span class="status-badge-modern" [ngClass]="{
                 'status-approved': q.status === 'Accepted',
                 'status-pending': q.status === 'Sent' || q.status === 'Draft',
-                'status-rejected': q.status === 'Expired'
+                'status-rejected': q.status === 'Expired' || q.status === 'Rejected'
               }">{{ q.status }}</span>
             </td>
             <td class="text-center">
@@ -132,6 +133,7 @@
               </button>
               <button type="button" class="btn btn-sm btn-outline-success" (click)="updateStatus(q, 'Sent')" *ngIf="q.status === 'Draft'" title="Mark Sent">Sent</button>
               <button type="button" class="btn btn-sm btn-outline-success" (click)="updateStatus(q, 'Accepted')" *ngIf="q.status === 'Sent'" title="Mark Accepted">Accept</button>
+              <button type="button" class="btn btn-sm btn-outline-danger ms-1" (click)="updateStatus(q, 'Rejected')" *ngIf="q.status === 'Sent'" title="Mark Rejected">Reject</button>
             </td>
           </tr>
         </tbody>

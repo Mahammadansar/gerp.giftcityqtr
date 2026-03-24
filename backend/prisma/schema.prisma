@@ -7,6 +7,36 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum DocumentKind {
+  SALES_ORDER
+  QUOTATION
+  INVOICE
+}
+
+enum QuotationStatus {
+  Draft
+  Sent
+  Accepted
+  Rejected
+  Expired
+}
+
+enum InvoiceStatus {
+  Draft
+  Sent
+  PartiallyPaid
+  Paid
+  Overdue
+  Cancelled
+}
+
+enum SalesOrderStatus {
+  Draft
+  Confirmed
+  Delivered
+  Cancelled
+}
+
 model Organization {
   id          String           @id @default(cuid())
   name        String
@@ -19,6 +49,7 @@ model Organization {
   suppliers   Supplier[]
   quotations  Quotation[]
   invoices    Invoice[]
+  salesOrders SalesOrder[]
   purchaseOrders PurchaseOrder[]
   inventoryItems InventoryItem[]
   assets      Asset[]
@@ -26,6 +57,7 @@ model Organization {
   leaveRequests LeaveRequest[]
   projects    Project[]
   timesheets  TimesheetEntry[]
+  documentSequences DocumentSequence[]
 }
 
 model User {
@@ -123,12 +155,15 @@ model Quotation {
   validUntil DateTime
   amount     Float
   currency   String
-  status     String
+  status     QuotationStatus
   notes      String?
   createdAt  DateTime        @default(now())
   updatedAt  DateTime        @updatedAt
   lines      QuotationLine[]
   organization Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId, status, date])
+  @@unique([orgId, quoteNo])
 }
 
 model QuotationLine {
@@ -151,13 +186,46 @@ model Invoice {
   dueDate    DateTime
   amount     Float
   currency   String
-  status     String
+  status     InvoiceStatus
   taxPercent Float?
   notes      String?
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
   lines      InvoiceLine[]
   organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId, status, date])
+  @@unique([orgId, invoiceNo])
+}
+
+model SalesOrder {
+  id        String           @id @default(cuid())
+  orgId     String
+  orderNo   String
+  date      DateTime
+  client    String
+  items     String
+  total     Float
+  currency  String
+  status    SalesOrderStatus
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  organization Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, orderNo])
+  @@index([orgId, status, date])
+}
+
+model DocumentSequence {
+  id           String       @id @default(cuid())
+  orgId        String
+  kind         DocumentKind
+  currentValue Int          @default(0)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, kind])
 }
 
 model InvoiceLine {

@@ -7,6 +7,8 @@ import { authRouter } from './modules/auth/auth.routes.js';
 import { crudRouter } from './modules/crud/crud.routes.js';
 import { dashboardRouter } from './modules/dashboard/dashboard.routes.js';
 import { erpRouter } from './modules/erp.routes.js';
+import { adminRouter } from './modules/admin/admin.routes.js';
+import { sqiRouter } from './modules/sqi/sqi.routes.js';
 import { errorHandler, notFound } from './middleware/error.js';
 
 export const app = express();
@@ -26,7 +28,9 @@ app.get('/health', (_req, res) => {
 });
 
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/admin', adminRouter);
 app.use('/api/v1/dashboard', dashboardRouter);
+app.use('/api/v1/sqi', sqiRouter);
 app.use('/api/v1/erp', erpRouter);
 app.use('/api/v1', crudRouter);
 

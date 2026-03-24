@@ -7,6 +7,8 @@
           <p class="text-muted mb-0">{{ subtitle }}</p>
         </div>
       </div>
+      <div class="alert alert-success mt-3" *ngIf="message">{{ message }}</div>
+      <div class="alert alert-danger mt-3" *ngIf="error">{{ error }}</div>
     </div>
   </div>
 
@@ -14,97 +16,109 @@
     <div class="card-body">
       <h6 class="fw-semibold mb-3">Company</h6>
       <div class="row g-2 align-items-end">
-        <div class="col-md-4"><label class="form-label small">Company name</label><input type="text" class="form-control form-control-sm" [(ngModel)]="companyName" placeholder="Company name" /></div>
-        <div class="col-md-2"><label class="form-label small">Currency</label><input type="text" class="form-control form-control-sm" [(ngModel)]="currency" placeholder="AED" /></div>
+        <div class="col-md-4"><label class="form-label small">Company name</label><input type="text" class="form-control form-control-sm" [(ngModel)]="companyName" /></div>
+        <div class="col-md-2"><label class="form-label small">Currency</label><input type="text" class="form-control form-control-sm" [(ngModel)]="currency" /></div>
         <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveCompany()">Save</button></div>
       </div>
     </div>
   </div>
 
   <div class="row">
-    <div class="col-lg-6 mb-4">
+    <div class="col-lg-7 mb-4">
       <div class="card border-0 shadow-sm">
         <div class="card-header bg-light border-0 py-3 d-flex justify-content-between align-items-center">
-          <h6 class="mb-0 fw-semibold">Custom User Roles</h6>
+          <h6 class="mb-0 fw-semibold">Users</h6>
+          <button type="button" class="btn btn-sm btn-primary" (click)="toggleAddUser()">{{ showAddUser ? 'Cancel' : 'Add User' }}</button>
+        </div>
+
+        <div class="card-body border-bottom" *ngIf="showAddUser">
+          <div class="row g-2 align-items-end">
+            <div class="col-md-3"><label class="form-label small">Name</label><input class="form-control form-control-sm" [(ngModel)]="userForm.fullName" /></div>
+            <div class="col-md-3"><label class="form-label small">Email</label><input class="form-control form-control-sm" [(ngModel)]="userForm.email" /></div>
+            <div class="col-md-3"><label class="form-label small">Password</label><input type="password" class="form-control form-control-sm" [(ngModel)]="userForm.password" /></div>
+            <div class="col-md-2">
+              <label class="form-label small">Role</label>
+              <select class="form-select form-select-sm" [(ngModel)]="userForm.roleId">
+                <option *ngFor="let r of roles" [value]="r.id">{{ r.name }}</option>
+              </select>
+            </div>
+            <div class="col-md-1"><button class="btn btn-sm btn-primary" (click)="createUser()">Save</button></div>
+          </div>
+        </div>
+
+        <div class="table-responsive" *ngIf="!loading">
+          <table class="table table-modern mb-0">
+            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr *ngFor="let u of users">
+                <td class="fw-semibold">{{ u.fullName }}</td>
+                <td>{{ u.email }}</td>
+                <td>
+                  <select class="form-select form-select-sm" [ngModel]="u.roles[0]?.id" (ngModelChange)="onChangeUserRole(u.id, $event)">
+                    <option *ngFor="let r of roles" [value]="r.id">{{ r.name }}</option>
+                  </select>
+                </td>
+                <td><span class="badge bg-success" *ngIf="u.isActive">Active</span><span class="badge bg-secondary" *ngIf="!u.isActive">Disabled</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-5 mb-4">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-light border-0 py-3 d-flex justify-content-between align-items-center">
+          <h6 class="mb-0 fw-semibold">Roles</h6>
           <button type="button" class="btn btn-sm btn-primary" (click)="toggleAddRole()">{{ showAddRole ? 'Cancel' : 'Add Role' }}</button>
         </div>
+
         <div class="card-body border-bottom" *ngIf="showAddRole">
           <div class="row g-2 align-items-end">
-            <div class="col-4"><label class="form-label small">Role name</label><input type="text" class="form-control form-control-sm" [(ngModel)]="roleForm.name" placeholder="Name" /></div>
-            <div class="col-2"><label class="form-label small">Users</label><input type="number" class="form-control form-control-sm" [(ngModel)]="roleForm.users" min="0" /></div>
-            <div class="col-4"><label class="form-label small">Description</label><input type="text" class="form-control form-control-sm" [(ngModel)]="roleForm.description" placeholder="Description" /></div>
-            <div class="col-2"><button type="button" class="btn btn-sm btn-primary" (click)="addRole()">Save</button></div>
+            <div class="col-8"><label class="form-label small">Role name</label><input class="form-control form-control-sm" [(ngModel)]="roleForm.name" /></div>
+            <div class="col-4"><button class="btn btn-sm btn-primary" (click)="createRole()">Create</button></div>
+          </div>
+          <div class="mt-3">
+            <label class="form-label small">Default permissions</label>
+            <div class="d-flex flex-wrap gap-2">
+              <div *ngFor="let p of permissions" class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" [id]="'new_'+p.id" [checked]="roleForm.permissionIds.includes(p.id)" (change)="toggleNewRolePermission(p.id)" />
+                <label class="form-check-label small" [for]="'new_'+p.id">{{ p.action }}:{{ p.resource }}</label>
+              </div>
+            </div>
           </div>
         </div>
+
         <div class="table-responsive">
           <table class="table table-modern mb-0">
-            <thead>
-              <tr>
-                <th>Role</th>
-                <th class="text-end">Users</th>
-                <th>Description</th>
-              </tr>
-            </thead>
+            <thead><tr><th>Role</th><th class="text-end">Users</th></tr></thead>
             <tbody>
-              <tr *ngFor="let r of roles">
+              <tr *ngFor="let r of roles" (click)="onRoleSelected(r.id)" [class.table-active]="selectedRoleId===r.id" style="cursor:pointer">
                 <td class="fw-semibold">{{ r.name }}</td>
                 <td class="text-end">{{ r.users }}</td>
-                <td class="small text-muted">{{ r.description }}</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
-    </div>
-    <div class="col-lg-6 mb-4">
+
       <div class="card border-0 shadow-sm">
         <div class="card-header bg-light border-0 py-3 d-flex justify-content-between align-items-center">
-          <h6 class="mb-0 fw-semibold">Business Workflows</h6>
-          <button type="button" class="btn btn-sm btn-primary" (click)="toggleAddWorkflow()">{{ showAddWorkflow ? 'Cancel' : 'Add Workflow' }}</button>
+          <h6 class="mb-0 fw-semibold">Role Permissions</h6>
+          <button class="btn btn-sm btn-primary" (click)="saveRolePermissions()" [disabled]="!selectedRoleId">Save Permissions</button>
         </div>
-        <div class="card-body border-bottom" *ngIf="showAddWorkflow">
-          <div class="row g-2 align-items-end">
-            <div class="col-3"><label class="form-label small">Name</label><input type="text" class="form-control form-control-sm" [(ngModel)]="workflowForm.name" placeholder="Name" /></div>
-            <div class="col-2"><label class="form-label small">Type</label><input type="text" class="form-control form-control-sm" [(ngModel)]="workflowForm.type" placeholder="Type" /></div>
-            <div class="col-2"><label class="form-label small">Steps</label><input type="number" class="form-control form-control-sm" [(ngModel)]="workflowForm.steps" min="1" /></div>
-            <div class="col-2"><label class="form-label small">Status</label><input type="text" class="form-control form-control-sm" [(ngModel)]="workflowForm.status" placeholder="Active" /></div>
-            <div class="col-2"><button type="button" class="btn btn-sm btn-primary" (click)="addWorkflow()">Save</button></div>
+        <div class="card-body" *ngIf="selectedRoleId; else noRoleSelected">
+          <div class="d-flex flex-wrap gap-2">
+            <div *ngFor="let p of permissions" class="form-check form-check-inline me-3">
+              <input class="form-check-input" type="checkbox" [id]="p.id" [checked]="selectedRolePermissionIds.includes(p.id)" (change)="togglePermission(p.id)" />
+              <label class="form-check-label small" [for]="p.id">{{ p.action }}:{{ p.resource }}</label>
+            </div>
           </div>
         </div>
-        <div class="table-responsive">
-          <table class="table table-modern mb-0">
-            <thead>
-              <tr>
-                <th>Workflow</th>
-                <th>Type</th>
-                <th class="text-end">Steps</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let w of workflows">
-                <td class="fw-semibold">{{ w.name }}</td>
-                <td>{{ w.type }}</td>
-                <td class="text-end">{{ w.steps }}</td>
-                <td><span class="status-badge-modern status-approved">{{ w.status }}</span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <ng-template #noRoleSelected>
+          <div class="card-body text-muted small">Select a role to manage permissions.</div>
+        </ng-template>
       </div>
-    </div>
-  </div>
-
-  <div class="card border-0 shadow-sm">
-    <div class="card-body">
-      <h6 class="fw-semibold mb-3">Professional + Settings</h6>
-      <ul class="list-unstyled mb-0 small">
-        <li class="py-2 border-bottom"><i class="feather icon-globe me-2 text-muted"></i>Custom domain</li>
-        <li class="py-2 border-bottom"><i class="feather icon-layers me-2 text-muted"></i>Custom modules</li>
-        <li class="py-2 border-bottom"><i class="feather icon-check-square me-2 text-muted"></i>Custom field validation</li>
-        <li class="py-2 border-bottom"><i class="feather icon-code me-2 text-muted"></i>Custom functions</li>
-        <li class="py-2"><i class="feather icon-maximize-2 me-2 text-muted"></i>Embed web pages / apps</li>
-      </ul>
     </div>
   </div>
 </div>

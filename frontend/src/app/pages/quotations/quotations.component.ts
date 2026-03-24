@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AppDataService, Quotation, QuoteLine, Invoice, InvoiceLine } from '../../services/app-data.service';
+import { Quotation, QuoteLine } from '../../services/app-data.service';
+import { SqiApiService } from '../../services/sqi-api.service';
 
 @Component({
   selector: 'app-quotations',
@@ -12,6 +13,7 @@ export class QuotationsComponent implements OnInit {
   subtitle = 'Create and manage customer quotations.';
   showCreateForm = false;
   quotations: Quotation[] = [];
+  error = '';
 
   form = {
     client: '',
@@ -22,14 +24,21 @@ export class QuotationsComponent implements OnInit {
   };
   lines: QuoteLine[] = [{ description: '', size: '', qty: 1, unitPrice: 0, amount: 0 }];
 
-  constructor(private data: AppDataService, private router: Router) {}
+  constructor(private sqiApi: SqiApiService, private router: Router) {}
 
   ngOnInit(): void {
     this.loadQuotations();
   }
 
   loadQuotations(): void {
-    this.quotations = this.data.getQuotations();
+    this.sqiApi.listQuotations().subscribe({
+      next: (res) => {
+        this.quotations = res.data.map((q) => ({ ...q, date: String(q.date).slice(0, 10), validUntil: String(q.validUntil).slice(0, 10) }));
+      },
+      error: (e) => {
+        this.error = e?.error?.error?.message || 'Failed to load quotations';
+      }
+    });
   }
 
   get subtotal(): number {
@@ -47,63 +56,48 @@ export class QuotationsComponent implements OnInit {
     }
   }
 
-  addLine(): void {
-    this.lines.push({ description: '', size: '', qty: 1, unitPrice: 0, amount: 0 });
-  }
-
-  removeLine(index: number): void {
-    if (this.lines.length > 1) this.lines.splice(index, 1);
-  }
-
-  updateLineAmount(i: number): void {
-    const l = this.lines[i];
-    l.amount = l.qty * l.unitPrice;
-  }
+  addLine(): void { this.lines.push({ description: '', size: '', qty: 1, unitPrice: 0, amount: 0 }); }
+  removeLine(index: number): void { if (this.lines.length > 1) this.lines.splice(index, 1); }
+  updateLineAmount(i: number): void { const l = this.lines[i]; l.amount = l.qty * l.unitPrice; }
 
   saveQuotation(): void {
-    const q: Quotation = {
-      id: String(Date.now()),
-      quoteNo: this.data.getNextQuotationNumber(),
+    this.error = '';
+    this.sqiApi.createQuotation({
       client: this.form.client || 'New Client',
       date: this.form.quoteDate,
       validUntil: this.form.validUntil || this.form.quoteDate,
-      amount: this.subtotal,
       currency: this.form.currency,
-      status: 'Draft',
       notes: this.form.notes || '',
-      lines: this.lines.map(l => ({ ...l, amount: l.qty * l.unitPrice }))
-    };
-    this.data.addQuotation(q);
-    this.loadQuotations();
-    this.showCreateForm = false;
+      lines: this.lines.map((l) => ({ ...l, amount: l.qty * l.unitPrice }))
+    }).subscribe({
+      next: () => {
+        this.loadQuotations();
+        this.showCreateForm = false;
+      },
+      error: (e) => {
+        this.error = e?.error?.error?.message || 'Failed to save quotation';
+      }
+    });
   }
 
   updateStatus(q: Quotation, status: string): void {
-    this.data.updateQuotationStatus(q.id, status);
-    this.loadQuotations();
+    this.sqiApi.updateQuotationStatus(q.id, status).subscribe({
+      next: () => this.loadQuotations(),
+      error: (e) => {
+        this.error = e?.error?.error?.message || 'Failed to update quotation status';
+      }
+    });
   }
 
   convertToInvoice(q: Quotation): void {
-    const due = new Date(q.date);
-    due.setDate(due.getDate() + 30);
-    const invLines: InvoiceLine[] = (q.lines && q.lines.length > 0)
-      ? q.lines.map(l => ({ description: l.description, size: l.size, qty: l.qty, unitPrice: l.unitPrice, amount: l.qty * l.unitPrice }))
-      : [{ description: 'From Quotation ' + q.quoteNo, size: '', qty: 1, unitPrice: q.amount, amount: q.amount }];
-    const inv: Invoice = {
-      id: String(Date.now()),
-      invoiceNo: this.data.getNextInvoiceNumber(),
-      client: q.client,
-      date: new Date().toISOString().slice(0, 10),
-      dueDate: due.toISOString().slice(0, 10),
-      amount: q.amount,
-      currency: q.currency,
-      status: 'Draft',
-      notes: q.notes || '',
-      lines: invLines
-    };
-    this.data.addInvoice(inv);
-    this.data.updateQuotationStatus(q.id, 'Accepted');
-    this.loadQuotations();
-    this.router.navigate(['/invoices']);
+    this.sqiApi.convertQuotationToInvoice(q.id).subscribe({
+      next: () => {
+        this.loadQuotations();
+        this.router.navigate(['/invoices']);
+      },
+      error: (e) => {
+        this.error = e?.error?.error?.message || 'Failed to convert quotation';
+      }
+    });
   }
 }
