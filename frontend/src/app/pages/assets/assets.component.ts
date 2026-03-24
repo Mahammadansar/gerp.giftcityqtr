@@ -15,6 +15,7 @@ export class AssetsComponent implements OnInit {
   showAddForm = false;
   error = '';
   loading = false;
+  submitting = false;
   form: Partial<Asset> = { name: '', category: 'Equipment', purchaseDate: '', value: 0, status: 'Active' };
 
   constructor(private opsApi: OpsApiService) {}
@@ -36,6 +37,8 @@ export class AssetsComponent implements OnInit {
   }
 
   saveAsset(): void {
+    if (this.submitting) return;
+    this.submitting = true;
     this.opsApi.createAsset({
       name: this.form.name || 'Asset',
       category: this.form.category || 'Equipment',
@@ -43,8 +46,8 @@ export class AssetsComponent implements OnInit {
       value: this.form.value || 0,
       status: this.form.status || 'Active'
     }).subscribe({
-      next: () => { this.load(); this.showAddForm = false; },
-      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to save asset'); }
+      next: () => { this.load(); this.showAddForm = false; this.submitting = false; },
+      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to save asset'); this.submitting = false; }
     });
   }
 }

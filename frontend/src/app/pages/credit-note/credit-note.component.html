@@ -58,8 +58,8 @@
         </div>
       </div>
       <div class="mt-4 d-flex gap-2">
-        <button type="button" class="btn btn-primary btn-modern" (click)="saveCreditNote()">
-          <i class="feather icon-save me-2"></i>Save Credit Note
+        <button type="button" class="btn btn-primary btn-modern" (click)="saveCreditNote()" [disabled]="submitting">
+          <i class="feather icon-save me-2"></i>{{ submitting ? 'Saving...' : 'Save Credit Note' }}
         </button>
         <button type="button" class="btn btn-outline-secondary" (click)="toggleCreateForm()">Cancel</button>
       </div>

@@ -26,7 +26,7 @@
         <div class="col-md-2"><label class="form-label small">Items (summary)</label><input type="text" class="form-control form-control-sm" [(ngModel)]="poForm.items" placeholder="e.g. Supplies" /></div>
         <div class="col-md-1"><label class="form-label small">Total</label><input type="number" class="form-control form-control-sm" [(ngModel)]="poForm.total" min="0" /></div>
         <div class="col-md-1"><label class="form-label small">Currency</label><input type="text" class="form-control form-control-sm" [(ngModel)]="poForm.currency" placeholder="AED" /></div>
-        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="savePO()">Save</button></div>
+        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="savePO()" [disabled]="submitting">{{ submitting ? 'Saving...' : 'Save' }}</button></div>
       </div>
     </div>
   </div>

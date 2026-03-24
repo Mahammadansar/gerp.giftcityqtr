@@ -25,6 +25,7 @@ export class BankStatementComponent implements OnInit {
   transferRows: BankEntry[] = [];
   error = '';
   loading = false;
+  submitting = false;
 
   showAdd = false;
   form: Partial<BankEntry> = { type: 'cheque', date: '', ref: '', description: '', amount: 0, status: 'Pending' };
@@ -54,6 +55,8 @@ export class BankStatementComponent implements OnInit {
   }
 
   saveEntry(): void {
+    if (this.submitting) return;
+    this.submitting = true;
     const type = this.entryType;
     const ref = this.form.ref || (type === 'cheque' ? `CHQ-${Date.now()}` : type === 'deposit' ? `DEP-${Date.now()}` : type === 'withdrawal' ? `WD-${Date.now()}` : `TRF-${Date.now()}`);
     this.opsApi.createBankEntry({
@@ -65,8 +68,8 @@ export class BankStatementComponent implements OnInit {
       toFrom: this.form.toFrom,
       status: this.form.status
     }).subscribe({
-      next: () => { this.load(); this.showAdd = false; },
-      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to save bank entry'); }
+      next: () => { this.load(); this.showAdd = false; this.submitting = false; },
+      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to save bank entry'); this.submitting = false; }
     });
   }
 }

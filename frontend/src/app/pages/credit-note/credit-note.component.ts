@@ -14,6 +14,7 @@ export class CreditNoteComponent implements OnInit {
   creditNotes: CreditNote[] = [];
   error = '';
   loading = false;
+  submitting = false;
 
   form = {
     invoiceNo: '',
@@ -47,6 +48,8 @@ export class CreditNoteComponent implements OnInit {
   }
 
   saveCreditNote(): void {
+    if (this.submitting) return;
+    this.submitting = true;
     this.opsApi.createCreditNote({
       invoiceNo: this.form.invoiceNo || 'NA',
       client: this.form.client || 'Client',
@@ -56,8 +59,8 @@ export class CreditNoteComponent implements OnInit {
       reason: this.form.reason || '-',
       status: 'Draft'
     }).subscribe({
-      next: () => { this.loadNotes(); this.showCreateForm = false; },
-      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to save credit note'); }
+      next: () => { this.loadNotes(); this.showCreateForm = false; this.submitting = false; },
+      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to save credit note'); this.submitting = false; }
     });
   }
 }

@@ -31,7 +31,7 @@
         <div class="col-md-2" *ngIf="activeTab === 'transfer'"><label class="form-label small">To</label><input type="text" class="form-control form-control-sm" [(ngModel)]="form.toFrom" placeholder="To" /></div>
         <div class="col-md-2"><label class="form-label small">Amount</label><input type="number" class="form-control form-control-sm" [(ngModel)]="form.amount" min="0" /></div>
         <div class="col-md-2" *ngIf="activeTab === 'cheque'"><label class="form-label small">Status</label><select class="form-select form-select-sm" [(ngModel)]="form.status"><option>Pending</option><option>Cleared</option></select></div>
-        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveEntry()">Save</button><button type="button" class="btn btn-sm btn-outline-secondary ms-1" (click)="showAdd = false">Cancel</button></div>
+        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveEntry()" [disabled]="submitting">{{ submitting ? 'Saving...' : 'Save' }}</button><button type="button" class="btn btn-sm btn-outline-secondary ms-1" (click)="showAdd = false">Cancel</button></div>
       </div>
     </div>
   </div>

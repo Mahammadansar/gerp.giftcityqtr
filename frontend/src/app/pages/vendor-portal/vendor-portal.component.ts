@@ -17,6 +17,7 @@ export class VendorPortalComponent implements OnInit {
   showAddPO = false;
   error = '';
   loading = false;
+  submitting = false;
   poForm: { vendor: string; date: string; deliveryDate: string; total: number; currency: string; items: string } = { vendor: '', date: '', deliveryDate: '', total: 0, currency: 'AED', items: '' };
 
   constructor(private pqiApi: PqiApiService) {}
@@ -29,6 +30,8 @@ export class VendorPortalComponent implements OnInit {
   }
 
   savePO(): void {
+    if (this.submitting) return;
+    this.submitting = true;
     this.pqiApi.createPurchaseOrder({
       vendor: this.poForm.vendor || 'Vendor',
       date: this.poForm.date,
@@ -36,8 +39,8 @@ export class VendorPortalComponent implements OnInit {
       currency: this.poForm.currency || 'AED',
       lines: [{ description: this.poForm.items || 'Order', size: '', qty: 1, unitPrice: this.poForm.total || 0, amount: this.poForm.total || 0 }]
     }).subscribe({
-      next: () => { this.load(); this.showAddPO = false; },
-      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to create purchase order'); }
+      next: () => { this.load(); this.showAddPO = false; this.submitting = false; },
+      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to create purchase order'); this.submitting = false; }
     });
   }
 

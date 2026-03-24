@@ -16,6 +16,7 @@ export class CollaborationComponent implements OnInit {
   newText = '';
   error = '';
   loading = false;
+  submitting = false;
 
   constructor(private opsApi: OpsApiService) {}
 
@@ -30,14 +31,16 @@ export class CollaborationComponent implements OnInit {
   }
 
   sendMessage(): void {
+    if (this.submitting) return;
     if (!this.newText.trim()) return;
+    this.submitting = true;
     this.opsApi.createChatMessage({
       from: this.newFrom || 'You',
       text: this.newText.trim(),
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }).subscribe({
-      next: () => { this.newText = ''; this.load(); },
-      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to send message'); }
+      next: () => { this.newText = ''; this.load(); this.submitting = false; },
+      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to send message'); this.submitting = false; }
     });
   }
 }

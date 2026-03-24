@@ -14,6 +14,7 @@ export class DamageSectionComponent implements OnInit {
   entries: DamageEntry[] = [];
   error = '';
   loading = false;
+  submitting = false;
 
   form = { itemName: '', sku: '', size: '', qty: 1, reason: '', reportedBy: '' };
 
@@ -36,6 +37,8 @@ export class DamageSectionComponent implements OnInit {
   }
 
   saveEntry(): void {
+    if (this.submitting) return;
+    this.submitting = true;
     const today = new Date().toISOString().slice(0, 10);
     this.opsApi.createDamageEntry({
       date: today,
@@ -47,8 +50,8 @@ export class DamageSectionComponent implements OnInit {
       reportedBy: this.form.reportedBy || '-',
       status: 'Under review'
     }).subscribe({
-      next: () => { this.loadEntries(); this.showCreateForm = false; },
-      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to save damage entry'); }
+      next: () => { this.loadEntries(); this.showCreateForm = false; this.submitting = false; },
+      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to save damage entry'); this.submitting = false; }
     });
   }
 }
