@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PqiApiService } from '../../services/pqi-api.service';
 import { SqiApiService } from '../../services/sqi-api.service';
+import { OpsApiService } from '../../services/ops-api.service';
 import { getApiErrorMessage } from '../../shared/api-error.util';
 
 @Component({
@@ -20,7 +21,7 @@ export class DailyReportsComponent implements OnInit {
   paymentsRows: { date: string; category: string; ref: string; amount: number; currency: string }[] = [];
   error = '';
 
-  constructor(private sqiApi: SqiApiService, private pqiApi: PqiApiService) {}
+  constructor(private sqiApi: SqiApiService, private pqiApi: PqiApiService, private opsApi: OpsApiService) {}
 
   ngOnInit(): void { this.refresh(); }
 
@@ -43,12 +44,20 @@ export class DailyReportsComponent implements OnInit {
       error: (e) => { this.error = getApiErrorMessage(e, 'Failed to load purchase reports'); }
     });
 
-    const today = new Date().toISOString().slice(0, 10);
-    this.paymentsRows = [
-      { date: today, category: 'Salary', ref: 'PAY-SAL', amount: 0, currency: 'AED' },
-      { date: today, category: 'Rent', ref: 'PAY-RNT', amount: 0, currency: 'AED' },
-      { date: today, category: 'Petty cash', ref: 'PAY-PET', amount: 0, currency: 'AED' },
-      { date: today, category: 'Local Purchase', ref: 'PAY-LP', amount: 0, currency: 'AED' }
-    ];
+    this.opsApi.listBankEntries().subscribe({
+      next: (bankRes) => {
+        const outflows = (bankRes.data || [])
+          .filter((e) => e.type === 'cheque' || e.type === 'withdrawal' || e.type === 'transfer')
+          .map((e) => ({
+            date: String(e.date).slice(0, 10),
+            category: e.type === 'cheque' ? 'Cheque' : e.type === 'withdrawal' ? 'Withdrawal' : 'Transfer',
+            ref: e.ref,
+            amount: e.amount,
+            currency: 'AED'
+          }));
+        this.paymentsRows = outflows;
+      },
+      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to load payment transactions'); }
+    });
   }
 }

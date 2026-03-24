@@ -34,9 +34,7 @@ export class DamageSectionComponent implements OnInit {
 
   saveEntry(): void {
     const today = new Date().toISOString().slice(0, 10);
-    const refNo = `DMG-${new Date().getFullYear()}-${String(this.entries.length + 1).padStart(3, '0')}`;
     this.opsApi.createDamageEntry({
-      refNo,
       date: today,
       itemName: this.form.itemName || '-',
       sku: this.form.sku || '-',

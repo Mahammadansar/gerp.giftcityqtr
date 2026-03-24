@@ -11,6 +11,8 @@ enum DocumentKind {
   SALES_ORDER
   QUOTATION
   INVOICE
+  CREDIT_NOTE
+  DAMAGE_ENTRY
 }
 
 enum QuotationStatus {

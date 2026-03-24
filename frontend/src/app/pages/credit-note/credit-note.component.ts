@@ -44,9 +44,7 @@ export class CreditNoteComponent implements OnInit {
   }
 
   saveCreditNote(): void {
-    const nextNo = `CN-GCQ-${new Date().getFullYear()}-${String(this.creditNotes.length + 1).padStart(3, '0')}`;
     this.opsApi.createCreditNote({
-      cnNo: nextNo,
       invoiceNo: this.form.invoiceNo || 'NA',
       client: this.form.client || 'Client',
       date: this.form.date,

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { prisma } from '../../lib/prisma.js';
 import type { AuthedRequest } from '../../middleware/auth.js';
+import { DocumentKind } from '@prisma/client';
 
 const modelMap: Record<string, keyof typeof prisma> = {
   customers: 'customer',
@@ -24,6 +25,18 @@ function getRepo(entity: string): any {
   const key = modelMap[entity];
   if (!key) throw new Error('Unsupported entity');
   return (prisma as any)[key];
+}
+
+async function nextDocNo(orgId: string, kind: DocumentKind): Promise<string> {
+  const seq = await prisma.documentSequence.upsert({
+    where: { orgId_kind: { orgId, kind } },
+    update: { currentValue: { increment: 1 } },
+    create: { orgId, kind, currentValue: 1 }
+  });
+  const n = String(seq.currentValue).padStart(3, '0');
+  if (kind === 'CREDIT_NOTE') return `CN-GCQ-${new Date().getFullYear()}-${n}`;
+  if (kind === 'DAMAGE_ENTRY') return `DMG-${new Date().getFullYear()}-${n}`;
+  return n;
 }
 
 export async function listEntity(req: Request, res: Response) {
@@ -60,6 +73,28 @@ export async function createEntity(req: Request, res: Response) {
     };
     delete payload.from;
     delete payload.to;
+  } else if (entity === 'creditNotes') {
+    payload = {
+      ...req.body,
+      cnNo: req.body.cnNo || (await nextDocNo(orgId, 'CREDIT_NOTE')),
+      date: req.body.date ? new Date(req.body.date) : new Date()
+    };
+  } else if (entity === 'damageEntries') {
+    payload = {
+      ...req.body,
+      refNo: req.body.refNo || (await nextDocNo(orgId, 'DAMAGE_ENTRY')),
+      date: req.body.date ? new Date(req.body.date) : new Date()
+    };
+  } else if (entity === 'bankEntries') {
+    payload = {
+      ...req.body,
+      date: req.body.date ? new Date(req.body.date) : new Date()
+    };
+  } else if (entity === 'assets') {
+    payload = {
+      ...req.body,
+      purchaseDate: req.body.purchaseDate ? new Date(req.body.purchaseDate) : new Date()
+    };
   }
   payload = { ...payload, orgId };
 

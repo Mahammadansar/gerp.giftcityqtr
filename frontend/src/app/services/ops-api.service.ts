@@ -9,6 +9,8 @@ export interface BankEntry { id: string; type: 'cheque' | 'deposit' | 'withdrawa
 export interface Asset { id: string; name: string; category: string; purchaseDate: string; value: number; status: string; }
 export interface ChatMessage { id: string; from: string; text: string; time: string; }
 export interface AppSettings { companyName: string; currency: string; }
+export type CreateCreditNotePayload = Omit<CreditNote, 'id' | 'cnNo'> & { cnNo?: string };
+export type CreateDamageEntryPayload = Omit<DamageEntry, 'id' | 'refNo'> & { refNo?: string };
 
 @Injectable({ providedIn: 'root' })
 export class OpsApiService {
@@ -17,10 +19,10 @@ export class OpsApiService {
   constructor(private http: HttpClient) {}
 
   listCreditNotes(): Observable<{ data: CreditNote[] }> { return this.http.get<{ data: CreditNote[] }>(`${this.api}/creditNotes`); }
-  createCreditNote(payload: Omit<CreditNote, 'id'>): Observable<{ data: CreditNote }> { return this.http.post<{ data: CreditNote }>(`${this.api}/creditNotes`, payload); }
+  createCreditNote(payload: CreateCreditNotePayload): Observable<{ data: CreditNote }> { return this.http.post<{ data: CreditNote }>(`${this.api}/creditNotes`, payload); }
 
   listDamageEntries(): Observable<{ data: DamageEntry[] }> { return this.http.get<{ data: DamageEntry[] }>(`${this.api}/damageEntries`); }
-  createDamageEntry(payload: Omit<DamageEntry, 'id'>): Observable<{ data: DamageEntry }> { return this.http.post<{ data: DamageEntry }>(`${this.api}/damageEntries`, payload); }
+  createDamageEntry(payload: CreateDamageEntryPayload): Observable<{ data: DamageEntry }> { return this.http.post<{ data: DamageEntry }>(`${this.api}/damageEntries`, payload); }
 
   listBankEntries(): Observable<{ data: BankEntry[] }> { return this.http.get<{ data: BankEntry[] }>(`${this.api}/bankEntries`); }
   createBankEntry(payload: Omit<BankEntry, 'id'>): Observable<{ data: BankEntry }> { return this.http.post<{ data: BankEntry }>(`${this.api}/bankEntries`, payload); }
