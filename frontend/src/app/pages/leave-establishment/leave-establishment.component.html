@@ -11,6 +11,8 @@
       </div>
     </div>
   </div>
+  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
   <div class="card border-0 shadow-sm mb-4" *ngIf="showAddType">
     <div class="card-body">
       <h6 class="mb-3">Add leave type</h6>

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AppDataService, StaffMember } from '../../services/app-data.service';
+import { HrApiService, HrStaff } from '../../services/hr-api.service';
 
 @Component({
   selector: 'app-staff-details',
@@ -9,18 +9,26 @@ import { AppDataService, StaffMember } from '../../services/app-data.service';
 export class StaffDetailsComponent implements OnInit {
   title = 'Staff Details';
   subtitle = 'Employee information and roles.';
-  staff: StaffMember[] = [];
+  staff: HrStaff[] = [];
   showAddForm = false;
-  form: Partial<StaffMember> = { name: '', role: '', department: '', joinDate: '', email: '' };
+  error = '';
+  form: Partial<HrStaff> = { name: '', role: '', department: '', joinDate: '', email: '' };
 
-  constructor(private data: AppDataService) {}
+  constructor(private hrApi: HrApiService) {}
 
   ngOnInit(): void {
     this.load();
   }
 
   load(): void {
-    this.staff = this.data.getStaff();
+    this.hrApi.listStaff().subscribe({
+      next: (res) => {
+        this.staff = (res.data || []).map((s) => ({ ...s, joinDate: String(s.joinDate).slice(0, 10) }));
+      },
+      error: (e) => {
+        this.error = e?.error?.error?.message || 'Failed to load staff';
+      }
+    });
   }
 
   toggleAddForm(): void {
@@ -29,16 +37,21 @@ export class StaffDetailsComponent implements OnInit {
   }
 
   saveStaff(): void {
-    const s: StaffMember = {
-      id: 'EMP' + String(this.staff.length + 1).padStart(3, '0'),
+    this.error = '';
+    this.hrApi.createStaff({
       name: this.form.name || '',
       role: this.form.role || '',
       department: this.form.department || '',
-      joinDate: this.form.joinDate || '',
+      joinDate: this.form.joinDate || new Date().toISOString().slice(0, 10),
       email: this.form.email || ''
-    };
-    this.data.addStaff(s);
-    this.load();
-    this.showAddForm = false;
+    }).subscribe({
+      next: () => {
+        this.load();
+        this.showAddForm = false;
+      },
+      error: (e) => {
+        this.error = e?.error?.error?.message || 'Failed to save staff';
+      }
+    });
   }
 }

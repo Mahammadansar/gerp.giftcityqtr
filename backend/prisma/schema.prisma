@@ -55,6 +55,7 @@ model Organization {
   assets      Asset[]
   staff       Staff[]
   leaveRequests LeaveRequest[]
+  leaveTypes  LeaveType[]
   projects    Project[]
   timesheets  TimesheetEntry[]
   documentSequences DocumentSequence[]
@@ -323,6 +324,20 @@ model LeaveRequest {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+}
+
+model LeaveType {
+  id          String   @id @default(cuid())
+  orgId       String
+  name        String
+  daysPerYear Int
+  carryOver   Int
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, name])
 }
 
 model Project {

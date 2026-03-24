@@ -12,6 +12,7 @@ import { sqiRouter } from './modules/sqi/sqi.routes.js';
 import { pqiRouter } from './modules/pqi/pqi.routes.js';
 import { inventoryRouter } from './modules/inventory/inventory.routes.js';
 import { financeRouter } from './modules/finance/finance.routes.js';
+import { hrRouter } from './modules/hr/hr.routes.js';
 import { errorHandler, notFound } from './middleware/error.js';
 
 export const app = express();
@@ -37,6 +38,7 @@ app.use('/api/v1/sqi', sqiRouter);
 app.use('/api/v1/pqi', pqiRouter);
 app.use('/api/v1/inventory', inventoryRouter);
 app.use('/api/v1/finance', financeRouter);
+app.use('/api/v1/hr', hrRouter);
 app.use('/api/v1/erp', erpRouter);
 app.use('/api/v1', crudRouter);
 
