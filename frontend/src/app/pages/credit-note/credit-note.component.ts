@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { AppDataService, CreditNote } from '../../services/app-data.service';
+import { OpsApiService, CreditNote } from '../../services/ops-api.service';
+import { getApiErrorMessage } from '../../shared/api-error.util';
 
 @Component({
   selector: 'app-credit-note',
@@ -11,6 +12,7 @@ export class CreditNoteComponent implements OnInit {
   subtitle = 'Issue and track credit notes for returns and adjustments.';
   showCreateForm = false;
   creditNotes: CreditNote[] = [];
+  error = '';
 
   form = {
     invoiceNo: '',
@@ -21,44 +23,40 @@ export class CreditNoteComponent implements OnInit {
     reason: ''
   };
 
-  constructor(private data: AppDataService) {}
+  constructor(private opsApi: OpsApiService) {}
 
-  ngOnInit(): void {
-    this.loadNotes();
-  }
+  ngOnInit(): void { this.loadNotes(); }
 
   loadNotes(): void {
-    this.creditNotes = this.data.getCreditNotes();
+    this.opsApi.listCreditNotes().subscribe({
+      next: (res) => {
+        this.creditNotes = (res.data || []).map((cn) => ({ ...cn, date: String(cn.date).slice(0, 10) }));
+      },
+      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to load credit notes'); }
+    });
   }
 
   toggleCreateForm(): void {
     this.showCreateForm = !this.showCreateForm;
     if (this.showCreateForm) {
-      this.form = {
-        invoiceNo: '',
-        client: '',
-        date: new Date().toISOString().slice(0, 10),
-        amount: 0,
-        currency: 'AED',
-        reason: ''
-      };
+      this.form = { invoiceNo: '', client: '', date: new Date().toISOString().slice(0, 10), amount: 0, currency: 'AED', reason: '' };
     }
   }
 
   saveCreditNote(): void {
-    const cn: CreditNote = {
-      id: String(Date.now()),
-      cnNo: this.data.getNextCreditNoteNumber(),
-      invoiceNo: this.form.invoiceNo || '—',
+    const nextNo = `CN-GCQ-${new Date().getFullYear()}-${String(this.creditNotes.length + 1).padStart(3, '0')}`;
+    this.opsApi.createCreditNote({
+      cnNo: nextNo,
+      invoiceNo: this.form.invoiceNo || 'NA',
       client: this.form.client || 'Client',
       date: this.form.date,
       amount: this.form.amount,
       currency: this.form.currency,
-      reason: this.form.reason || '—',
+      reason: this.form.reason || '-',
       status: 'Draft'
-    };
-    this.data.addCreditNote(cn);
-    this.loadNotes();
-    this.showCreateForm = false;
+    }).subscribe({
+      next: () => { this.loadNotes(); this.showCreateForm = false; },
+      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to save credit note'); }
+    });
   }
 }

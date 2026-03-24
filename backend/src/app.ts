@@ -14,6 +14,7 @@ import { inventoryRouter } from './modules/inventory/inventory.routes.js';
 import { financeRouter } from './modules/finance/finance.routes.js';
 import { hrRouter } from './modules/hr/hr.routes.js';
 import { projectsRouter } from './modules/projects/projects.routes.js';
+import { settingsRouter } from './modules/settings/settings.routes.js';
 import { errorHandler, notFound } from './middleware/error.js';
 
 export const app = express();
@@ -41,6 +42,7 @@ app.use('/api/v1/inventory', inventoryRouter);
 app.use('/api/v1/finance', financeRouter);
 app.use('/api/v1/hr', hrRouter);
 app.use('/api/v1/projects', projectsRouter);
+app.use('/api/v1/settings', settingsRouter);
 app.use('/api/v1/erp', erpRouter);
 app.use('/api/v1', crudRouter);
 

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { AppDataService, Asset } from '../../services/app-data.service';
+import { OpsApiService, Asset } from '../../services/ops-api.service';
+import { getApiErrorMessage } from '../../shared/api-error.util';
 
 @Component({
   selector: 'app-assets',
@@ -12,16 +13,18 @@ export class AssetsComponent implements OnInit {
 
   assets: Asset[] = [];
   showAddForm = false;
+  error = '';
   form: Partial<Asset> = { name: '', category: 'Equipment', purchaseDate: '', value: 0, status: 'Active' };
 
-  constructor(private data: AppDataService) {}
+  constructor(private opsApi: OpsApiService) {}
 
-  ngOnInit(): void {
-    this.load();
-  }
+  ngOnInit(): void { this.load(); }
 
   load(): void {
-    this.assets = this.data.getAssets();
+    this.opsApi.listAssets().subscribe({
+      next: (res) => { this.assets = (res.data || []).map((a) => ({ ...a, purchaseDate: String(a.purchaseDate).slice(0, 10) })); },
+      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to load assets'); }
+    });
   }
 
   toggleAddForm(): void {
@@ -30,16 +33,15 @@ export class AssetsComponent implements OnInit {
   }
 
   saveAsset(): void {
-    const a: Asset = {
-      id: 'FA-' + String(this.assets.length + 1).padStart(3, '0'),
+    this.opsApi.createAsset({
       name: this.form.name || 'Asset',
       category: this.form.category || 'Equipment',
-      purchaseDate: this.form.purchaseDate || '',
+      purchaseDate: this.form.purchaseDate || new Date().toISOString().slice(0, 10),
       value: this.form.value || 0,
       status: this.form.status || 'Active'
-    };
-    this.data.addAsset(a);
-    this.load();
-    this.showAddForm = false;
+    }).subscribe({
+      next: () => { this.load(); this.showAddForm = false; },
+      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to save asset'); }
+    });
   }
 }

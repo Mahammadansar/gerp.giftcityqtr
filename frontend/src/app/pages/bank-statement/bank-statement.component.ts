@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { AppDataService, BankEntry } from '../../services/app-data.service';
+import { OpsApiService, BankEntry } from '../../services/ops-api.service';
+import { getApiErrorMessage } from '../../shared/api-error.util';
 
 @Component({
   selector: 'app-bank-statement',
@@ -11,7 +12,6 @@ export class BankStatementComponent implements OnInit {
   subtitle = 'Cheque, deposits, withdrawals, and transfers.';
   activeTab: 'cheque' | 'deposits' | 'withdrawals' | 'transfer' = 'cheque';
 
-  /** Map UI tab to BankEntry type */
   get entryType(): 'cheque' | 'deposit' | 'withdrawal' | 'transfer' {
     if (this.activeTab === 'deposits') return 'deposit';
     if (this.activeTab === 'withdrawals') return 'withdrawal';
@@ -23,22 +23,26 @@ export class BankStatementComponent implements OnInit {
   depositsRows: BankEntry[] = [];
   withdrawalsRows: BankEntry[] = [];
   transferRows: BankEntry[] = [];
+  error = '';
 
   showAdd = false;
-  form: Partial<BankEntry> & { payee?: string; purpose?: string; from?: string; to?: string } = { type: 'cheque', date: '', ref: '', description: '', amount: 0, status: 'Pending' };
+  form: Partial<BankEntry> = { type: 'cheque', date: '', ref: '', description: '', amount: 0, status: 'Pending' };
 
-  constructor(private data: AppDataService) {}
+  constructor(private opsApi: OpsApiService) {}
 
-  ngOnInit(): void {
-    this.load();
-  }
+  ngOnInit(): void { this.load(); }
 
   load(): void {
-    this.entries = this.data.getBankEntries();
-    this.chequeRows = this.entries.filter(e => e.type === 'cheque');
-    this.depositsRows = this.entries.filter(e => e.type === 'deposit');
-    this.withdrawalsRows = this.entries.filter(e => e.type === 'withdrawal');
-    this.transferRows = this.entries.filter(e => e.type === 'transfer');
+    this.opsApi.listBankEntries().subscribe({
+      next: (res) => {
+        this.entries = (res.data || []).map((e) => ({ ...e, date: String(e.date).slice(0, 10) }));
+        this.chequeRows = this.entries.filter((e) => e.type === 'cheque');
+        this.depositsRows = this.entries.filter((e) => e.type === 'deposit');
+        this.withdrawalsRows = this.entries.filter((e) => e.type === 'withdrawal');
+        this.transferRows = this.entries.filter((e) => e.type === 'transfer');
+      },
+      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to load bank entries'); }
+    });
   }
 
   openAdd(): void {
@@ -48,20 +52,18 @@ export class BankStatementComponent implements OnInit {
 
   saveEntry(): void {
     const type = this.entryType;
-    const ref = this.form.ref || (type === 'cheque' ? 'CHQ-' + Date.now() : type === 'deposit' ? 'DEP-' + Date.now() : type === 'withdrawal' ? 'WD-' + Date.now() : 'TRF-' + Date.now());
-    const desc = this.form.description || (this.form.payee || this.form.purpose || this.form.from || '');
-    const be: BankEntry = {
-      id: String(Date.now()),
-      type: this.entryType,
-      date: this.form.date || '',
+    const ref = this.form.ref || (type === 'cheque' ? `CHQ-${Date.now()}` : type === 'deposit' ? `DEP-${Date.now()}` : type === 'withdrawal' ? `WD-${Date.now()}` : `TRF-${Date.now()}`);
+    this.opsApi.createBankEntry({
+      type,
+      date: this.form.date || new Date().toISOString().slice(0, 10),
       ref,
-      description: desc,
+      description: this.form.description || '-',
       amount: this.form.amount || 0,
       toFrom: this.form.toFrom,
       status: this.form.status
-    };
-    this.data.addBankEntry(be);
-    this.load();
-    this.showAdd = false;
+    }).subscribe({
+      next: () => { this.load(); this.showAdd = false; },
+      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to save bank entry'); }
+    });
   }
 }

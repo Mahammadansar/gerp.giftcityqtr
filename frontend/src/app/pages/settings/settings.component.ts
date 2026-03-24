@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { AppDataService, AppSettings } from '../../services/app-data.service';
 import { AdminManagementService, PermissionItem, RoleItem, UserItem } from '../../services/admin-management.service';
+import { OpsApiService, AppSettings } from '../../services/ops-api.service';
+import { getApiErrorMessage } from '../../shared/api-error.util';
 
 @Component({
   selector: 'app-settings',
@@ -26,33 +27,31 @@ export class SettingsComponent implements OnInit {
   showAddUser = false;
   showAddRole = false;
 
-  userForm = {
-    fullName: '',
-    email: '',
-    password: '',
-    roleId: ''
-  };
-
-  roleForm = {
-    name: '',
-    permissionIds: [] as string[]
-  };
+  userForm = { fullName: '', email: '', password: '', roleId: '' };
+  roleForm = { name: '', permissionIds: [] as string[] };
 
   selectedRoleId = '';
   selectedRolePermissionIds: string[] = [];
 
-  constructor(private data: AppDataService, private adminApi: AdminManagementService) {}
+  constructor(private opsApi: OpsApiService, private adminApi: AdminManagementService) {}
 
   ngOnInit(): void {
-    this.settings = this.data.getSettings();
-    this.companyName = this.settings.companyName;
-    this.currency = this.settings.currency;
+    this.opsApi.getCompanySettings().subscribe({
+      next: (res) => {
+        this.settings = res.data;
+        this.companyName = this.settings.companyName;
+        this.currency = this.settings.currency;
+      },
+      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to load company settings'); }
+    });
     this.loadAdminData();
   }
 
   saveCompany(): void {
-    this.data.saveSettings({ companyName: this.companyName, currency: this.currency });
-    this.message = 'Company settings saved';
+    this.opsApi.saveCompanySettings({ companyName: this.companyName, currency: this.currency }).subscribe({
+      next: () => { this.message = 'Company settings saved'; },
+      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to save company settings'); }
+    });
   }
 
   loadAdminData(): void {
@@ -65,85 +64,49 @@ export class SettingsComponent implements OnInit {
         this.adminApi.getRoles().subscribe({
           next: (r) => {
             this.roles = r.data;
-            if (this.roles.length && !this.selectedRoleId) {
-              this.onRoleSelected(this.roles[0].id);
-            }
+            if (this.roles.length && !this.selectedRoleId) this.onRoleSelected(this.roles[0].id);
             this.adminApi.getUsers().subscribe({
-              next: (u) => {
-                this.users = u.data;
-                this.loading = false;
-              },
-              error: () => {
-                this.error = 'Failed to load users';
-                this.loading = false;
-              }
+              next: (u) => { this.users = u.data; this.loading = false; },
+              error: (e) => { this.error = getApiErrorMessage(e, 'Failed to load users'); this.loading = false; }
             });
           },
-          error: () => {
-            this.error = 'Failed to load roles';
-            this.loading = false;
-          }
+          error: (e) => { this.error = getApiErrorMessage(e, 'Failed to load roles'); this.loading = false; }
         });
       },
-      error: () => {
-        this.error = 'Failed to load permissions';
-        this.loading = false;
-      }
+      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to load permissions'); this.loading = false; }
     });
   }
 
   toggleAddUser(): void {
     this.showAddUser = !this.showAddUser;
-    if (this.showAddUser) {
-      this.userForm = { fullName: '', email: '', password: '', roleId: this.roles[0]?.id || '' };
-    }
+    if (this.showAddUser) this.userForm = { fullName: '', email: '', password: '', roleId: this.roles[0]?.id || '' };
   }
 
   createUser(): void {
     this.error = '';
     this.message = '';
-
     this.adminApi.createUser(this.userForm).subscribe({
-      next: () => {
-        this.message = 'User created';
-        this.showAddUser = false;
-        this.loadAdminData();
-      },
-      error: (e) => {
-        this.error = e?.error?.error?.message || 'Failed to create user';
-      }
+      next: () => { this.message = 'User created'; this.showAddUser = false; this.loadAdminData(); },
+      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to create user'); }
     });
   }
 
   onChangeUserRole(userId: string, roleId: string): void {
     this.adminApi.updateUserRole(userId, roleId).subscribe({
-      next: () => {
-        this.message = 'User role updated';
-        this.loadAdminData();
-      },
-      error: () => {
-        this.error = 'Failed to update user role';
-      }
+      next: () => { this.message = 'User role updated'; this.loadAdminData(); },
+      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to update user role'); }
     });
   }
 
   toggleAddRole(): void {
     this.showAddRole = !this.showAddRole;
-    if (this.showAddRole) {
-      this.roleForm = { name: '', permissionIds: [] };
-    }
+    if (this.showAddRole) this.roleForm = { name: '', permissionIds: [] };
   }
 
   createRole(): void {
     this.adminApi.createRole(this.roleForm).subscribe({
-      next: () => {
-        this.message = 'Role created';
-        this.showAddRole = false;
-        this.loadAdminData();
-      },
-      error: () => {
-        this.error = 'Failed to create role';
-      }
+      next: () => { this.message = 'Role created'; this.showAddRole = false; this.loadAdminData(); },
+      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to create role'); }
     });
   }
 
@@ -154,32 +117,22 @@ export class SettingsComponent implements OnInit {
   }
 
   togglePermission(permissionId: string): void {
-    if (this.selectedRolePermissionIds.includes(permissionId)) {
-      this.selectedRolePermissionIds = this.selectedRolePermissionIds.filter((id) => id !== permissionId);
-    } else {
-      this.selectedRolePermissionIds = [...this.selectedRolePermissionIds, permissionId];
-    }
+    this.selectedRolePermissionIds = this.selectedRolePermissionIds.includes(permissionId)
+      ? this.selectedRolePermissionIds.filter((id) => id !== permissionId)
+      : [...this.selectedRolePermissionIds, permissionId];
   }
 
   toggleNewRolePermission(permissionId: string): void {
-    if (this.roleForm.permissionIds.includes(permissionId)) {
-      this.roleForm.permissionIds = this.roleForm.permissionIds.filter((id) => id !== permissionId);
-    } else {
-      this.roleForm.permissionIds = [...this.roleForm.permissionIds, permissionId];
-    }
+    this.roleForm.permissionIds = this.roleForm.permissionIds.includes(permissionId)
+      ? this.roleForm.permissionIds.filter((id) => id !== permissionId)
+      : [...this.roleForm.permissionIds, permissionId];
   }
 
   saveRolePermissions(): void {
     if (!this.selectedRoleId) return;
-
     this.adminApi.updateRolePermissions(this.selectedRoleId, this.selectedRolePermissionIds).subscribe({
-      next: () => {
-        this.message = 'Role permissions updated';
-        this.loadAdminData();
-      },
-      error: () => {
-        this.error = 'Failed to update role permissions';
-      }
+      next: () => { this.message = 'Role permissions updated'; this.loadAdminData(); },
+      error: (e) => { this.error = getApiErrorMessage(e, 'Failed to update role permissions'); }
     });
   }
 

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from '../../lib/prisma.js';
+import type { AuthedRequest } from '../../middleware/auth.js';
 
 const modelMap: Record<string, keyof typeof prisma> = {
   customers: 'customer',
@@ -12,7 +13,11 @@ const modelMap: Record<string, keyof typeof prisma> = {
   staff: 'staff',
   leaveRequests: 'leaveRequest',
   projects: 'project',
-  timesheets: 'timesheetEntry'
+  timesheets: 'timesheetEntry',
+  creditNotes: 'creditNote',
+  damageEntries: 'damageEntry',
+  bankEntries: 'bankEntry',
+  chatMessages: 'chatMessage'
 };
 
 function getRepo(entity: string): any {
@@ -24,15 +29,18 @@ function getRepo(entity: string): any {
 export async function listEntity(req: Request, res: Response) {
   const entity = String(req.params.entity);
   const repo = getRepo(entity);
-  const orgId = String(req.query.orgId || '');
+  const orgId = (req as AuthedRequest).user?.orgId;
+  if (!orgId) throw new Error('Missing organization scope');
   const include = entity === 'quotations' || entity === 'invoices' || entity === 'purchaseOrders' ? { lines: true } : undefined;
-  const data = await repo.findMany({ where: orgId ? { orgId } : {}, include, orderBy: { createdAt: 'desc' } });
+  const data = await repo.findMany({ where: { orgId }, include, orderBy: { createdAt: 'desc' } });
   res.json({ data });
 }
 
 export async function createEntity(req: Request, res: Response) {
   const entity = String(req.params.entity);
   const repo = getRepo(entity);
+  const orgId = (req as AuthedRequest).user?.orgId;
+  if (!orgId) throw new Error('Missing organization scope');
   let payload = req.body;
 
   if (entity === 'quotations' && Array.isArray(req.body.lines)) {
@@ -53,6 +61,7 @@ export async function createEntity(req: Request, res: Response) {
     delete payload.from;
     delete payload.to;
   }
+  payload = { ...payload, orgId };
 
   const data = await repo.create({ data: payload });
   res.status(201).json({ data });
@@ -60,12 +69,22 @@ export async function createEntity(req: Request, res: Response) {
 
 export async function updateEntity(req: Request, res: Response) {
   const repo = getRepo(String(req.params.entity));
-  const data = await repo.update({ where: { id: req.params.id }, data: req.body });
+  const orgId = (req as AuthedRequest).user?.orgId;
+  if (!orgId) throw new Error('Missing organization scope');
+  const id = String(req.params.id);
+  const existing = await repo.findFirst({ where: { id, orgId } });
+  if (!existing) return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Record not found' } });
+  const data = await repo.update({ where: { id }, data: req.body });
   res.json({ data });
 }
 
 export async function removeEntity(req: Request, res: Response) {
   const repo = getRepo(String(req.params.entity));
-  await repo.delete({ where: { id: req.params.id } });
+  const orgId = (req as AuthedRequest).user?.orgId;
+  if (!orgId) throw new Error('Missing organization scope');
+  const id = String(req.params.id);
+  const existing = await repo.findFirst({ where: { id, orgId } });
+  if (!existing) return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Record not found' } });
+  await repo.delete({ where: { id } });
   res.status(204).send();
 }

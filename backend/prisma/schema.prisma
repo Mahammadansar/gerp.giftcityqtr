@@ -60,6 +60,11 @@ model Organization {
   timesheets  TimesheetEntry[]
   documentSequences DocumentSequence[]
   retainers   Retainer[]
+  creditNotes CreditNote[]
+  damageEntries DamageEntry[]
+  bankEntries BankEntry[]
+  chatMessages ChatMessage[]
+  appSetting AppSetting?
 }
 
 model User {
@@ -379,4 +384,83 @@ model Retainer {
   organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
   @@index([orgId, startDate])
+}
+
+model CreditNote {
+  id        String   @id @default(cuid())
+  orgId     String
+  cnNo      String
+  invoiceNo String
+  client    String
+  date      DateTime
+  amount    Float
+  currency  String
+  reason    String
+  status    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, cnNo])
+  @@index([orgId, date])
+}
+
+model DamageEntry {
+  id         String   @id @default(cuid())
+  orgId      String
+  refNo      String
+  date       DateTime
+  itemName   String
+  sku        String
+  size       String
+  qty        Int
+  reason     String
+  reportedBy String
+  status     String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, refNo])
+  @@index([orgId, date])
+}
+
+model BankEntry {
+  id          String   @id @default(cuid())
+  orgId       String
+  type        String
+  date        DateTime
+  ref         String
+  description String
+  amount      Float
+  toFrom      String?
+  status      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId, date, type])
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  orgId     String
+  from      String
+  text      String
+  time      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId, createdAt])
+}
+
+model AppSetting {
+  id          String   @id @default(cuid())
+  orgId       String   @unique
+  companyName String
+  currency    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 }
