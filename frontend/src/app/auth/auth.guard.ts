@@ -18,7 +18,7 @@ export class AuthGuard implements CanActivate {
 
         const permission = route.data['permission'] as string | undefined;
         if (permission && !this.auth.hasPermission(permission)) {
-          this.router.navigate(['/dashboard']);
+          this.router.navigateByUrl(this.auth.defaultRoute());
           return false;
         }
 

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { PqiApiService, ApprovalItem } from '../../services/pqi-api.service';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-approvals',
@@ -12,7 +13,7 @@ export class ApprovalsComponent implements OnInit {
   items: ApprovalItem[] = [];
   error = '';
 
-  constructor(private pqiApi: PqiApiService) {}
+  constructor(private pqiApi: PqiApiService, public auth: AuthService) {}
 
   ngOnInit(): void {
     this.load();

@@ -5,7 +5,7 @@ import { requireAnyPermission } from '../middleware/rbac.js';
 
 export const erpRouter = Router();
 
-erpRouter.post('/quotations/:id/convert-to-invoice', requireAuth, requireAnyPermission(['write:erp', 'manage:all']), async (req, res) => {
+erpRouter.post('/quotations/:id/convert-to-invoice', requireAuth, requireAnyPermission(['write:sales', 'manage:all']), async (req, res) => {
   const quotationId = String(req.params.id);
   const quotation = await prisma.quotation.findUnique({ where: { id: quotationId } });
   if (!quotation) {

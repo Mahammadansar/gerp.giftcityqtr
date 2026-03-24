@@ -8,7 +8,7 @@
         </div>
         <div class="d-flex align-items-center gap-2">
           <span class="demo-badge-page"><i class="feather icon-info me-1"></i>Demo Data</span>
-          <button type="button" class="btn btn-primary btn-modern" (click)="toggleCreateForm()">
+          <button type="button" class="btn btn-primary btn-modern" (click)="toggleCreateForm()" [disabled]="!auth.canWrite('inventory')">
             <i class="feather icon-plus me-2"></i>{{ showCreateForm ? 'Cancel' : 'Report Damage' }}
           </button>
         </div>
@@ -22,7 +22,7 @@
   <div class="card border-0 shadow-sm mb-4" *ngIf="showCreateForm">
     <div class="card-header bg-light border-0 py-3 d-flex justify-content-between align-items-center">
       <h5 class="mb-0 fw-semibold">Report damaged item</h5>
-      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="toggleCreateForm()">
+      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="toggleCreateForm()" [disabled]="!auth.canWrite('inventory')">
         <i class="feather icon-x"></i>
       </button>
     </div>
@@ -54,10 +54,10 @@
         </div>
       </div>
       <div class="mt-4 d-flex gap-2">
-        <button type="button" class="btn btn-primary btn-modern" (click)="saveEntry()" [disabled]="submitting">
+        <button type="button" class="btn btn-primary btn-modern" (click)="saveEntry()" [disabled]="submitting || !auth.canWrite('inventory')">
           <i class="feather icon-save me-2"></i>Save
         </button>
-        <button type="button" class="btn btn-outline-secondary" (click)="toggleCreateForm()">Cancel</button>
+        <button type="button" class="btn btn-outline-secondary" (click)="toggleCreateForm()" [disabled]="!auth.canWrite('inventory')">Cancel</button>
       </div>
     </div>
   </div>

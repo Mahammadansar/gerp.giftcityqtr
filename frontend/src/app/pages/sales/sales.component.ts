@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { SalesOrder, PriceList } from '../../services/app-data.service';
 import { SqiApiService } from '../../services/sqi-api.service';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-sales',
@@ -20,7 +21,7 @@ export class SalesComponent implements OnInit {
   orderForm: Partial<SalesOrder> = { client: '', items: '', total: 0, currency: 'AED', date: '', status: 'Draft' };
   priceListForm: Partial<PriceList> = { name: '', type: 'Gifts', validFrom: '', items: 0, status: 'Active' };
 
-  constructor(private sqiApi: SqiApiService) {}
+  constructor(private sqiApi: SqiApiService, public auth: AuthService) {}
 
   ngOnInit(): void {
     this.load();

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Quotation, QuoteLine } from '../../services/app-data.service';
 import { SqiApiService } from '../../services/sqi-api.service';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-quotations',
@@ -24,7 +25,7 @@ export class QuotationsComponent implements OnInit {
   };
   lines: QuoteLine[] = [{ description: '', size: '', qty: 1, unitPrice: 0, amount: 0 }];
 
-  constructor(private sqiApi: SqiApiService, private router: Router) {}
+  constructor(private sqiApi: SqiApiService, private router: Router, public auth: AuthService) {}
 
   ngOnInit(): void {
     this.loadQuotations();

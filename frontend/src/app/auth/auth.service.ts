@@ -31,7 +31,36 @@ export class AuthService {
   hasPermission(permission: string): boolean {
     const user = this.currentUser;
     if (!user) return false;
-    return user.permissions.includes('manage:all') || user.permissions.includes(permission);
+    if (user.permissions.includes('manage:all') || user.permissions.includes(permission)) return true;
+    if (permission.startsWith('read:')) {
+      const module = permission.slice(5);
+      if (user.permissions.includes(`write:${module}`)) return true;
+    }
+    return false;
+  }
+
+  canRead(module: string): boolean {
+    return this.hasPermission(`read:${module}`);
+  }
+
+  canWrite(module: string): boolean {
+    return this.hasPermission(`write:${module}`);
+  }
+
+  defaultRoute(): string {
+    const candidates: Array<{ route: string; permission: string }> = [
+      { route: '/dashboard', permission: 'read:dashboard' },
+      { route: '/sales', permission: 'read:sales' },
+      { route: '/purchasing', permission: 'read:purchasing' },
+      { route: '/inventory', permission: 'read:inventory' },
+      { route: '/finance', permission: 'read:finance' },
+      { route: '/staff-details', permission: 'read:hr' },
+      { route: '/projects', permission: 'read:projects' },
+      { route: '/approvals', permission: 'read:approvals' },
+      { route: '/settings', permission: 'read:settings' }
+    ];
+    const first = candidates.find((c) => this.hasPermission(c.permission));
+    return first?.route || '/dashboard';
   }
 
   loginAndLoad(email: string, password: string): Observable<AuthUser> {

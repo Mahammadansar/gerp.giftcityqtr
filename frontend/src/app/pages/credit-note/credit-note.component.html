@@ -8,7 +8,7 @@
         </div>
         <div class="d-flex align-items-center gap-2">
           <span class="demo-badge-page"><i class="feather icon-info me-1"></i>Demo Data</span>
-          <button type="button" class="btn btn-primary btn-modern" (click)="toggleCreateForm()">
+          <button type="button" class="btn btn-primary btn-modern" (click)="toggleCreateForm()" [disabled]="!auth.canWrite('finance')">
             <i class="feather icon-plus me-2"></i>{{ showCreateForm ? 'Cancel' : 'Create Credit Note' }}
           </button>
         </div>
@@ -22,7 +22,7 @@
   <div class="card border-0 shadow-sm mb-4" *ngIf="showCreateForm">
     <div class="card-header bg-light border-0 py-3 d-flex justify-content-between align-items-center">
       <h5 class="mb-0 fw-semibold">New Credit Note</h5>
-      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="toggleCreateForm()">
+      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="toggleCreateForm()" [disabled]="!auth.canWrite('finance')">
         <i class="feather icon-x"></i>
       </button>
     </div>
@@ -58,10 +58,10 @@
         </div>
       </div>
       <div class="mt-4 d-flex gap-2">
-        <button type="button" class="btn btn-primary btn-modern" (click)="saveCreditNote()" [disabled]="submitting">
+        <button type="button" class="btn btn-primary btn-modern" (click)="saveCreditNote()" [disabled]="submitting || !auth.canWrite('finance')">
           <i class="feather icon-save me-2"></i>{{ submitting ? 'Saving...' : 'Save Credit Note' }}
         </button>
-        <button type="button" class="btn btn-outline-secondary" (click)="toggleCreateForm()">Cancel</button>
+        <button type="button" class="btn btn-outline-secondary" (click)="toggleCreateForm()" [disabled]="!auth.canWrite('finance')">Cancel</button>
       </div>
     </div>
   </div>

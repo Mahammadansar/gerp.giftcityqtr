@@ -61,7 +61,7 @@ router.get('/purchase-orders', requireAnyPermission(['read:purchasing', 'manage:
   res.json({ data });
 });
 
-router.post('/purchase-orders', requireAnyPermission(['write:erp', 'manage:all']), async (req, res) => {
+router.post('/purchase-orders', requireAnyPermission(['write:purchasing', 'manage:all']), async (req, res) => {
   const orgId = getOrgId(req as AuthedRequest);
   const payload = poCreateSchema.parse(req.body);
 
@@ -90,7 +90,7 @@ router.post('/purchase-orders', requireAnyPermission(['write:erp', 'manage:all']
   res.status(201).json({ data });
 });
 
-router.patch('/purchase-orders/:id/status', requireAnyPermission(['write:erp', 'manage:all']), async (req, res) => {
+router.patch('/purchase-orders/:id/status', requireAnyPermission(['write:purchasing', 'manage:all']), async (req, res) => {
   const orgId = getOrgId(req as AuthedRequest);
   const id = String(req.params.id);
   const { status } = poStatusSchema.parse(req.body);

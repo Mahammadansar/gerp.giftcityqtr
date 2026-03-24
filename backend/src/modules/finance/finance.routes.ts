@@ -62,7 +62,7 @@ router.get('/overview', async (req, res) => {
   });
 });
 
-router.post('/retainers', requireAnyPermission(['write:erp', 'manage:all']), async (req, res) => {
+router.post('/retainers', requireAnyPermission(['write:finance', 'manage:all']), async (req, res) => {
   const orgId = getOrgId(req as AuthedRequest);
   const payload = createRetainerSchema.parse(req.body);
   const retainer = await prisma.retainer.create({

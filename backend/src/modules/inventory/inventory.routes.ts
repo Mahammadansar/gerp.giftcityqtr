@@ -40,7 +40,7 @@ router.get('/items', requireAnyPermission(['read:inventory', 'manage:all']), asy
   res.json({ data });
 });
 
-router.post('/items', requireAnyPermission(['write:erp', 'manage:all']), async (req, res) => {
+router.post('/items', requireAnyPermission(['write:inventory', 'manage:all']), async (req, res) => {
   const orgId = getOrgId(req as AuthedRequest);
   const payload = createItemSchema.parse(req.body);
 
@@ -62,7 +62,7 @@ router.post('/items', requireAnyPermission(['write:erp', 'manage:all']), async (
   res.status(201).json({ data });
 });
 
-router.patch('/items/:id/adjust', requireAnyPermission(['write:erp', 'manage:all']), async (req, res) => {
+router.patch('/items/:id/adjust', requireAnyPermission(['write:inventory', 'manage:all']), async (req, res) => {
   const orgId = getOrgId(req as AuthedRequest);
   const id = String(req.params.id);
   const payload = adjustSchema.parse(req.body);

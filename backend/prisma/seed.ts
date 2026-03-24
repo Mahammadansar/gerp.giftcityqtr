@@ -4,21 +4,37 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
+  await prisma.permission.deleteMany({
+    where: {
+      OR: [
+        { action: 'read', resource: 'erp' },
+        { action: 'write', resource: 'erp' }
+      ]
+    }
+  });
+
   const permissions = [
     ['manage', 'all'],
-    ['read', 'dashboard'],
-    ['read', 'erp'],
-    ['write', 'erp'],
+    ['manage', 'users'],
+    ['manage', 'roles'],
     ['approve', 'purchaseOrder'],
+    ['read', 'dashboard'],
     ['read', 'sales'],
+    ['write', 'sales'],
     ['read', 'purchasing'],
+    ['write', 'purchasing'],
     ['read', 'inventory'],
+    ['write', 'inventory'],
     ['read', 'finance'],
+    ['write', 'finance'],
     ['read', 'hr'],
+    ['write', 'hr'],
     ['read', 'projects'],
+    ['write', 'projects'],
     ['read', 'approvals'],
+    ['write', 'approvals'],
     ['read', 'settings'],
-    ['manage', 'users']
+    ['write', 'settings']
   ];
 
   for (const [action, resource] of permissions) {
@@ -40,6 +56,17 @@ async function main() {
     update: {},
     create: { orgId: org.id, name: 'super_admin' }
   });
+
+  // Fresh RBAC strategy: reset role-permission mappings for this org.
+  const orgRoleIds = (
+    await prisma.role.findMany({
+      where: { orgId: org.id },
+      select: { id: true }
+    })
+  ).map((r) => r.id);
+  if (orgRoleIds.length) {
+    await prisma.rolePermission.deleteMany({ where: { roleId: { in: orgRoleIds } } });
+  }
 
   const allPerms = await prisma.permission.findMany();
   for (const p of allPerms) {

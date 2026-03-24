@@ -43,7 +43,7 @@ router.get('/timesheets', async (req, res) => {
   });
 });
 
-router.post('/timesheets', requireAnyPermission(['write:erp', 'manage:all']), async (req, res) => {
+router.post('/timesheets', requireAnyPermission(['write:projects', 'manage:all']), async (req, res) => {
   const orgId = getOrgId(req as AuthedRequest);
   const payload = timesheetCreateSchema.parse(req.body);
   const row = await prisma.timesheetEntry.create({
@@ -81,7 +81,7 @@ router.get('/profitability', async (req, res) => {
   });
 });
 
-router.post('/profitability', requireAnyPermission(['write:erp', 'manage:all']), async (req, res) => {
+router.post('/profitability', requireAnyPermission(['write:projects', 'manage:all']), async (req, res) => {
   const orgId = getOrgId(req as AuthedRequest);
   const payload = projectCreateSchema.parse(req.body);
   const row = await prisma.project.create({

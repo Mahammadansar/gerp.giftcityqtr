@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { InventoryItem } from '../../services/app-data.service';
 import { InventoryApiService } from '../../services/inventory-api.service';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-inventory',
@@ -15,7 +16,7 @@ export class InventoryComponent implements OnInit {
   error = '';
   form: Partial<InventoryItem> = { sku: '', name: '', category: 'Gifts', size: '', qty: 0, unit: 'pcs', reorderLevel: 0, status: 'In Stock' };
 
-  constructor(private inventoryApi: InventoryApiService) {}
+  constructor(private inventoryApi: InventoryApiService, public auth: AuthService) {}
 
   ngOnInit(): void {
     this.load();

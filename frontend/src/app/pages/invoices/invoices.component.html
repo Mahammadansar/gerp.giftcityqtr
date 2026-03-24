@@ -8,7 +8,7 @@
         </div>
         <div class="d-flex align-items-center gap-2">
           <span class="text-muted small">{{ invoices.length }} invoice(s)</span>
-          <button type="button" class="btn btn-primary btn-modern" (click)="toggleGenerateForm()">
+          <button type="button" class="btn btn-primary btn-modern" (click)="toggleGenerateForm()" [disabled]="!auth.canWrite('finance')">
             <i class="feather icon-plus me-2"></i>{{ showGenerateForm ? 'Cancel' : 'Generate Invoice' }}
           </button>
         </div>
@@ -21,7 +21,7 @@
   <div class="card border-0 shadow-sm mb-4" *ngIf="showGenerateForm">
     <div class="card-header bg-light border-0 py-3 d-flex justify-content-between align-items-center">
       <h5 class="mb-0 fw-semibold">New Invoice</h5>
-      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="toggleGenerateForm()">
+      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="toggleGenerateForm()" [disabled]="!auth.canWrite('finance')">
         <i class="feather icon-x"></i>
       </button>
     </div>
@@ -70,7 +70,7 @@
               <td><input type="number" class="form-control form-control-sm" [(ngModel)]="line.unitPrice" (ngModelChange)="updateLineAmount(i)" min="0" step="0.01"></td>
               <td class="text-end">{{ (line.qty * line.unitPrice) | number:'1.2-2' }}</td>
               <td>
-                <button type="button" class="btn btn-sm btn-outline-danger p-1" (click)="removeLine(i)" [disabled]="lines.length === 1" title="Remove line">
+                <button type="button" class="btn btn-sm btn-outline-danger p-1" (click)="removeLine(i)" [disabled]="lines.length === 1 || !auth.canWrite('finance')" title="Remove line">
                   <i class="feather icon-trash-2"></i>
                 </button>
               </td>
@@ -78,7 +78,7 @@
           </tbody>
         </table>
       </div>
-      <button type="button" class="btn btn-outline-primary btn-sm mb-3" (click)="addLine()">
+      <button type="button" class="btn btn-outline-primary btn-sm mb-3" (click)="addLine()" [disabled]="!auth.canWrite('finance')">
         <i class="feather icon-plus me-1"></i>Add line
       </button>
 
@@ -109,10 +109,10 @@
       </div>
 
       <div class="mt-4 d-flex gap-2">
-        <button type="button" class="btn btn-primary btn-modern" (click)="saveInvoice()">
+        <button type="button" class="btn btn-primary btn-modern" (click)="saveInvoice()" [disabled]="!auth.canWrite('finance')">
           <i class="feather icon-save me-2"></i>Save Invoice
         </button>
-        <button type="button" class="btn btn-outline-secondary" (click)="toggleGenerateForm()">Cancel</button>
+        <button type="button" class="btn btn-outline-secondary" (click)="toggleGenerateForm()" [disabled]="!auth.canWrite('finance')">Cancel</button>
       </div>
     </div>
   </div>
@@ -158,10 +158,10 @@
                 <i class="feather icon-download"></i>
               </button>
               <div class="btn-group btn-group-sm" *ngIf="inv.status === 'Draft' || inv.status === 'Sent' || inv.status === 'PartiallyPaid'">
-                <button type="button" class="btn btn-outline-success" (click)="updateStatus(inv, 'Sent')" *ngIf="inv.status === 'Draft'" title="Mark Sent">Sent</button>
-                <button type="button" class="btn btn-outline-success" (click)="updateStatus(inv, 'PartiallyPaid')" *ngIf="inv.status === 'Sent'" title="Mark Partially Paid">Partially Paid</button>
-                <button type="button" class="btn btn-outline-success" (click)="updateStatus(inv, 'Paid')" *ngIf="inv.status !== 'Draft'" title="Mark Paid">Paid</button>
-                <button type="button" class="btn btn-outline-danger" (click)="updateStatus(inv, 'Cancelled')" *ngIf="inv.status === 'Draft' || inv.status === 'Sent' || inv.status === 'PartiallyPaid'" title="Cancel">Cancel</button>
+                <button type="button" class="btn btn-outline-success" (click)="updateStatus(inv, 'Sent')" [disabled]="!auth.canWrite('finance')" *ngIf="inv.status === 'Draft'" title="Mark Sent">Sent</button>
+                <button type="button" class="btn btn-outline-success" (click)="updateStatus(inv, 'PartiallyPaid')" [disabled]="!auth.canWrite('finance')" *ngIf="inv.status === 'Sent'" title="Mark Partially Paid">Partially Paid</button>
+                <button type="button" class="btn btn-outline-success" (click)="updateStatus(inv, 'Paid')" [disabled]="!auth.canWrite('finance')" *ngIf="inv.status !== 'Draft'" title="Mark Paid">Paid</button>
+                <button type="button" class="btn btn-outline-danger" (click)="updateStatus(inv, 'Cancelled')" [disabled]="!auth.canWrite('finance')" *ngIf="inv.status === 'Draft' || inv.status === 'Sent' || inv.status === 'PartiallyPaid'" title="Cancel">Cancel</button>
               </div>
             </td>
           </tr>

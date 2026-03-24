@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ProfitabilityRow, ProjectsApiService, TimesheetRow } from '../../services/projects-api.service';
 import { getApiErrorMessage } from '../../shared/api-error.util';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-projects',
@@ -20,7 +21,7 @@ export class ProjectsComponent implements OnInit {
   tsForm: Partial<TimesheetRow> = { project: '', date: '', hours: 0, task: '', billable: true };
   projectForm: Partial<ProfitabilityRow> = { project: '', client: '', revenue: 0, cost: 0, profit: 0, margin: '' };
 
-  constructor(private projectsApi: ProjectsApiService) {}
+  constructor(private projectsApi: ProjectsApiService, public auth: AuthService) {}
 
   ngOnInit(): void {
     this.load();

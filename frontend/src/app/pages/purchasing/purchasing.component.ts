@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PurchaseOrder } from '../../services/app-data.service';
 import { PqiApiService } from '../../services/pqi-api.service';
+import { AuthService } from '../../auth/auth.service';
 
 interface POLine {
   description: string;
@@ -31,7 +32,7 @@ export class PurchasingComponent implements OnInit {
   };
   poLines: POLine[] = [{ description: '', size: '', qty: 1, unitPrice: 0, amount: 0 }];
 
-  constructor(private pqiApi: PqiApiService) {}
+  constructor(private pqiApi: PqiApiService, public auth: AuthService) {}
 
   ngOnInit(): void {
     this.loadOrders();

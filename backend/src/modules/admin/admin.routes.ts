@@ -38,7 +38,13 @@ adminRouter.use(requireAuth, requireAnyPermission(['manage:users', 'manage:all']
 
 adminRouter.get('/permissions', async (_req, res) => {
   const permissions = await prisma.permission.findMany({ orderBy: [{ resource: 'asc' }, { action: 'asc' }] });
-  res.json({ data: permissions });
+  res.json({
+    data: permissions.map((p) => ({
+      ...p,
+      module: p.resource,
+      access: p.action
+    }))
+  });
 });
 
 adminRouter.get('/roles', async (req, res) => {

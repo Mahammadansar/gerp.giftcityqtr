@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PqiApiService } from '../../services/pqi-api.service';
 import { getApiErrorMessage } from '../../shared/api-error.util';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-vendor-portal',
@@ -20,7 +21,7 @@ export class VendorPortalComponent implements OnInit {
   submitting = false;
   poForm: { vendor: string; date: string; deliveryDate: string; total: number; currency: string; items: string } = { vendor: '', date: '', deliveryDate: '', total: 0, currency: 'AED', items: '' };
 
-  constructor(private pqiApi: PqiApiService) {}
+  constructor(private pqiApi: PqiApiService, public auth: AuthService) {}
 
   ngOnInit(): void { this.load(); }
 

@@ -12,6 +12,18 @@ export interface HrStaff {
   email: string;
 }
 
+export interface CreateStaffPayload {
+  name: string;
+  role: string;
+  department: string;
+  joinDate: string;
+  email: string;
+  createUser?: boolean;
+  userEmail?: string;
+  userPassword?: string;
+  userRoleId?: string;
+}
+
 export interface HrLeaveType {
   id: string;
   name: string;
@@ -37,8 +49,8 @@ export class HrApiService {
   constructor(private http: HttpClient) {}
 
   listStaff(): Observable<{ data: HrStaff[] }> { return this.http.get<{ data: HrStaff[] }>(`${this.api}/staff`); }
-  createStaff(payload: { name: string; role: string; department: string; joinDate: string; email: string }): Observable<{ data: HrStaff }> {
-    return this.http.post<{ data: HrStaff }>(`${this.api}/staff`, payload);
+  createStaff(payload: CreateStaffPayload): Observable<{ data: { staff: HrStaff; user?: { id: string; email: string } | null } }> {
+    return this.http.post<{ data: { staff: HrStaff; user?: { id: string; email: string } | null } }>(`${this.api}/staff`, payload);
   }
 
   listLeaveTypes(): Observable<{ data: HrLeaveType[] }> { return this.http.get<{ data: HrLeaveType[] }>(`${this.api}/leave-types`); }

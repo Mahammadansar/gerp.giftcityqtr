@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HrApiService, HrLeaveRequest, HrLeaveType } from '../../services/hr-api.service';
 import { getApiErrorMessage } from '../../shared/api-error.util';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-leave-establishment',
@@ -19,7 +20,7 @@ export class LeaveEstablishmentComponent implements OnInit {
   typeForm: Partial<HrLeaveType> = { name: '', daysPerYear: 0, carryOver: 0, description: '' };
   requestForm: Partial<HrLeaveRequest> = { employee: '', type: '', from: '', to: '', days: 0 };
 
-  constructor(private hrApi: HrApiService) {}
+  constructor(private hrApi: HrApiService, public auth: AuthService) {}
 
   ngOnInit(): void {
     this.load();

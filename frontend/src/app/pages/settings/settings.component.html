@@ -18,7 +18,7 @@
       <div class="row g-2 align-items-end">
         <div class="col-md-4"><label class="form-label small">Company name</label><input type="text" class="form-control form-control-sm" [(ngModel)]="companyName" /></div>
         <div class="col-md-2"><label class="form-label small">Currency</label><input type="text" class="form-control form-control-sm" [(ngModel)]="currency" /></div>
-        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveCompany()">Save</button></div>
+        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveCompany()" [disabled]="!auth.canWrite('settings')">Save</button></div>
       </div>
     </div>
   </div>
@@ -28,7 +28,7 @@
       <div class="card border-0 shadow-sm">
         <div class="card-header bg-light border-0 py-3 d-flex justify-content-between align-items-center">
           <h6 class="mb-0 fw-semibold">Users</h6>
-          <button type="button" class="btn btn-sm btn-primary" (click)="toggleAddUser()">{{ showAddUser ? 'Cancel' : 'Add User' }}</button>
+          <button type="button" class="btn btn-sm btn-primary" (click)="toggleAddUser()" [disabled]="!auth.hasPermission('manage:users') && !auth.hasPermission('manage:all')">{{ showAddUser ? 'Cancel' : 'Add User' }}</button>
         </div>
 
         <div class="card-body border-bottom" *ngIf="showAddUser">
@@ -42,7 +42,7 @@
                 <option *ngFor="let r of roles" [value]="r.id">{{ r.name }}</option>
               </select>
             </div>
-            <div class="col-md-1"><button class="btn btn-sm btn-primary" (click)="createUser()">Save</button></div>
+            <div class="col-md-1"><button class="btn btn-sm btn-primary" (click)="createUser()" [disabled]="!auth.hasPermission('manage:users') && !auth.hasPermission('manage:all')">Save</button></div>
           </div>
         </div>
 
@@ -54,7 +54,7 @@
                 <td class="fw-semibold">{{ u.fullName }}</td>
                 <td>{{ u.email }}</td>
                 <td>
-                  <select class="form-select form-select-sm" [ngModel]="u.roles[0]?.id" (ngModelChange)="onChangeUserRole(u.id, $event)">
+                  <select class="form-select form-select-sm" [ngModel]="u.roles[0]?.id" (ngModelChange)="onChangeUserRole(u.id, $event)" [disabled]="!auth.hasPermission('manage:users') && !auth.hasPermission('manage:all')">
                     <option *ngFor="let r of roles" [value]="r.id">{{ r.name }}</option>
                   </select>
                 </td>
@@ -70,22 +70,35 @@
       <div class="card border-0 shadow-sm mb-4">
         <div class="card-header bg-light border-0 py-3 d-flex justify-content-between align-items-center">
           <h6 class="mb-0 fw-semibold">Roles</h6>
-          <button type="button" class="btn btn-sm btn-primary" (click)="toggleAddRole()">{{ showAddRole ? 'Cancel' : 'Add Role' }}</button>
+          <button type="button" class="btn btn-sm btn-primary" (click)="toggleAddRole()" [disabled]="!auth.hasPermission('manage:roles') && !auth.hasPermission('manage:all')">{{ showAddRole ? 'Cancel' : 'Add Role' }}</button>
         </div>
 
         <div class="card-body border-bottom" *ngIf="showAddRole">
-          <div class="row g-2 align-items-end">
+          <div class="row g-2 align-items-end mb-3">
             <div class="col-8"><label class="form-label small">Role name</label><input class="form-control form-control-sm" [(ngModel)]="roleForm.name" /></div>
-            <div class="col-4"><button class="btn btn-sm btn-primary" (click)="createRole()">Create</button></div>
+            <div class="col-4"><button class="btn btn-sm btn-primary" (click)="createRole()" [disabled]="!auth.hasPermission('manage:roles') && !auth.hasPermission('manage:all')">Create</button></div>
           </div>
-          <div class="mt-3">
-            <label class="form-label small">Default permissions</label>
-            <div class="d-flex flex-wrap gap-2">
-              <div *ngFor="let p of permissions" class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" [id]="'new_'+p.id" [checked]="roleForm.permissionIds.includes(p.id)" (change)="toggleNewRolePermission(p.id)" />
-                <label class="form-check-label small" [for]="'new_'+p.id">{{ p.action }}:{{ p.resource }}</label>
-              </div>
-            </div>
+
+          <h6 class="small fw-semibold mb-2">Module Access</h6>
+          <div class="table-responsive mb-3">
+            <table class="table table-sm mb-0">
+              <thead><tr><th>Module</th><th class="text-center">Read</th><th class="text-center">Write</th></tr></thead>
+              <tbody>
+                <tr *ngFor="let m of moduleRows">
+                  <td>{{ m.label }}</td>
+                  <td class="text-center"><input type="checkbox" [checked]="isModuleReadChecked(m,'new')" (change)="setModuleAccess(m,'read',$any($event.target).checked,'new')" [disabled]="!auth.hasPermission('manage:roles') && !auth.hasPermission('manage:all')" /></td>
+                  <td class="text-center"><input type="checkbox" [checked]="isModuleWriteChecked(m,'new')" (change)="setModuleAccess(m,'write',$any($event.target).checked,'new')" [disabled]="!auth.hasPermission('manage:roles') && !auth.hasPermission('manage:all')" /></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h6 class="small fw-semibold mb-2">Special Permissions</h6>
+          <div class="d-flex flex-wrap gap-2">
+            <label class="form-check form-check-inline" *ngFor="let p of specialPermissions">
+              <input class="form-check-input" type="checkbox" [checked]="roleForm.permissionIds.includes(p.id)" (change)="toggleSpecialPermission(p.id, 'new')" [disabled]="!auth.hasPermission('manage:roles') && !auth.hasPermission('manage:all')" />
+              <span class="form-check-label small">{{ p.action }}:{{ p.resource }}</span>
+            </label>
           </div>
         </div>
 
@@ -105,14 +118,29 @@
       <div class="card border-0 shadow-sm">
         <div class="card-header bg-light border-0 py-3 d-flex justify-content-between align-items-center">
           <h6 class="mb-0 fw-semibold">Role Permissions</h6>
-          <button class="btn btn-sm btn-primary" (click)="saveRolePermissions()" [disabled]="!selectedRoleId">Save Permissions</button>
+          <button class="btn btn-sm btn-primary" (click)="saveRolePermissions()" [disabled]="!selectedRoleId || (!auth.hasPermission('manage:roles') && !auth.hasPermission('manage:all'))">Save Permissions</button>
         </div>
         <div class="card-body" *ngIf="selectedRoleId; else noRoleSelected">
+          <h6 class="small fw-semibold mb-2">Module Access</h6>
+          <div class="table-responsive mb-3">
+            <table class="table table-sm mb-0">
+              <thead><tr><th>Module</th><th class="text-center">Read</th><th class="text-center">Write</th></tr></thead>
+              <tbody>
+                <tr *ngFor="let m of moduleRows">
+                  <td>{{ m.label }}</td>
+                  <td class="text-center"><input type="checkbox" [checked]="isModuleReadChecked(m,'selected')" (change)="setModuleAccess(m,'read',$any($event.target).checked,'selected')" [disabled]="!auth.hasPermission('manage:roles') && !auth.hasPermission('manage:all')" /></td>
+                  <td class="text-center"><input type="checkbox" [checked]="isModuleWriteChecked(m,'selected')" (change)="setModuleAccess(m,'write',$any($event.target).checked,'selected')" [disabled]="!auth.hasPermission('manage:roles') && !auth.hasPermission('manage:all')" /></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h6 class="small fw-semibold mb-2">Special Permissions</h6>
           <div class="d-flex flex-wrap gap-2">
-            <div *ngFor="let p of permissions" class="form-check form-check-inline me-3">
-              <input class="form-check-input" type="checkbox" [id]="p.id" [checked]="selectedRolePermissionIds.includes(p.id)" (change)="togglePermission(p.id)" />
-              <label class="form-check-label small" [for]="p.id">{{ p.action }}:{{ p.resource }}</label>
-            </div>
+            <label class="form-check form-check-inline" *ngFor="let p of specialPermissions">
+              <input class="form-check-input" type="checkbox" [checked]="selectedRolePermissionIds.includes(p.id)" (change)="toggleSpecialPermission(p.id, 'selected')" [disabled]="!auth.hasPermission('manage:roles') && !auth.hasPermission('manage:all')" />
+              <span class="form-check-label small">{{ p.action }}:{{ p.resource }}</span>
+            </label>
           </div>
         </div>
         <ng-template #noRoleSelected>

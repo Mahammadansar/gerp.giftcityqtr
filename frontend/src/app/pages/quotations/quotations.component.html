@@ -8,7 +8,7 @@
         </div>
         <div class="d-flex align-items-center gap-2">
           <span class="text-muted small">{{ quotations.length }} quotation(s)</span>
-          <button type="button" class="btn btn-primary btn-modern" (click)="toggleCreateForm()">
+          <button type="button" class="btn btn-primary btn-modern" (click)="toggleCreateForm()" [disabled]="!auth.canWrite('sales')">
             <i class="feather icon-plus me-2"></i>{{ showCreateForm ? 'Cancel' : 'Create Quotation' }}
           </button>
         </div>
@@ -20,7 +20,7 @@
   <div class="card border-0 shadow-sm mb-4" *ngIf="showCreateForm">
     <div class="card-header bg-light border-0 py-3 d-flex justify-content-between align-items-center">
       <h5 class="mb-0 fw-semibold">New Quotation</h5>
-      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="toggleCreateForm()">
+      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="toggleCreateForm()" [disabled]="!auth.canWrite('sales')">
         <i class="feather icon-x"></i>
       </button>
     </div>
@@ -68,7 +68,7 @@
               <td><input type="number" class="form-control form-control-sm" [(ngModel)]="line.unitPrice" (ngModelChange)="updateLineAmount(i)" min="0" step="0.01"></td>
               <td class="text-end">{{ (line.qty * line.unitPrice) | number:'1.2-2' }}</td>
               <td>
-                <button type="button" class="btn btn-sm btn-outline-danger p-1" (click)="removeLine(i)" [disabled]="lines.length === 1" title="Remove line">
+                <button type="button" class="btn btn-sm btn-outline-danger p-1" (click)="removeLine(i)" [disabled]="lines.length === 1 || !auth.canWrite('sales')" title="Remove line">
                   <i class="feather icon-trash-2"></i>
                 </button>
               </td>
@@ -76,7 +76,7 @@
           </tbody>
         </table>
       </div>
-      <button type="button" class="btn btn-outline-primary btn-sm mb-3" (click)="addLine()">
+      <button type="button" class="btn btn-outline-primary btn-sm mb-3" (click)="addLine()" [disabled]="!auth.canWrite('sales')">
         <i class="feather icon-plus me-1"></i>Add line
       </button>
       <div class="d-flex justify-content-end mb-3">
@@ -87,10 +87,10 @@
         <textarea class="form-control form-control-modern" [(ngModel)]="form.notes" rows="2" placeholder="Terms, validity, etc."></textarea>
       </div>
       <div class="d-flex gap-2">
-        <button type="button" class="btn btn-primary btn-modern" (click)="saveQuotation()">
+        <button type="button" class="btn btn-primary btn-modern" (click)="saveQuotation()" [disabled]="!auth.canWrite('sales')">
           <i class="feather icon-save me-2"></i>Save Quotation
         </button>
-        <button type="button" class="btn btn-outline-secondary" (click)="toggleCreateForm()">Cancel</button>
+        <button type="button" class="btn btn-outline-secondary" (click)="toggleCreateForm()" [disabled]="!auth.canWrite('sales')">Cancel</button>
       </div>
     </div>
   </div>
@@ -128,12 +128,12 @@
               }">{{ q.status }}</span>
             </td>
             <td class="text-center">
-              <button type="button" class="btn btn-sm btn-primary me-1" (click)="convertToInvoice(q)" title="Convert to Invoice">
+              <button type="button" class="btn btn-sm btn-primary me-1" (click)="convertToInvoice(q)" [disabled]="!auth.canWrite('sales')" title="Convert to Invoice">
                 <i class="feather icon-file-text me-1"></i>To Invoice
               </button>
-              <button type="button" class="btn btn-sm btn-outline-success" (click)="updateStatus(q, 'Sent')" *ngIf="q.status === 'Draft'" title="Mark Sent">Sent</button>
-              <button type="button" class="btn btn-sm btn-outline-success" (click)="updateStatus(q, 'Accepted')" *ngIf="q.status === 'Sent'" title="Mark Accepted">Accept</button>
-              <button type="button" class="btn btn-sm btn-outline-danger ms-1" (click)="updateStatus(q, 'Rejected')" *ngIf="q.status === 'Sent'" title="Mark Rejected">Reject</button>
+              <button type="button" class="btn btn-sm btn-outline-success" (click)="updateStatus(q, 'Sent')" [disabled]="!auth.canWrite('sales')" *ngIf="q.status === 'Draft'" title="Mark Sent">Sent</button>
+              <button type="button" class="btn btn-sm btn-outline-success" (click)="updateStatus(q, 'Accepted')" [disabled]="!auth.canWrite('sales')" *ngIf="q.status === 'Sent'" title="Mark Accepted">Accept</button>
+              <button type="button" class="btn btn-sm btn-outline-danger ms-1" (click)="updateStatus(q, 'Rejected')" [disabled]="!auth.canWrite('sales')" *ngIf="q.status === 'Sent'" title="Mark Rejected">Reject</button>
             </td>
           </tr>
         </tbody>

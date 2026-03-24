@@ -6,7 +6,7 @@
           <h2>{{ title }}</h2>
           <p class="text-muted mb-0">{{ subtitle }}</p>
         </div>
-        <button type="button" class="btn btn-primary" (click)="toggleAddForm()">
+        <button type="button" class="btn btn-primary" (click)="toggleAddForm()" [disabled]="!auth.canWrite('settings')">
         {{ showAddForm ? 'Cancel' : 'Add Asset' }}
       </button>
       </div>
@@ -24,7 +24,7 @@
         <div class="col-md-2"><input type="text" class="form-control form-control-sm" [(ngModel)]="form.category" placeholder="Category" /></div>
         <div class="col-md-2"><input type="date" class="form-control form-control-sm" [(ngModel)]="form.purchaseDate" placeholder="Purchase date" /></div>
         <div class="col-md-2"><input type="number" class="form-control form-control-sm" [(ngModel)]="form.value" placeholder="Value" min="0" /></div>
-        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveAsset()" [disabled]="submitting">{{ submitting ? 'Saving...' : 'Save' }}</button></div>
+        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveAsset()" [disabled]="submitting || !auth.canWrite('settings')">{{ submitting ? 'Saving...' : 'Save' }}</button></div>
       </div>
     </div>
   </div>

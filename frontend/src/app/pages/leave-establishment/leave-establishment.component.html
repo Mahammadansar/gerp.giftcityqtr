@@ -6,8 +6,8 @@
           <h2>{{ title }}</h2>
           <p class="text-muted mb-0">{{ subtitle }}</p>
         </div>
-        <button type="button" class="btn btn-primary me-2" (click)="toggleAddType()">{{ showAddType ? 'Cancel' : 'Add Leave Type' }}</button>
-        <button type="button" class="btn btn-outline-primary" (click)="toggleAddRequest()">{{ showAddRequest ? 'Cancel' : 'Request Leave' }}</button>
+        <button type="button" class="btn btn-primary me-2" (click)="toggleAddType()" [disabled]="!auth.canWrite('hr')">{{ showAddType ? 'Cancel' : 'Add Leave Type' }}</button>
+        <button type="button" class="btn btn-outline-primary" (click)="toggleAddRequest()" [disabled]="!auth.canWrite('hr')">{{ showAddRequest ? 'Cancel' : 'Request Leave' }}</button>
       </div>
     </div>
   </div>
@@ -21,7 +21,7 @@
         <div class="col-md-1"><input type="number" class="form-control form-control-sm" [(ngModel)]="typeForm.daysPerYear" placeholder="Days/yr" min="0" /></div>
         <div class="col-md-1"><input type="number" class="form-control form-control-sm" [(ngModel)]="typeForm.carryOver" placeholder="Carry" min="0" /></div>
         <div class="col-md-4"><input type="text" class="form-control form-control-sm" [(ngModel)]="typeForm.description" placeholder="Description" /></div>
-        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveLeaveType()">Save</button></div>
+        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveLeaveType()" [disabled]="!auth.canWrite('hr')">Save</button></div>
       </div>
     </div>
   </div>
@@ -34,7 +34,7 @@
         <div class="col-md-2"><input type="date" class="form-control form-control-sm" [(ngModel)]="requestForm.from" placeholder="From" /></div>
         <div class="col-md-2"><input type="date" class="form-control form-control-sm" [(ngModel)]="requestForm.to" placeholder="To" /></div>
         <div class="col-md-1"><input type="number" class="form-control form-control-sm" [(ngModel)]="requestForm.days" min="0" placeholder="Days" /></div>
-        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveLeaveRequest()">Save</button></div>
+        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveLeaveRequest()" [disabled]="!auth.canWrite('hr')">Save</button></div>
       </div>
     </div>
   </div>
@@ -85,8 +85,8 @@
             <td class="text-end">{{ r.days }}</td>
             <td><span class="status-badge-modern" [ngClass]="r.status === 'Approved' ? 'status-approved' : r.status === 'Rejected' ? 'status-rejected' : 'status-pending'">{{ r.status }}</span></td>
             <td class="text-end">
-              <button type="button" class="btn btn-sm btn-success me-1" (click)="approveRequest(r)" *ngIf="r.status === 'Pending'">Approve</button>
-              <button type="button" class="btn btn-sm btn-danger" (click)="rejectRequest(r)" *ngIf="r.status === 'Pending'">Reject</button>
+              <button type="button" class="btn btn-sm btn-success me-1" (click)="approveRequest(r)" [disabled]="!auth.canWrite('hr')" *ngIf="r.status === 'Pending'">Approve</button>
+              <button type="button" class="btn btn-sm btn-danger" (click)="rejectRequest(r)" [disabled]="!auth.canWrite('hr')" *ngIf="r.status === 'Pending'">Reject</button>
             </td>
           </tr>
         </tbody>

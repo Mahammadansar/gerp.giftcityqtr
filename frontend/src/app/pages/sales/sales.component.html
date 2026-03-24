@@ -8,10 +8,10 @@
         </div>
         <div class="d-flex align-items-center gap-2">
           <span class="text-muted small">{{ salesOrders.length }} orders, {{ priceLists.length }} price lists</span>
-          <button type="button" class="btn btn-primary btn-sm" (click)="toggleAddOrder()" *ngIf="activeTab === 'orders'">
+          <button type="button" class="btn btn-primary btn-sm" (click)="toggleAddOrder()" *ngIf="activeTab === 'orders'" [disabled]="!auth.canWrite('sales')">
             {{ showAddOrder ? 'Cancel' : 'Add Sales Order' }}
           </button>
-          <button type="button" class="btn btn-primary btn-sm" (click)="toggleAddPriceList()" *ngIf="activeTab === 'pricelists'">
+          <button type="button" class="btn btn-primary btn-sm" (click)="toggleAddPriceList()" *ngIf="activeTab === 'pricelists'" [disabled]="!auth.canWrite('sales')">
             {{ showAddPriceList ? 'Cancel' : 'Add Price List' }}
           </button>
         </div>
@@ -39,7 +39,7 @@
         <div class="col-md-2"><label class="form-label small">Items (summary)</label><input type="text" class="form-control form-control-sm" [(ngModel)]="orderForm.items" placeholder="e.g. 10x Pen Set" /></div>
         <div class="col-md-2"><label class="form-label small">Total</label><input type="number" class="form-control form-control-sm" [(ngModel)]="orderForm.total" min="0" /></div>
         <div class="col-md-1"><label class="form-label small">Currency</label><input type="text" class="form-control form-control-sm" [(ngModel)]="orderForm.currency" placeholder="AED" /></div>
-        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveOrder()">Save</button></div>
+        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveOrder()" [disabled]="!auth.canWrite('sales')">Save</button></div>
       </div>
     </div>
   </div>
@@ -52,7 +52,7 @@
         <div class="col-md-2"><label class="form-label small">Type</label><input type="text" class="form-control form-control-sm" [(ngModel)]="priceListForm.type" placeholder="Gifts / Print" /></div>
         <div class="col-md-2"><label class="form-label small">Valid from</label><input type="date" class="form-control form-control-sm" [(ngModel)]="priceListForm.validFrom" /></div>
         <div class="col-md-1"><label class="form-label small">Items</label><input type="number" class="form-control form-control-sm" [(ngModel)]="priceListForm.items" min="0" /></div>
-        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="savePriceList()">Save</button></div>
+        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="savePriceList()" [disabled]="!auth.canWrite('sales')">Save</button></div>
       </div>
     </div>
   </div>
@@ -86,7 +86,7 @@
                 'status-pending': o.status === 'Draft'
               }">{{ o.status }}</span>
               <span class="ms-1" *ngIf="o.status === 'Draft' || o.status === 'Confirmed'">
-                <button type="button" class="btn btn-sm btn-outline-success" (click)="updateOrderStatus(o, o.status === 'Draft' ? 'Confirmed' : 'Delivered')">
+                <button type="button" class="btn btn-sm btn-outline-success" (click)="updateOrderStatus(o, o.status === 'Draft' ? 'Confirmed' : 'Delivered')" [disabled]="!auth.canWrite('sales')">
                   {{ o.status === 'Draft' ? 'Confirm' : 'Mark Delivered' }}
                 </button>
               </span>

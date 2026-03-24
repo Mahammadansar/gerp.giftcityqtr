@@ -7,10 +7,10 @@
           <p class="text-muted mb-0">{{ subtitle }}</p>
         </div>
         <div class="d-flex gap-2">
-          <button type="button" class="btn btn-primary" (click)="toggleAddBill()" *ngIf="activeTab === 'bills'">
+          <button type="button" class="btn btn-primary" (click)="toggleAddBill()" *ngIf="activeTab === 'bills'" [disabled]="!auth.canWrite('finance')">
             {{ showAddBill ? 'Cancel' : 'Add Vendor Bill' }}
           </button>
-          <button type="button" class="btn btn-primary" (click)="toggleAddRetainer()" *ngIf="activeTab === 'retainers'">
+          <button type="button" class="btn btn-primary" (click)="toggleAddRetainer()" *ngIf="activeTab === 'retainers'" [disabled]="!auth.canWrite('finance')">
             {{ showAddRetainer ? 'Cancel' : 'Add Retainer' }}
           </button>
         </div>
@@ -36,7 +36,7 @@
         <div class="col-md-2"><label class="form-label small">Due date</label><input type="date" class="form-control form-control-sm" [(ngModel)]="billForm.dueDate" /></div>
         <div class="col-md-2"><label class="form-label small">Amount</label><input type="number" class="form-control form-control-sm" [(ngModel)]="billForm.amount" min="0" /></div>
         <div class="col-md-1"><label class="form-label small">Currency</label><input type="text" class="form-control form-control-sm" [(ngModel)]="billForm.currency" placeholder="AED" /></div>
-        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveBill()">Save</button></div>
+        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveBill()" [disabled]="!auth.canWrite('finance')">Save</button></div>
       </div>
     </div>
   </div>
@@ -76,7 +76,7 @@
         <div class="col-md-2"><label class="form-label small">Amount</label><input type="number" class="form-control form-control-sm" [(ngModel)]="retainerForm.amount" placeholder="Amount" /></div>
         <div class="col-md-2"><label class="form-label small">Currency</label><input type="text" class="form-control form-control-sm" [(ngModel)]="retainerForm.currency" placeholder="AED" /></div>
         <div class="col-md-2"><label class="form-label small">Start date</label><input type="date" class="form-control form-control-sm" [(ngModel)]="retainerForm.startDate" /></div>
-        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveRetainer()">Save</button></div>
+        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveRetainer()" [disabled]="!auth.canWrite('finance')">Save</button></div>
       </div>
     </div>
   </div>

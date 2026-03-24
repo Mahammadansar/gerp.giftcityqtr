@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { PqiApiService } from '../../services/pqi-api.service';
 import { FinanceApiService, FinanceOverview, FinanceRetainer } from '../../services/finance-api.service';
 import { getApiErrorMessage } from '../../shared/api-error.util';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-finance',
@@ -29,7 +30,7 @@ export class FinanceComponent implements OnInit {
 
   cashflowMonths: FinanceOverview['cashflowMonths'] = [];
 
-  constructor(private pqiApi: PqiApiService, private financeApi: FinanceApiService) {}
+  constructor(private pqiApi: PqiApiService, private financeApi: FinanceApiService, public auth: AuthService) {}
 
   ngOnInit(): void { this.load(); }
 

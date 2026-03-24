@@ -102,7 +102,7 @@ const invoiceTransitions: Record<string, string[]> = {
   Cancelled: []
 };
 
-router.use(requireAuth, requireAnyPermission(['read:sales', 'read:finance', 'write:erp', 'manage:all']));
+router.use(requireAuth, requireAnyPermission(['read:sales', 'read:finance', 'manage:all']));
 
 router.get('/sales-orders', async (req, res) => {
   const orgId = getOrgId(req as AuthedRequest);
@@ -110,7 +110,7 @@ router.get('/sales-orders', async (req, res) => {
   res.json({ data });
 });
 
-router.post('/sales-orders', requireAnyPermission(['write:erp', 'manage:all']), async (req, res) => {
+router.post('/sales-orders', requireAnyPermission(['write:sales', 'manage:all']), async (req, res) => {
   const orgId = getOrgId(req as AuthedRequest);
   const payload = salesCreateSchema.parse(req.body);
   const data = await prisma.$transaction(async (tx) => {
@@ -131,7 +131,7 @@ router.post('/sales-orders', requireAnyPermission(['write:erp', 'manage:all']), 
   res.status(201).json({ data });
 });
 
-router.patch('/sales-orders/:id/status', requireAnyPermission(['write:erp', 'manage:all']), async (req, res) => {
+router.patch('/sales-orders/:id/status', requireAnyPermission(['write:sales', 'manage:all']), async (req, res) => {
   const orgId = getOrgId(req as AuthedRequest);
   const { status } = statusSchema.parse(req.body);
   if (!salesStatus.includes(status as any)) return res.status(422).json({ error: { code: 'INVALID_STATUS', message: 'Invalid sales status' } });
@@ -148,7 +148,7 @@ router.get('/quotations', async (req, res) => {
   res.json({ data });
 });
 
-router.post('/quotations', requireAnyPermission(['write:erp', 'manage:all']), async (req, res) => {
+router.post('/quotations', requireAnyPermission(['write:sales', 'manage:all']), async (req, res) => {
   const orgId = getOrgId(req as AuthedRequest);
   const payload = quotationCreateSchema.parse(req.body);
   const normalizedLines = payload.lines.map((l) => ({ ...l, amount: Number((l.qty * l.unitPrice).toFixed(2)) }));
@@ -176,7 +176,7 @@ router.post('/quotations', requireAnyPermission(['write:erp', 'manage:all']), as
   res.status(201).json({ data });
 });
 
-router.patch('/quotations/:id/status', requireAnyPermission(['write:erp', 'manage:all']), async (req, res) => {
+router.patch('/quotations/:id/status', requireAnyPermission(['write:sales', 'manage:all']), async (req, res) => {
   const orgId = getOrgId(req as AuthedRequest);
   const { status } = statusSchema.parse(req.body);
   if (!quoteStatus.includes(status as any)) return res.status(422).json({ error: { code: 'INVALID_STATUS', message: 'Invalid quotation status' } });
@@ -194,7 +194,7 @@ router.patch('/quotations/:id/status', requireAnyPermission(['write:erp', 'manag
   res.json({ data });
 });
 
-router.post('/quotations/:id/convert-to-invoice', requireAnyPermission(['write:erp', 'manage:all']), async (req, res) => {
+router.post('/quotations/:id/convert-to-invoice', requireAnyPermission(['write:sales', 'manage:all']), async (req, res) => {
   const orgId = getOrgId(req as AuthedRequest);
   const id = String(req.params.id);
   const quotation = await prisma.quotation.findFirst({ where: { id, orgId }, include: { lines: true } });
@@ -243,7 +243,7 @@ router.get('/invoices', async (req, res) => {
   res.json({ data });
 });
 
-router.post('/invoices', requireAnyPermission(['write:erp', 'manage:all']), async (req, res) => {
+router.post('/invoices', requireAnyPermission(['write:finance', 'manage:all']), async (req, res) => {
   const orgId = getOrgId(req as AuthedRequest);
   const payload = invoiceCreateSchema.parse(req.body);
   const normalizedLines = payload.lines.map((l) => ({ ...l, amount: Number((l.qty * l.unitPrice).toFixed(2)) }));
@@ -272,7 +272,7 @@ router.post('/invoices', requireAnyPermission(['write:erp', 'manage:all']), asyn
   res.status(201).json({ data });
 });
 
-router.patch('/invoices/:id/status', requireAnyPermission(['write:erp', 'manage:all']), async (req, res) => {
+router.patch('/invoices/:id/status', requireAnyPermission(['write:finance', 'manage:all']), async (req, res) => {
   const orgId = getOrgId(req as AuthedRequest);
   const { status } = statusSchema.parse(req.body);
   if (!invoiceStatus.includes(status as any)) return res.status(422).json({ error: { code: 'INVALID_STATUS', message: 'Invalid invoice status' } });

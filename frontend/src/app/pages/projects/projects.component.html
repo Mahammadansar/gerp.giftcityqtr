@@ -7,10 +7,10 @@
           <p class="text-muted mb-0">{{ subtitle }}</p>
         </div>
         <div class="d-flex gap-2">
-          <button type="button" class="btn btn-primary" (click)="toggleLogTime()" *ngIf="activeTab === 'timesheets'">
+          <button type="button" class="btn btn-primary" (click)="toggleLogTime()" *ngIf="activeTab === 'timesheets'" [disabled]="!auth.canWrite('projects')">
             {{ showLogTime ? 'Cancel' : 'Log Time' }}
           </button>
-          <button type="button" class="btn btn-outline-primary" (click)="toggleAddProject()" *ngIf="activeTab === 'profitability'">
+          <button type="button" class="btn btn-outline-primary" (click)="toggleAddProject()" *ngIf="activeTab === 'profitability'" [disabled]="!auth.canWrite('projects')">
             {{ showAddProject ? 'Cancel' : 'Add Project' }}
           </button>
         </div>
@@ -34,7 +34,7 @@
         <div class="col-md-1"><label class="form-label small">Hours</label><input type="number" class="form-control form-control-sm" [(ngModel)]="tsForm.hours" min="0" step="0.5" /></div>
         <div class="col-md-2"><label class="form-label small">Task</label><input type="text" class="form-control form-control-sm" [(ngModel)]="tsForm.task" placeholder="Task" /></div>
         <div class="col-md-2"><label class="form-label small">Billable</label><div class="form-check"><input type="checkbox" class="form-check-input" [(ngModel)]="tsForm.billable" id="tsBillable" /><label class="form-check-label" for="tsBillable">Billable</label></div></div>
-        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveTimesheet()">Save</button></div>
+        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveTimesheet()" [disabled]="!auth.canWrite('projects')">Save</button></div>
       </div>
     </div>
   </div>
@@ -72,7 +72,7 @@
         <div class="col-md-2"><label class="form-label small">Client</label><input type="text" class="form-control form-control-sm" [(ngModel)]="projectForm.client" placeholder="Client" /></div>
         <div class="col-md-2"><label class="form-label small">Revenue</label><input type="number" class="form-control form-control-sm" [(ngModel)]="projectForm.revenue" min="0" /></div>
         <div class="col-md-2"><label class="form-label small">Cost</label><input type="number" class="form-control form-control-sm" [(ngModel)]="projectForm.cost" min="0" /></div>
-        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveProject()">Save</button></div>
+        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveProject()" [disabled]="!auth.canWrite('projects')">Save</button></div>
       </div>
     </div>
   </div>

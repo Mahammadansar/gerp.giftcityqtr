@@ -7,6 +7,8 @@ export interface PermissionItem {
   id: string;
   action: string;
   resource: string;
+  module?: string;
+  access?: string;
 }
 
 export interface RoleItem {

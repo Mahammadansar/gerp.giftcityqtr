@@ -21,8 +21,12 @@ export class LoginComponent {
 
     this.auth.loginAndLoad(this.email, this.password).subscribe({
       next: () => {
-        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/dashboard';
-        this.router.navigateByUrl(returnUrl);
+        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+        if (returnUrl) {
+          this.router.navigateByUrl(returnUrl);
+          return;
+        }
+        this.router.navigateByUrl(this.auth.defaultRoute());
       },
       error: () => {
         this.error = 'Invalid login credentials';

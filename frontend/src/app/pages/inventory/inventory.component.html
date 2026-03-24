@@ -6,7 +6,7 @@
           <h2>{{ title }}</h2>
           <p class="text-muted mb-0">{{ subtitle }}</p>
         </div>
-        <button type="button" class="btn btn-primary" (click)="toggleAddForm()">
+        <button type="button" class="btn btn-primary" (click)="toggleAddForm()" [disabled]="!auth.canWrite('inventory')">
         {{ showAddForm ? 'Cancel' : 'Add Item' }}
       </button>
       </div>
@@ -67,7 +67,7 @@
         <div class="col-md-1"><input type="number" class="form-control form-control-sm" [(ngModel)]="form.qty" placeholder="Qty" min="0" /></div>
         <div class="col-md-1"><input type="text" class="form-control form-control-sm" [(ngModel)]="form.unit" placeholder="Unit" /></div>
         <div class="col-md-1"><input type="number" class="form-control form-control-sm" [(ngModel)]="form.reorderLevel" placeholder="Reorder" min="0" /></div>
-        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveItem()">Save</button></div>
+        <div class="col-md-2"><button type="button" class="btn btn-sm btn-primary" (click)="saveItem()" [disabled]="!auth.canWrite('inventory')">Save</button></div>
       </div>
     </div>
   </div>
@@ -106,7 +106,7 @@
               }">{{ i.status }}</span>
             </td>
             <td class="text-end">
-              <input type="number" class="form-control form-control-sm d-inline-block w-75" #qtyInput [value]="i.qty" min="0" (change)="adjustQty(i, qtyInput.value ? +qtyInput.value : 0)" />
+              <input type="number" class="form-control form-control-sm d-inline-block w-75" #qtyInput [value]="i.qty" min="0" (change)="adjustQty(i, qtyInput.value ? +qtyInput.value : 0)" [disabled]="!auth.canWrite('inventory')" />
             </td>
           </tr>
         </tbody>

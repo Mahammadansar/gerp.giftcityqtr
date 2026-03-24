@@ -26,7 +26,7 @@ router.get('/company', requireAuth, requireAnyPermission(['read:settings', 'mana
   });
 });
 
-router.put('/company', requireAuth, requireAnyPermission(['write:erp', 'manage:all']), async (req, res) => {
+router.put('/company', requireAuth, requireAnyPermission(['write:settings', 'manage:all']), async (req, res) => {
   const orgId = getOrgId(req as AuthedRequest);
   const payload = companySchema.parse(req.body);
   const row = await prisma.appSetting.upsert({

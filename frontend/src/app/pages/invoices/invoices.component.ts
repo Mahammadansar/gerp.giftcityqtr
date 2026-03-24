@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Invoice, InvoiceLine } from '../../services/app-data.service';
 import { SqiApiService } from '../../services/sqi-api.service';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-invoices',
@@ -24,7 +25,7 @@ export class InvoicesComponent implements OnInit {
   };
   lines: InvoiceLine[] = [{ description: '', size: '', qty: 1, unitPrice: 0, amount: 0 }];
 
-  constructor(private sqiApi: SqiApiService) {}
+  constructor(private sqiApi: SqiApiService, public auth: AuthService) {}
 
   ngOnInit(): void {
     this.loadInvoices();

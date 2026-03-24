@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { OpsApiService, BankEntry } from '../../services/ops-api.service';
 import { getApiErrorMessage } from '../../shared/api-error.util';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-bank-statement',
@@ -30,7 +31,7 @@ export class BankStatementComponent implements OnInit {
   showAdd = false;
   form: Partial<BankEntry> = { type: 'cheque', date: '', ref: '', description: '', amount: 0, status: 'Pending' };
 
-  constructor(private opsApi: OpsApiService) {}
+  constructor(private opsApi: OpsApiService, public auth: AuthService) {}
 
   ngOnInit(): void { this.load(); }
 

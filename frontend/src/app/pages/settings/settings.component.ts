@@ -2,6 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { AdminManagementService, PermissionItem, RoleItem, UserItem } from '../../services/admin-management.service';
 import { OpsApiService, AppSettings } from '../../services/ops-api.service';
 import { getApiErrorMessage } from '../../shared/api-error.util';
+import { AuthService } from '../../auth/auth.service';
+
+interface ModuleAccessRow {
+  key: string;
+  label: string;
+  readPermissionId: string | null;
+  writePermissionId: string | null;
+}
 
 @Component({
   selector: 'app-settings',
@@ -19,6 +27,8 @@ export class SettingsComponent implements OnInit {
   users: UserItem[] = [];
   roles: RoleItem[] = [];
   permissions: PermissionItem[] = [];
+  moduleRows: ModuleAccessRow[] = [];
+  specialPermissions: PermissionItem[] = [];
 
   loading = false;
   message = '';
@@ -33,7 +43,7 @@ export class SettingsComponent implements OnInit {
   selectedRoleId = '';
   selectedRolePermissionIds: string[] = [];
 
-  constructor(private opsApi: OpsApiService, private adminApi: AdminManagementService) {}
+  constructor(private opsApi: OpsApiService, private adminApi: AdminManagementService, public auth: AuthService) {}
 
   ngOnInit(): void {
     this.opsApi.getCompanySettings().subscribe({
@@ -45,6 +55,35 @@ export class SettingsComponent implements OnInit {
       error: (e) => { this.error = getApiErrorMessage(e, 'Failed to load company settings'); }
     });
     this.loadAdminData();
+  }
+
+  private buildPermissionViews(): void {
+    const modules: Array<{ key: string; label: string }> = [
+      { key: 'dashboard', label: 'Dashboard' },
+      { key: 'sales', label: 'Sales' },
+      { key: 'purchasing', label: 'Purchasing' },
+      { key: 'inventory', label: 'Inventory' },
+      { key: 'finance', label: 'Finance' },
+      { key: 'hr', label: 'HR' },
+      { key: 'projects', label: 'Projects' },
+      { key: 'approvals', label: 'Approvals' },
+      { key: 'settings', label: 'Settings' }
+    ];
+
+    const byKey = new Map<string, PermissionItem>();
+    this.permissions.forEach((p) => byKey.set(`${p.action}:${p.resource}`, p));
+
+    this.moduleRows = modules.map((m) => ({
+      key: m.key,
+      label: m.label,
+      readPermissionId: byKey.get(`read:${m.key}`)?.id || null,
+      writePermissionId: byKey.get(`write:${m.key}`)?.id || null
+    }));
+
+    this.specialPermissions = this.permissions.filter((p) => {
+      const k = `${p.action}:${p.resource}`;
+      return k === 'approve:purchaseOrder' || k === 'manage:users' || k === 'manage:roles' || k === 'manage:all';
+    });
   }
 
   saveCompany(): void {
@@ -61,6 +100,7 @@ export class SettingsComponent implements OnInit {
     this.adminApi.getPermissions().subscribe({
       next: (p) => {
         this.permissions = p.data;
+        this.buildPermissionViews();
         this.adminApi.getRoles().subscribe({
           next: (r) => {
             this.roles = r.data;
@@ -116,16 +156,42 @@ export class SettingsComponent implements OnInit {
     this.selectedRolePermissionIds = role ? role.permissions.map((p) => p.id) : [];
   }
 
-  togglePermission(permissionId: string): void {
-    this.selectedRolePermissionIds = this.selectedRolePermissionIds.includes(permissionId)
-      ? this.selectedRolePermissionIds.filter((id) => id !== permissionId)
-      : [...this.selectedRolePermissionIds, permissionId];
+  private setPermissionChecked(id: string | null, checked: boolean, target: 'selected' | 'new'): void {
+    if (!id) return;
+    const arr = target === 'selected' ? this.selectedRolePermissionIds : this.roleForm.permissionIds;
+    const has = arr.includes(id);
+    const next = checked ? (has ? arr : [...arr, id]) : arr.filter((x) => x !== id);
+    if (target === 'selected') this.selectedRolePermissionIds = next;
+    else this.roleForm.permissionIds = next;
   }
 
-  toggleNewRolePermission(permissionId: string): void {
-    this.roleForm.permissionIds = this.roleForm.permissionIds.includes(permissionId)
-      ? this.roleForm.permissionIds.filter((id) => id !== permissionId)
-      : [...this.roleForm.permissionIds, permissionId];
+  setModuleAccess(module: ModuleAccessRow, access: 'read' | 'write', checked: boolean, target: 'selected' | 'new'): void {
+    if (access === 'write') {
+      this.setPermissionChecked(module.writePermissionId, checked, target);
+      if (checked) this.setPermissionChecked(module.readPermissionId, true, target);
+      return;
+    }
+    this.setPermissionChecked(module.readPermissionId, checked, target);
+    if (!checked) this.setPermissionChecked(module.writePermissionId, false, target);
+  }
+
+  isModuleReadChecked(module: ModuleAccessRow, target: 'selected' | 'new'): boolean {
+    const arr = target === 'selected' ? this.selectedRolePermissionIds : this.roleForm.permissionIds;
+    const hasRead = module.readPermissionId ? arr.includes(module.readPermissionId) : false;
+    const hasWrite = module.writePermissionId ? arr.includes(module.writePermissionId) : false;
+    return hasRead || hasWrite;
+  }
+
+  isModuleWriteChecked(module: ModuleAccessRow, target: 'selected' | 'new'): boolean {
+    const arr = target === 'selected' ? this.selectedRolePermissionIds : this.roleForm.permissionIds;
+    return module.writePermissionId ? arr.includes(module.writePermissionId) : false;
+  }
+
+  toggleSpecialPermission(permissionId: string, target: 'selected' | 'new'): void {
+    const arr = target === 'selected' ? this.selectedRolePermissionIds : this.roleForm.permissionIds;
+    const next = arr.includes(permissionId) ? arr.filter((id) => id !== permissionId) : [...arr, permissionId];
+    if (target === 'selected') this.selectedRolePermissionIds = next;
+    else this.roleForm.permissionIds = next;
   }
 
   saveRolePermissions(): void {

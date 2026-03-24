@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
+import bcrypt from 'bcryptjs';
 import { prisma } from '../../lib/prisma.js';
 import { requireAuth, type AuthedRequest } from '../../middleware/auth.js';
 import { requireAnyPermission } from '../../middleware/rbac.js';
@@ -11,7 +12,11 @@ const staffCreateSchema = z.object({
   role: z.string().trim().min(1),
   department: z.string().trim().min(1),
   joinDate: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)),
-  email: z.string().email()
+  email: z.string().email(),
+  createUser: z.boolean().optional().default(false),
+  userEmail: z.string().email().optional(),
+  userPassword: z.string().min(8).optional(),
+  userRoleId: z.string().optional()
 });
 
 const leaveTypeCreateSchema = z.object({
@@ -55,20 +60,53 @@ router.get('/staff', async (req, res) => {
   });
 });
 
-router.post('/staff', requireAnyPermission(['write:erp', 'manage:all']), async (req, res) => {
+router.post('/staff', requireAnyPermission(['write:hr', 'manage:all']), async (req, res) => {
   const orgId = getOrgId(req as AuthedRequest);
   const payload = staffCreateSchema.parse(req.body);
-  const staff = await prisma.staff.create({
-    data: {
-      orgId,
-      name: payload.name,
-      role: payload.role,
-      department: payload.department,
-      joinDate: new Date(payload.joinDate),
-      email: payload.email
+  const result = await prisma.$transaction(async (tx) => {
+    const staff = await tx.staff.create({
+      data: {
+        orgId,
+        name: payload.name,
+        role: payload.role,
+        department: payload.department,
+        joinDate: new Date(payload.joinDate),
+        email: payload.email
+      }
+    });
+
+    let createdUser: { id: string; email: string } | null = null;
+    if (payload.createUser) {
+      if (!payload.userEmail || !payload.userPassword || !payload.userRoleId) {
+        throw new Error('Missing user onboarding fields');
+      }
+
+      const role = await tx.role.findFirst({ where: { id: payload.userRoleId, orgId } });
+      if (!role) {
+        throw new Error('Invalid onboarding role');
+      }
+
+      const existing = await tx.user.findUnique({ where: { email: payload.userEmail } });
+      if (existing) {
+        throw new Error('User email already exists');
+      }
+
+      const passwordHash = await bcrypt.hash(payload.userPassword, 12);
+      const user = await tx.user.create({
+        data: {
+          orgId,
+          fullName: payload.name,
+          email: payload.userEmail,
+          passwordHash
+        }
+      });
+      await tx.userRole.create({ data: { userId: user.id, roleId: payload.userRoleId } });
+      createdUser = { id: user.id, email: user.email };
     }
+
+    return { staff, user: createdUser };
   });
-  res.status(201).json({ data: staff });
+  res.status(201).json({ data: result });
 });
 
 router.get('/leave-types', async (req, res) => {
@@ -77,7 +115,7 @@ router.get('/leave-types', async (req, res) => {
   res.json({ data: leaveTypes });
 });
 
-router.post('/leave-types', requireAnyPermission(['write:erp', 'manage:all']), async (req, res) => {
+router.post('/leave-types', requireAnyPermission(['write:hr', 'manage:all']), async (req, res) => {
   const orgId = getOrgId(req as AuthedRequest);
   const payload = leaveTypeCreateSchema.parse(req.body);
   const leaveType = await prisma.leaveType.create({
@@ -108,7 +146,7 @@ router.get('/leave-requests', async (req, res) => {
   });
 });
 
-router.post('/leave-requests', requireAnyPermission(['write:erp', 'manage:all']), async (req, res) => {
+router.post('/leave-requests', requireAnyPermission(['write:hr', 'manage:all']), async (req, res) => {
   const orgId = getOrgId(req as AuthedRequest);
   const payload = leaveRequestCreateSchema.parse(req.body);
   const request = await prisma.leaveRequest.create({
@@ -135,7 +173,7 @@ router.post('/leave-requests', requireAnyPermission(['write:erp', 'manage:all'])
   });
 });
 
-router.patch('/leave-requests/:id/status', requireAnyPermission(['write:erp', 'manage:all']), async (req, res) => {
+router.patch('/leave-requests/:id/status', requireAnyPermission(['write:hr', 'manage:all']), async (req, res) => {
   const orgId = getOrgId(req as AuthedRequest);
   const requestId = String(req.params.id);
   const { status } = leaveStatusSchema.parse(req.body);

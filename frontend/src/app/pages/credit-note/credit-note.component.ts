@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { OpsApiService, CreditNote } from '../../services/ops-api.service';
 import { getApiErrorMessage } from '../../shared/api-error.util';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-credit-note',
@@ -25,7 +26,7 @@ export class CreditNoteComponent implements OnInit {
     reason: ''
   };
 
-  constructor(private opsApi: OpsApiService) {}
+  constructor(private opsApi: OpsApiService, public auth: AuthService) {}
 
   ngOnInit(): void { this.loadNotes(); }
 

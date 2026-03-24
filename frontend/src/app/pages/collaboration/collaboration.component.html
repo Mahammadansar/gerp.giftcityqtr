@@ -19,7 +19,7 @@
       <div class="row g-2 align-items-end">
         <div class="col-md-2"><input type="text" class="form-control form-control-sm" [(ngModel)]="newFrom" placeholder="Your name" /></div>
         <div class="col-md-6"><input type="text" class="form-control form-control-sm" [(ngModel)]="newText" placeholder="Message" (keyup.enter)="sendMessage()" /></div>
-        <div class="col-md-2"><button type="button" class="btn btn-primary btn-sm" (click)="sendMessage()" [disabled]="submitting">{{ submitting ? 'Sending...' : 'Send' }}</button></div>
+        <div class="col-md-2"><button type="button" class="btn btn-primary btn-sm" (click)="sendMessage()" [disabled]="submitting || !auth.canWrite('projects')">{{ submitting ? 'Sending...' : 'Send' }}</button></div>
       </div>
     </div>
   </div>
