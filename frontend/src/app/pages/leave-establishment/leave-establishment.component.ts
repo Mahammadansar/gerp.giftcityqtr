@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HrApiService, HrLeaveRequest, HrLeaveType } from '../../services/hr-api.service';
+import { getApiErrorMessage } from '../../shared/api-error.util';
 
 @Component({
   selector: 'app-leave-establishment',
@@ -30,7 +31,7 @@ export class LeaveEstablishmentComponent implements OnInit {
         this.leaveTypes = res.data || [];
       },
       error: (e) => {
-        this.error = e?.error?.error?.message || 'Failed to load leave types';
+        this.error = getApiErrorMessage(e, 'Failed to load leave types');
       }
     });
 
@@ -43,7 +44,7 @@ export class LeaveEstablishmentComponent implements OnInit {
         }));
       },
       error: (e) => {
-        this.error = e?.error?.error?.message || 'Failed to load leave requests';
+        this.error = getApiErrorMessage(e, 'Failed to load leave requests');
       }
     });
   }
@@ -66,7 +67,7 @@ export class LeaveEstablishmentComponent implements OnInit {
         this.showAddType = false;
       },
       error: (e) => {
-        this.error = e?.error?.error?.message || 'Failed to save leave type';
+        this.error = getApiErrorMessage(e, 'Failed to save leave type');
       }
     });
   }
@@ -90,7 +91,7 @@ export class LeaveEstablishmentComponent implements OnInit {
         this.showAddRequest = false;
       },
       error: (e) => {
-        this.error = e?.error?.error?.message || 'Failed to save leave request';
+        this.error = getApiErrorMessage(e, 'Failed to save leave request');
       }
     });
   }
@@ -100,7 +101,7 @@ export class LeaveEstablishmentComponent implements OnInit {
     this.hrApi.updateLeaveRequestStatus(r.id, 'Approved').subscribe({
       next: () => this.load(),
       error: (e) => {
-        this.error = e?.error?.error?.message || 'Failed to approve leave request';
+        this.error = getApiErrorMessage(e, 'Failed to approve leave request');
       }
     });
   }
@@ -110,7 +111,7 @@ export class LeaveEstablishmentComponent implements OnInit {
     this.hrApi.updateLeaveRequestStatus(r.id, 'Rejected').subscribe({
       next: () => this.load(),
       error: (e) => {
-        this.error = e?.error?.error?.message || 'Failed to reject leave request';
+        this.error = getApiErrorMessage(e, 'Failed to reject leave request');
       }
     });
   }

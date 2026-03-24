@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ProfitabilityRow, ProjectsApiService, TimesheetRow } from '../../services/projects-api.service';
+import { getApiErrorMessage } from '../../shared/api-error.util';
 
 @Component({
   selector: 'app-projects',
@@ -31,7 +32,7 @@ export class ProjectsComponent implements OnInit {
         this.timesheets = (res.data || []).map((t) => ({ ...t, date: String(t.date).slice(0, 10) }));
       },
       error: (e) => {
-        this.error = e?.error?.error?.message || 'Failed to load timesheets';
+        this.error = getApiErrorMessage(e, 'Failed to load timesheets');
       }
     });
 
@@ -40,7 +41,7 @@ export class ProjectsComponent implements OnInit {
         this.profitability = res.data || [];
       },
       error: (e) => {
-        this.error = e?.error?.error?.message || 'Failed to load project profitability';
+        this.error = getApiErrorMessage(e, 'Failed to load project profitability');
       }
     });
   }
@@ -64,7 +65,7 @@ export class ProjectsComponent implements OnInit {
         this.showLogTime = false;
       },
       error: (e) => {
-        this.error = e?.error?.error?.message || 'Failed to save timesheet';
+        this.error = getApiErrorMessage(e, 'Failed to save timesheet');
       }
     });
   }
@@ -87,7 +88,7 @@ export class ProjectsComponent implements OnInit {
         this.showAddProject = false;
       },
       error: (e) => {
-        this.error = e?.error?.error?.message || 'Failed to save project';
+        this.error = getApiErrorMessage(e, 'Failed to save project');
       }
     });
   }

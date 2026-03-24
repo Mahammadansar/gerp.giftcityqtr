@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HrApiService, HrStaff } from '../../services/hr-api.service';
+import { getApiErrorMessage } from '../../shared/api-error.util';
 
 @Component({
   selector: 'app-staff-details',
@@ -26,7 +27,7 @@ export class StaffDetailsComponent implements OnInit {
         this.staff = (res.data || []).map((s) => ({ ...s, joinDate: String(s.joinDate).slice(0, 10) }));
       },
       error: (e) => {
-        this.error = e?.error?.error?.message || 'Failed to load staff';
+        this.error = getApiErrorMessage(e, 'Failed to load staff');
       }
     });
   }
@@ -50,7 +51,7 @@ export class StaffDetailsComponent implements OnInit {
         this.showAddForm = false;
       },
       error: (e) => {
-        this.error = e?.error?.error?.message || 'Failed to save staff';
+        this.error = getApiErrorMessage(e, 'Failed to save staff');
       }
     });
   }

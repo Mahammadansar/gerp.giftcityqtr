@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { DashboardApiService } from '../../services/dashboard-api.service';
+import { DashboardApiService, DashboardOverviewData } from '../../services/dashboard-api.service';
+import { getApiErrorMessage } from '../../shared/api-error.util';
 
 @Component({
   selector: 'app-broker-dashboard',
@@ -7,14 +8,14 @@ import { DashboardApiService } from '../../services/dashboard-api.service';
   styleUrls: ['./broker-dashboard.component.scss']
 })
 export class BrokerDashboardComponent implements OnInit {
-  kpis: { label: string; value: number; icon: string; trend: number; subtitle: string; chartData: string }[] = [];
-  revenueData: { label: string; amount: number; value: number }[] = [];
-  quickStats: { icon: string; label: string; value: string; change: number }[] = [];
-  recentActivities: { icon: string; type: string; title: string; time: string; description: string }[] = [];
-  topOrders: { client: string; amount: number; currency: string }[] = [];
+  kpis: DashboardOverviewData['kpis'] = [];
+  revenueData: DashboardOverviewData['revenueData'] = [];
+  quickStats: DashboardOverviewData['quickStats'] = [];
+  recentActivities: DashboardOverviewData['recentActivities'] = [];
+  topOrders: DashboardOverviewData['topDeals'] = [];
   topDeals = this.topOrders;
-  performance: { label: string; value: string; percentage: number; color: string }[] = [];
-  clientSegments: { label: string; count: number; percentage: number; type: string }[] = [];
+  performance: DashboardOverviewData['performance'] = [];
+  clientSegments: DashboardOverviewData['clientSegments'] = [];
   error = '';
 
   constructor(private dashboardApi: DashboardApiService) {}
@@ -27,7 +28,7 @@ export class BrokerDashboardComponent implements OnInit {
     this.error = '';
     this.dashboardApi.getOverview().subscribe({
       next: (res) => {
-        const d = res.data || {};
+        const d = res.data;
         this.kpis = d.kpis || [];
         this.revenueData = d.revenueData || [];
         this.quickStats = d.quickStats || [];
@@ -38,7 +39,7 @@ export class BrokerDashboardComponent implements OnInit {
         this.clientSegments = d.clientSegments || [];
       },
       error: (e) => {
-        this.error = e?.error?.error?.message || 'Failed to load dashboard';
+        this.error = getApiErrorMessage(e, 'Failed to load dashboard');
       }
     });
   }
