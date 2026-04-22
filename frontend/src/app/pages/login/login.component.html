@@ -1,24 +1,77 @@
 <div class="login-page">
-  <div class="login-card">
-    <h3>Gift City Qatar ERP</h3>
-    <p class="text-muted mb-4">Sign in to continue</p>
-
-    <form (ngSubmit)="submit()">
-      <div class="mb-3">
-        <label class="form-label">Email</label>
-        <input class="form-control" name="email" [(ngModel)]="email" type="email" required />
+  <div class="login-bg" aria-hidden="true"></div>
+  <div class="login-shell">
+    <div class="login-brand-panel">
+      <div class="login-brand-inner">
+        <p class="login-brand-eyebrow">Enterprise resource planning</p>
+        <h1 class="login-brand-title">Operations, finance, and teams in one place.</h1>
+        <p class="login-brand-copy">
+          Secure access to Gift City Qatar ERP. Sign in with your organization account.
+        </p>
       </div>
+    </div>
 
-      <div class="mb-3">
-        <label class="form-label">Password</label>
-        <input class="form-control" name="password" [(ngModel)]="password" type="password" required />
+    <div class="login-form-wrap">
+      <div class="login-card">
+        <div class="login-card-header">
+          <img
+            class="login-logo"
+            src="assets/logo.png"
+            alt="Gift City"
+            width="220"
+            height="auto"
+          />
+          <h2 class="login-heading">Sign in</h2>
+          <p class="login-subtitle">Use your work email and password to continue.</p>
+        </div>
+
+        <form class="login-form" (ngSubmit)="submit()" novalidate>
+          <div class="mb-3">
+            <label class="form-label" for="login-email">Email</label>
+            <input
+              id="login-email"
+              class="form-control login-input"
+              name="email"
+              [(ngModel)]="email"
+              type="email"
+              autocomplete="username"
+              required
+              placeholder="name@company.com"
+            />
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label" for="login-password">Password</label>
+            <input
+              id="login-password"
+              class="form-control login-input"
+              name="password"
+              [(ngModel)]="password"
+              type="password"
+              autocomplete="current-password"
+              required
+              placeholder="••••••••"
+            />
+          </div>
+
+          <div class="alert alert-danger login-alert" role="alert" *ngIf="error">{{ error }}</div>
+
+          <button
+            class="btn login-submit w-100"
+            type="submit"
+            [disabled]="loading"
+            [attr.aria-busy]="loading"
+          >
+            <span *ngIf="!loading">Sign in</span>
+            <span *ngIf="loading" class="login-submit-loading">
+              <span class="login-spinner" aria-hidden="true"></span>
+              Signing in…
+            </span>
+          </button>
+        </form>
+
+        <p class="login-footer">Gift City Qatar — internal use</p>
       </div>
-
-      <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
-
-      <button class="btn btn-primary w-100" [disabled]="loading" type="submit">
-        {{ loading ? 'Signing in...' : 'Sign In' }}
-      </button>
-    </form>
+    </div>
   </div>
 </div>
